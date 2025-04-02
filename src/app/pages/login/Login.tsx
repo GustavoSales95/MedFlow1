@@ -7,8 +7,9 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { FormEvent, useContext, useState } from "react";
 import { Form } from "react-router-dom";
+import { AppContext } from '../../shared/contexts/AppContext';
 const Background = styled("div")({
   display: "flex",
   justifyContent: "center",
@@ -37,11 +38,13 @@ const InputBox = styled(Box)({
 });
 
 export const Login = () => {
+  const {logar} = useContext(AppContext);
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
 
-  const handleLogar = () => {
-    alert(email + " + " + senha);
+  const handleLogar = async (e:FormEvent) => {
+    e.preventDefault();
+    await logar(email,senha);
   };
 
   return (

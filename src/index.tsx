@@ -6,15 +6,17 @@ import Router from "./app/routes";
 import { RouterProvider } from "react-router-dom";
 import { ThemeProvider } from '@mui/material';
 import theme from './app/theme/theme'
-
+import { AppProvider } from './app/shared/contexts/AppContext';
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <ThemeProvider theme ={theme}>
-      <RouterProvider router={Router} />
-    </ThemeProvider>
+    <AppProvider>
+      <ThemeProvider theme ={theme}>
+        <RouterProvider router={Router} />
+      </ThemeProvider>
+    </AppProvider>
   </React.StrictMode>
 );
 
