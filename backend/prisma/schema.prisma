@@ -1,0 +1,170 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Conecta com o banco de dados
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+// Modelo da tabela dos tipos de usuário para serem usados como foreign key
+model Tipo_usuario {
+id_tipo Int @id @default(autoincrement())
+tipo String
+}
+
+// Modelo das tabelas de pessoas e usuários
+model Pessoa {
+  id_pessoa Int @id @default(autoincrement())
+  cpf String @unique
+  nome String
+  telefone Int
+  data_nascimento DateTime @db.Date
+  sexo String  
+  data_cadastro DateTime @default(now())
+  // Define uma relação de 1-1 com as tabelas de usuário e paciente
+  usuario Usuario?
+  paciente Paciente?
+  entrada_saida Entrada_saida?
+}
+
+model Usuario {
+  id_usuario Int @id @default(autoincrement())
+  id_pessoa Int @unique
+  login String @unique
+  senha String
+  // Busca a relação com a tabela pessoa. Age como uma foreign key
+  pessoa Pessoa @relation(fields: [id_pessoa], references: [id_pessoa])
+
+  medico Medico?
+  entrada_saida Entrada_saida?
+}
+
+model Medico {
+  id_medico Int @id @default(autoincrement())
+  id_usuario Int @unique
+  crm String @unique
+  email String @default("") @unique
+  especialidade String
+
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
+  exame Exame?
+  entrada_saida Entrada_saida?
+}
+
+model Paciente {
+  id_paciente Int @id @default(autoincrement())
+  id_pessoa Int @unique
+  cartao_sus String 
+  convenio_medico String
+  nivel_emg String
+
+  pessoa Pessoa @relation(fields: [id_pessoa], references: [id_pessoa])
+
+  entrada_saida Entrada_saida?
+}
+
+// Modelo das tabelas de exame e consulta
+model Exame {
+  id_exame Int @id @default(autoincrement())
+  id_medico Int @unique
+  tipo String
+  resultado String
+  data_solicitada DateTime @db.Date
+  data_realizada DateTime @db.Date
+  veredito String
+
+  medico Medico @relation(fields: [id_medico], references: [id_medico])
+
+  entrada_saida Entrada_saida?
+}
+
+model Consulta {
+  id_consulta Int @id @default(autoincrement())
+  nome String
+  data String 
+  horario String
+  cpf String
+  cartao_sus String
+  }
+
+// Modelo das tabelas de controle de estoque
+model Fornecedor {
+  id_fornecedor Int @id @default(autoincrement())
+  cnpj String @unique
+  nome String
+  telefone String
+  endereco String
+
+  nota_fiscal Nota_fiscal?
+}
+
+model Estoque_produto {
+  id_produto Int @id @default(autoincrement())
+  nome String
+  data_validade DateTime @db.Date
+  tipo String
+  descricao String
+  fabricante String
+  lote Int
+  quantidade Int
+
+  produto_nota Produto_nota?
+  entrada_saida Entrada_saida?
+}
+
+model Nota_fiscal {
+  id_nota_fiscal Int @id @default(autoincrement())
+  id_fornecedor Int @unique
+  data_entrada DateTime @db.Date
+  numero_nota String
+  valor_nota Decimal @db.Decimal(10, 2)
+  data_cadastro_nota DateTime @db.Date
+
+  fornecedor Fornecedor @relation(fields: [id_fornecedor], references: [id_fornecedor])
+
+  produto_nota Produto_nota?
+}
+
+model Produto_nota {
+  id_produto_nota Int @id @default(autoincrement())
+  id_nota_fiscal Int @unique
+  id_produto Int @unique
+  quantidade Int
+
+  nota_fiscal Nota_fiscal @relation(fields: [id_nota_fiscal], references: [id_nota_fiscal])
+  estoque_produto Estoque_produto @relation(fields: [id_produto], references: [id_produto])
+
+  entrada_saida Entrada_saida?
+}
+
+model Entrada_saida {
+  id_entrada_saida Int @id @default(autoincrement())
+	id_produto Int @unique
+  id_produto_nota Int @unique
+	id_exame Int @unique
+  id_medico Int @unique
+  id_paciente Int @unique
+  id_usuario Int @unique
+  id_pessoa Int @unique
+  quantidade Int 
+  tipo_transacao String
+  data_transacao DateTime
+
+  estoque_produto Estoque_produto @relation(fields: [id_produto], references: [id_produto])
+  produto_nota Produto_nota @relation(fields: [id_produto_nota], references: [id_produto_nota])
+  exame Exame @relation(fields: [id_exame], references: [id_exame])
+  medico Medico @relation(fields: [id_medico], references: [id_medico])
+  paciente Paciente @relation(fields: [id_paciente], references: [id_paciente])
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+  pessoa Pessoa @relation(fields: [id_pessoa], references: [id_pessoa])
+}

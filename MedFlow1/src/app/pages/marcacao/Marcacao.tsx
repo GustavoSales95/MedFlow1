@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Container, Box, List, ListItem, ListItemText } from '@mui/material';
+// Import da conexão com a api
+import api from '../../services/api';
 
 interface Consulta {
   nome: string;
@@ -10,6 +12,7 @@ interface Consulta {
 }
 
 export const Marcacao = () => {
+
   const [nome, setNome] = useState('');
   const [data, setData] = useState('');
   const [hora, setHora] = useState('');
@@ -19,7 +22,7 @@ export const Marcacao = () => {
   const [consultas, setConsultas] = useState<Consulta[]>([]);
 
   // Função para lidar com a submissão do formulário
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validação dos campos
@@ -35,6 +38,7 @@ export const Marcacao = () => {
       setHora('');
       setCpf('');
       setSus('');
+      
     }
   };
 
