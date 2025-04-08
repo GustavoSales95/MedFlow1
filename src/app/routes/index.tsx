@@ -1,7 +1,9 @@
 import{
   createBrowserRouter,
 } from "react-router-dom";
-import { Dashboard, Login, Marcacao, Cadastros } from "../pages";
+import { Dashboard, Login, Marcacao, Cadastros, DashboardAdmin, CadastrosUsuarios} from "../pages";
+// import admin
+
 const router = createBrowserRouter ([
   {
     path: "/",
@@ -21,5 +23,16 @@ const router = createBrowserRouter ([
     path: "/Login",
     element: <Login></Login>
   },
+  {
+    path: "/Admin",
+    element: <DashboardAdmin></DashboardAdmin>,
+    children: [
+      {
+        path: "/Admin/CadastrosUsuarios",
+        element: <CadastrosUsuarios></CadastrosUsuarios>
+      }
+    ]
+  },
+  
 ]);
 export default router;
