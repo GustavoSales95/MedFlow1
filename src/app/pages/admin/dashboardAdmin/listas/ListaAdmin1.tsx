@@ -9,6 +9,8 @@ import { Link } from "react-router-dom";
 //Icones
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+
 
 export const ListaAdmin1 = () => {
   return (
@@ -16,7 +18,7 @@ export const ListaAdmin1 = () => {
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/"}
+          to={"/admin/ConsultarUsuarios"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -25,8 +27,8 @@ export const ListaAdmin1 = () => {
             },
           }}
         >
-          <ListItemIcon>{<InsertInvitationIcon />}</ListItemIcon>
-          <ListItemText primary={"Marcação de Consultas"} />
+          <ListItemIcon>{<PersonSearchIcon/>}</ListItemIcon>
+          <ListItemText primary={"Consultar usuários"} />
         </ListItemButton>
       </ListItem>
       <ListItem key={2} disablePadding>

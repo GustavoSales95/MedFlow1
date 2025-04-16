@@ -19,22 +19,9 @@ export const Lista2 = () => {
   return (
     <List>
       <ListItem key={1} disablePadding>
-        <ListItemButton onClick={()=>{setOpenDialogConfig(true)}} 
-          sx={{
-            transition: "0.8s",
-            "&:hover": {
-              backgroundColor: "#019C9B",
-              color: "white",
-            },
-          }}
-        >
-          <ListItemIcon>{<SettingsIcon />}</ListItemIcon>
-          <ListItemText primary={"Configurações Clinica"} />
-        </ListItemButton>
-      </ListItem>
-
-      <ListItem key={1} disablePadding>
         <ListItemButton onClick={deslogar}
+          component={Link}
+          to={"/Login"}
           sx={{
             transition: "0.8s",
             "&:hover": {

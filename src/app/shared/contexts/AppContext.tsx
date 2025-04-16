@@ -27,7 +27,7 @@ export const AppProvider = ({children}: AppProviderData)=>{
   
     }
   const deslogar = ()=>{
-      alert("Chamou a função deslogar");
+      alert("Você foi desconectado");
       return(null)
   
   }

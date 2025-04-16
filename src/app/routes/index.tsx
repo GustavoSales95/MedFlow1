@@ -1,7 +1,7 @@
 import{
   createBrowserRouter,
 } from "react-router-dom";
-import { Dashboard, Login, Marcacao, Cadastros, DashboardAdmin, CadastrosUsuarios} from "../pages";
+import { Dashboard, Login, Marcacao, Cadastros, DashboardAdmin, CadastrosUsuarios, ConsultarUsuarios, ConsultarPessoas} from "../pages";
 // import admin
 
 const router = createBrowserRouter ([
@@ -16,6 +16,10 @@ const router = createBrowserRouter ([
       {
         path: "/cadastros",
         element: <Cadastros></Cadastros>,
+      },
+      {
+        path: "/ConsultarPessoas",
+        element: <ConsultarPessoas></ConsultarPessoas>
       }
     ]
   }, 
@@ -30,6 +34,10 @@ const router = createBrowserRouter ([
       {
         path: "/Admin/CadastrosUsuarios",
         element: <CadastrosUsuarios></CadastrosUsuarios>
+      },
+      {
+        path: "/Admin/ConsultarUsuarios",
+        element: <ConsultarUsuarios></ConsultarUsuarios>
       }
     ]
   },

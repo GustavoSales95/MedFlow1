@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 //Icones
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 
 
 export const Lista1 = () => {
@@ -45,6 +46,23 @@ export const Lista1 = () => {
         >
           <ListItemIcon>{<PersonAddIcon />}</ListItemIcon>
           <ListItemText primary={"Cadastros"} />
+        </ListItemButton>
+      </ListItem>
+      <ListItem key={1} disablePadding>
+        <ListItemButton
+          component={Link}
+          to={"/ConsultarPessoas"}
+          sx={{
+            transition: "0.8s",
+            "&:hover": {
+              backgroundColor: "#019C9B",
+              color: "white",
+            },
+          }}
+        >
+          <ListItemIcon>{<PersonSearchIcon />}</ListItemIcon>
+          <ListItemText primary={"Registros"} />
+          
         </ListItemButton>
       </ListItem>
     </List>

@@ -4,16 +4,18 @@ import { TextField, Button, Grid2, Box, Typography } from '@mui/material';
 export const CadastrosUsuarios = () => {
   // Estado para armazenar os dados do formulário
   const [formData, setFormData] = useState({
-    nome: '',
-    idade: '',
-    endereco: '',
+    crm: '',
+    email: '',
+    senha: '',
+    especialidade: '',
     cpf: '',
-    cartaoSUS: '',
-    nomeResponsavel: '',
+    nome: '',
+    telefone: '',
+    data_nascimento: '',
+    sexo: '',
+    data_cadastro:'',
+    
   });
-
-  // Estado para controlar se a pessoa é menor de idade
-  const [isMenorIdade, setIsMenorIdade] = useState(false);
 
   // Função para atualizar o estado com o valor do input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,12 +23,6 @@ export const CadastrosUsuarios = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Função para verificar se a pessoa é menor de idade
-  const handleIdadeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const idade = e.target.value;
-    setFormData({ ...formData, idade });
-    setIsMenorIdade(parseInt(idade) < 18); // Verifica se é menor de idade
-  };
 
   // Função para simular o envio dos dados
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,7 +34,7 @@ export const CadastrosUsuarios = () => {
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
       <Typography variant="h4" gutterBottom alignItems={'center'}>
-        Cadastro de Usuario
+        Cadastro de Medico
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid2 container spacing={2}>
@@ -54,22 +50,21 @@ export const CadastrosUsuarios = () => {
           </Grid2>
           <Grid2 size={12}>
             <TextField
-              label="Idade"
+              label="Data de Nascimento"
               variant="outlined"
               fullWidth
-              type="number"
-              name="idade"
-              value={formData.idade}
-              onChange={handleIdadeChange}
+              type="date"
+              name="data_nascimento"
+              value={formData.data_nascimento}
             />
           </Grid2>
           <Grid2 size={12}>
             <TextField
-              label="Endereço"
+              label="Telefone"
               variant="outlined"
               fullWidth
-              name="endereco"
-              value={formData.endereco}
+              name="telefone"
+              value={formData.telefone}
               onChange={handleChange}
             />
           </Grid2>
@@ -85,29 +80,57 @@ export const CadastrosUsuarios = () => {
           </Grid2>
           <Grid2 size={12}>
             <TextField
-              label="Cartão do SUS"
+              label="Sexo"
               variant="outlined"
               fullWidth
-              name="cartaoSUS"
-              value={formData.cartaoSUS}
+              name="sexo"
+              value={formData.sexo}
+              onChange={handleChange}
+            />
+          </Grid2>
+          <Grid2 size={12}>
+            <TextField
+              label="Especialidade"
+              variant="outlined"
+              fullWidth
+              name="especialidade"
+              value={formData.especialidade}
+              onChange={handleChange}
+            />
+          </Grid2>
+          <Grid2 size={12}>
+            <TextField
+              label="Data de Cadastro"
+              variant="outlined"
+              fullWidth
+              type='date'
+              name="data_cadastro"
+              value={formData.data_cadastro}
               onChange={handleChange}
             />
           </Grid2>
 
+          <Grid2 size={12}>
+            <TextField
+              label="Email"
+              variant="outlined"
+              fullWidth
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+          </Grid2>
+          <Grid2 size={12}>
+            <TextField
+              label="Senha"
+              variant="outlined"
+              fullWidth
+              name="senha"
+              value={formData.senha}
+              onChange={handleChange}
+            />
+          </Grid2>
           {/* Campo de nome do responsável aparece apenas se a pessoa for menor de idade */}
-          {isMenorIdade && (
-            <Grid2 size={12}>
-              <TextField
-                label="Nome do Responsável"
-                variant="outlined"
-                fullWidth
-                name="nomeResponsavel"
-                value={formData.nomeResponsavel}
-                onChange={handleChange}
-              />
-            </Grid2>
-          )}
-
           <Grid2 size={12}>
             <Button variant="contained" color="primary" type="submit">
               Cadastrar
