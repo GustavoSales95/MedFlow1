@@ -1,6 +1,7 @@
 import express, { request, response } from "express";
 import { PrismaClient } from "@prisma/client";
 import cors from 'cors';
+<<<<<<< HEAD
 import dotenv from 'dotenv'; // Se estiver usando ES6 modules
 
 
@@ -9,6 +10,8 @@ import dotenv from 'dotenv'; // Se estiver usando ES6 modules
 dotenv.config(); // Carrega as variáveis de ambiente do arquivo .env
 // console.log(process.env.DATABASE_URL);  Verifica se a variável de ambiente está sendo lida corretamente
 
+=======
+>>>>>>> 1d7050a42eae661f3aab7ac4bc37439ed10eded0
 
 const prisma = new PrismaClient();
 

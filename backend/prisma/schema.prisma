@@ -91,7 +91,11 @@ model Exame {
 model Consulta {
   id_consulta Int @id @default(autoincrement())
   nome String
+<<<<<<< HEAD
   data DateTime 
+=======
+  data String 
+>>>>>>> 1d7050a42eae661f3aab7ac4bc37439ed10eded0
   horario String
   cpf String
   cartao_sus String
