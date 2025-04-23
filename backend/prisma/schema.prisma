@@ -16,90 +16,80 @@ datasource db {
 
 
 // Modelo da tabela dos tipos de usuário para serem usados como foreign key
-model Tipo_usuario {
-id_tipo Int @id @default(autoincrement())
-tipo String
+model Perfis {
+  id_perfis Int    @id
+  nome      String
+
+  Usuarios Usuarios[]
 }
 
-// Modelo das tabelas de pessoas e usuários
-model Pessoa {
-  id_pessoa Int @id @default(autoincrement())
-  cpf String @unique
-  nome String
-  telefone Int
-  data_nascimento DateTime @db.Date
-  sexo String  
-  data_cadastro DateTime @default(now())
-  // Define uma relação de 1-1 com as tabelas de usuário e paciente
-  usuario Usuario?
-  paciente Paciente?
-  entrada_saida Entrada_saida?
+model Usuarios {
+  id_usuario Int    @id @default(autoincrement())
+  nome       String
+  email      String @unique
+  senha      String
+  cpf        String @unique
+  perfil_id  Int
+  perfil     Perfis @relation(fields: [perfil_id], references: [id_perfis])
+
+  Medicos    Medicos?
 }
 
-model Usuario {
-  id_usuario Int @id @default(autoincrement())
-  id_pessoa Int @unique
-  login String @unique
-  senha String
-  // Busca a relação com a tabela pessoa. Age como uma foreign key
-  pessoa Pessoa @relation(fields: [id_pessoa], references: [id_pessoa])
+model Pacientes {
+  id_paciente      Int      @id @default(autoincrement())
+  cpf              String?  @unique
+  data_nascimento  DateTime? @db.Date
+  telefone         String?
+  endereco         String?
 
-  medico Medico?
-  entrada_saida Entrada_saida?
+  Prontuario Prontuario?
+  Agendamentos Agendamentos[]
 }
 
-model Medico {
-  id_medico Int @id @default(autoincrement())
-  id_usuario Int @unique
-  crm String @unique
-  email String @default("") @unique
-  especialidade String
-
-  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
-
-  exame Exame?
-  entrada_saida Entrada_saida?
+model Prontuario {
+  paciente_id          Int    @unique
+  alergias             String?
+  tipo_sanguineo       String? @db.Char(3)
+  medicamentos         String?
+  cirurgias            String?
+  doencas_infecciosas  String?
+  
+  Pacientes Pacientes @relation(fields: [paciente_id], references: [id_paciente])
 }
 
-model Paciente {
-  id_paciente Int @id @default(autoincrement())
-  id_pessoa Int @unique
-  cartao_sus String 
-  convenio_medico String
-  nivel_emg String
+model Medicos {
+  id_medico     Int      @id @default(autoincrement())
+  usuario_id    Int      @unique
+  crm           String   @unique
+  especialidade String?
 
-  pessoa Pessoa @relation(fields: [id_pessoa], references: [id_pessoa])
-
-  entrada_saida Entrada_saida?
+  Usuarios Usuarios @relation(fields: [usuario_id], references: [id_usuario])
+  Agendamentos Agendamentos[]
 }
 
-// Modelo das tabelas de exame e consulta
-model Exame {
-  id_exame Int @id @default(autoincrement())
-  id_medico Int @unique
-  tipo String
-  resultado String
-  data_solicitada DateTime @db.Date
-  data_realizada DateTime @db.Date
-  veredito String
+model Agendamentos {
+  id_agendamento Int       @id @default(autoincrement())
+  paciente_id    Int
+  medico_id      Int
+  data_hora      DateTime
+  status         String    @default("agendado")
 
-  medico Medico @relation(fields: [id_medico], references: [id_medico])
-
-  entrada_saida Entrada_saida?
+  Pacientes Pacientes @relation(fields: [paciente_id], references: [id_paciente])
+  Medicos   Medicos   @relation(fields: [medico_id], references: [id_medico])
+  Consultas Consultas?
 }
 
-model Consulta {
-  id_consulta Int @id @default(autoincrement())
-  nome String
-<<<<<<< HEAD
-  data DateTime 
-=======
-  data String 
->>>>>>> 1d7050a42eae661f3aab7ac4bc37439ed10eded0
-  horario String
-  cpf String
-  cartao_sus String
-  }
+model Consultas {
+  id_consulta    Int      @id @default(autoincrement())
+  agendamento_id Int      @unique
+  descricao      String?
+  receita        String?
+  observacoes    String?
+  data_consulta  DateTime?
+
+  Agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id_agendamento])
+}
+
 
 // Modelo das tabelas de controle de estoque
 model Fornecedor {
@@ -123,7 +113,6 @@ model Estoque_produto {
   quantidade Int
 
   produto_nota Produto_nota?
-  entrada_saida Entrada_saida?
 }
 
 model Nota_fiscal {
@@ -147,28 +136,5 @@ model Produto_nota {
 
   nota_fiscal Nota_fiscal @relation(fields: [id_nota_fiscal], references: [id_nota_fiscal])
   estoque_produto Estoque_produto @relation(fields: [id_produto], references: [id_produto])
-
-  entrada_saida Entrada_saida?
 }
 
-model Entrada_saida {
-  id_entrada_saida Int @id @default(autoincrement())
-	id_produto Int @unique
-  id_produto_nota Int @unique
-	id_exame Int @unique
-  id_medico Int @unique
-  id_paciente Int @unique
-  id_usuario Int @unique
-  id_pessoa Int @unique
-  quantidade Int 
-  tipo_transacao String
-  data_transacao DateTime
-
-  estoque_produto Estoque_produto @relation(fields: [id_produto], references: [id_produto])
-  produto_nota Produto_nota @relation(fields: [id_produto_nota], references: [id_produto_nota])
-  exame Exame @relation(fields: [id_exame], references: [id_exame])
-  medico Medico @relation(fields: [id_medico], references: [id_medico])
-  paciente Paciente @relation(fields: [id_paciente], references: [id_paciente])
-  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
-  pessoa Pessoa @relation(fields: [id_pessoa], references: [id_pessoa])
-}

@@ -1,17 +1,7 @@
 import express, { request, response } from "express";
 import { PrismaClient } from "@prisma/client";
 import cors from 'cors';
-<<<<<<< HEAD
-import dotenv from 'dotenv'; // Se estiver usando ES6 modules
-
-
-
-
-dotenv.config(); // Carrega as variáveis de ambiente do arquivo .env
-// console.log(process.env.DATABASE_URL);  Verifica se a variável de ambiente está sendo lida corretamente
-
-=======
->>>>>>> 1d7050a42eae661f3aab7ac4bc37439ed10eded0
+import routes from "./routes.js";
 
 const prisma = new PrismaClient();
 
@@ -19,6 +9,8 @@ const app = express();
 app.use(express.json());
 app.use(cors())
 
+
+app.use("/", routes);
 
 app.get('/', async (request, response) => {
 
@@ -70,4 +62,6 @@ app.delete('/:id', async (request, response) => {
     response.status(200).json({message: "Consulta deletado com sucesso"})
 });
 
-app.listen(3333);
+app.listen(3333, ()=> {
+    console.log("servidor rodando")
+});
