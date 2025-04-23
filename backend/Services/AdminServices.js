@@ -23,11 +23,11 @@ async function criarUsuarios(nome, email, senha, cpf, perfil_id) {
 }
 
 async function criarMedicos(cpf, crm, especialidade) {
-    const usuario = await buscarUsuarios(cpf);
-
     await prisma.medicos.create({
         data: {
-            id_usuario: usuario.id_usuario,
+            Usuarios: {
+                connect: { cpf } 
+            },
             crm: crm,
             especialidade: especialidade
         }
