@@ -10,3 +10,6 @@ export { CadastrosUsuarios } from "./admin/cadastros/CadastrosUsuarios";
 export { DashboardAdmin } from "./admin/dashboardAdmin/DashboardAdmin";
 export { ConsultarUsuarios } from "./admin/cadastros/ConsultarUsuarios";
 
+export {Entrada} from "./Entrada/Entrada_sai"
+export {Editar} from "./editar/editar";
+export {Estoque} from "./Estoque/Estoque"
