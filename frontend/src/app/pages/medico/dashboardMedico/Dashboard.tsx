@@ -8,12 +8,13 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { Outlet } from "react-router-dom";
 //Componente
-import { ListaAdmin1 } from "./listas/ListaAdmin1";
-import { ListaAdmin2 } from "./listas/ListaAdmin2";
+import {ListaMedico1} from "./listas/ListaMedico1"
+import { ListaMedico2 } from './listas/ListaMedico2';
+
 
 const drawerWidth = 240;
 
-export function DashboardAdmin() {
+export function DashboardMedico() {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -40,9 +41,9 @@ export function DashboardAdmin() {
         anchor="left"
       >
         <Toolbar />
-        <ListaAdmin1></ListaAdmin1>
+        <ListaMedico1></ListaMedico1>
         <Divider />
-        <ListaAdmin2></ListaAdmin2>
+        <ListaMedico2></ListaMedico2>
         <Divider />
       </Drawer>
       <Box

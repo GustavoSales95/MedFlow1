@@ -7,7 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import { FormularioConfigClinica } from "../forms/FormularioConfigClinica";
+import { FormularioConfigPerfilMedico } from "../forms/FormularioConfigPerfilMedico";
 import { Height } from "@mui/icons-material";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -23,12 +23,12 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     maxWidth: "900px",
   },
 }));
-interface DialogConfigClinicaProps {
+interface DialogConfigPerfilMedicoProps {
   open: boolean;
   setOpen: (e: boolean) => void;
 }
 
-export const DialogConfigClinica: React.FC<DialogConfigClinicaProps> = ({
+export const DialogConfigPerfilMedico: React.FC<DialogConfigPerfilMedicoProps> = ({
   open,
   setOpen,
 }) => {
@@ -47,7 +47,7 @@ export const DialogConfigClinica: React.FC<DialogConfigClinicaProps> = ({
         open={open}
       >
         <DialogTitle sx={{ m: 0, p: 2 }} id="customized-dialog-title">
-          Formulario da Clinica
+          Configuração de perfil
         </DialogTitle>
         <IconButton
           aria-label="close"
@@ -62,7 +62,7 @@ export const DialogConfigClinica: React.FC<DialogConfigClinicaProps> = ({
           <CloseIcon />
         </IconButton>
         <DialogContent dividers>
-          <FormularioConfigClinica></FormularioConfigClinica>
+          <FormularioConfigPerfilMedico></FormularioConfigPerfilMedico>
         </DialogContent>
         <DialogActions>
           <Button autoFocus onClick={handleClose}>

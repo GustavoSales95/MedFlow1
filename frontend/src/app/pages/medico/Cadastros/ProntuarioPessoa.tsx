@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   TextField,
   Button,
@@ -16,27 +17,24 @@ import {
   Paper,
 } from "@mui/material";
 
-interface UserData {
-  id: number;
+interface Pacientes {
+  id_paciente: number;
   nome: string;
   cpf: string;
-  email: string;
   telefone: string;
   data_nascimento: string;
 }
 
-export const ConsultarPessoas = () => {
+export const ConsultarProntuario = () => {
   const [cpf, setCpf] = useState("");
-  const [users, setUsers] = useState<UserData[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [Pacientes, setPacientes] = useState<Pacientes[]>([]);
 
-  // Função para atualizar o valor do CPF
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCpf(e.target.value);
   };
 
-  // Função para simular a pesquisa de usuários
   const handleSearch = async () => {
     if (cpf.length !== 11) {
       setSnackbarMessage(
@@ -46,47 +44,30 @@ export const ConsultarPessoas = () => {
       return;
     }
 
-    // Simulando uma busca de usuário com base no CPF
-    const fetchedUsers: UserData[] = [
-      {
-        id: 1,
-        nome: "Gustavo Sales",
-        cpf: "01234567891",
-        email: "gustavo.silva@example.com",
-        telefone: "123456789",
-        data_nascimento: "1990-01-01",
-      },
-      {
-        id: 2,
-        nome: "Maria Souza",
-        cpf: "98765432100",
-        email: "maria.souza@example.com",
-        telefone: "987654321",
-        data_nascimento: "1985-05-12",
-      },
-    ];
+    try {
+      const response = await axios.get<Pacientes[]>(
+        `http://localhost:3333`
+      );
 
-    // Filtrando por CPF (caso precise de busca real por CPF)
-    const filteredUsers = fetchedUsers.filter((user) => user.cpf.includes(cpf));
+      if (response.data.length === 0) {
+        setSnackbarMessage("Nenhum usuário encontrado para o CPF informado.");
+        setOpenSnackbar(true);
+      }
 
-    if (filteredUsers.length === 0) {
-      setSnackbarMessage("Nenhum usuário encontrado para o CPF informado.");
+      setPacientes(response.data);
+    } catch (error) {
+      console.error("Erro ao buscar dados da API:", error);
+      setSnackbarMessage("Erro ao buscar usuários. Tente novamente.");
       setOpenSnackbar(true);
     }
-
-    setUsers(filteredUsers);
   };
 
   return (
     <Box sx={{ padding: "20px", maxWidth: 800, margin: "0 auto" }}>
-      <Typography
-        variant="h4"
-        sx={{ marginBottom: "20px", textAlign: "center" }}
-      >
+      <Typography variant="h4" sx={{ marginBottom: "20px", textAlign: "center" }}>
         Consulta de Usuários
       </Typography>
 
-      {/* Campo de pesquisa por CPF */}
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <TextField
@@ -111,27 +92,24 @@ export const ConsultarPessoas = () => {
         </Grid>
       </Grid>
 
-      {/* Tabela de Resultados da Busca */}
-      {users.length > 0 && (
+      {Pacientes.length > 0 && (
         <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
           <Table sx={{ minWidth: 650 }} aria-label="tabela de usuários">
             <TableHead>
               <TableRow>
                 <TableCell>Nome</TableCell>
                 <TableCell>CPF</TableCell>
-                <TableCell>Email</TableCell>
                 <TableCell>Telefone</TableCell>
                 <TableCell>Data de Nascimento</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.nome}</TableCell>
-                  <TableCell>{user.cpf}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.telefone}</TableCell>
-                  <TableCell>{user.data_nascimento}</TableCell>
+              {Pacientes.map((paciente) => (
+                <TableRow key={paciente.id_paciente}>
+                  <TableCell>{paciente.nome}</TableCell>
+                  <TableCell>{paciente.cpf}</TableCell>
+                  <TableCell>{paciente.telefone}</TableCell>
+                  <TableCell>{paciente.data_nascimento}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -139,7 +117,6 @@ export const ConsultarPessoas = () => {
         </TableContainer>
       )}
 
-      {/* Snackbar para mensagens de feedback */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}

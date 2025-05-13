@@ -1,4 +1,6 @@
+import React from 'react';
 import { createContext, ReactNode, useState } from 'react';
+
 type Usuario = {
   userName: string,
   idUser: Number,

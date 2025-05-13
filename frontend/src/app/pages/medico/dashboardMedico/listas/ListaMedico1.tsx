@@ -9,16 +9,15 @@ import { Link } from "react-router-dom";
 //Icones
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 
-
-export const ListaAdmin1 = () => {
+export const ListaMedico1 = () => {
   return (
     <List>
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/admin/ConsultarUsuarios"}
+          to={"/"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -27,14 +26,16 @@ export const ListaAdmin1 = () => {
             },
           }}
         >
-          <ListItemIcon>{<PersonSearchIcon/>}</ListItemIcon>
-          <ListItemText primary={"Consultar usuários"} />
+          <ListItemIcon>{<InsertInvitationIcon />}</ListItemIcon>
+          <ListItemText primary={"Marcação de Consultas"} />
         </ListItemButton>
       </ListItem>
       <ListItem key={2} disablePadding>
+        
+        
         <ListItemButton
           component={Link}
-          to={"/Admin/CadastrosUsuarios"}
+          to={"/Medico/ConsultarProntuarios"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -44,7 +45,24 @@ export const ListaAdmin1 = () => {
           }}
         >
           <ListItemIcon>{<PersonAddIcon />}</ListItemIcon>
-          <ListItemText primary={"Gestão de Usuários"} />
+          <ListItemText primary={"Consultar Prontuario"} />
+        </ListItemButton>
+      </ListItem>
+      
+      <ListItem key={1} disablePadding>
+        <ListItemButton
+          component={Link}
+          to={"/"}
+          sx={{
+            transition: "0.8s",
+            "&:hover": {
+              backgroundColor: "#019C9B",
+              color: "white",
+            },
+          }}
+        >
+          <ListItemIcon>{<PersonSearchIcon />}</ListItemIcon>
+          <ListItemText primary={"Registros"} />
         </ListItemButton>
       </ListItem>
     </List>

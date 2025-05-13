@@ -4,19 +4,18 @@ import { Margin } from '@mui/icons-material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { fontGrid } from '@mui/material/styles/cssUtils';
-export const FormularioConfigClinica = () => {
+export const FormularioConfigPerfilMedico = () => {
   return (
     <Grid2 container spacing={2}>
       <Grid2 size={7}>
         <Grid2 container spacing={1}>
-          <Grid2 size={12}><TextField label="Nome da Clinica" variant="outlined" fullWidth /></Grid2>
+          <Grid2 size={12}><TextField label="Nome" variant="outlined" fullWidth /></Grid2>
           <Grid2 size={7}><TextField label="Endereço" variant="outlined" fullWidth /></Grid2>
           <Grid2 size={5}><TextField label="CEP" variant="outlined" fullWidth /></Grid2>
           <Grid2 size={12}><TextField label="Bairro" variant="outlined" fullWidth /></Grid2>
           <Grid2 size={8}><TextField label="Cidade" variant="outlined" fullWidth /></Grid2>
           <Grid2 size={4}><TextField label="Estado" variant="outlined" fullWidth /></Grid2>
           <Grid2 size={12}><TextField label="Telefone" variant="outlined" fullWidth /></Grid2>
-          <Grid2 size={12}><TextField label="CNPJ" variant="outlined" fullWidth /></Grid2>
         </Grid2>
       </Grid2>
       <Grid2 size={5}>
@@ -29,7 +28,7 @@ export const FormularioConfigClinica = () => {
               textAlign: "center",
             }}
           >
-            <Typography> Logo </Typography>
+            <Typography> Foto </Typography>
           </div>
         </Grid2>
         <Grid2 container spacing={1} alignItems={'center'} style={{
