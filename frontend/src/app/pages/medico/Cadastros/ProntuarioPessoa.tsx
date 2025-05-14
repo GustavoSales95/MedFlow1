@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../../../services/api";
 import {
   TextField,
   Button,
@@ -25,11 +25,23 @@ interface Pacientes {
   data_nascimento: string;
 }
 
+interface Prontuario {
+  paciente_id: number;
+  alergias: string;
+  tipo_sanguineo: string;
+  medicamentos: string;
+  cirurgias: string;
+  doencas_infecciosas: string;
+}
+
 export const ConsultarProntuario = () => {
   const [cpf, setCpf] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [Pacientes, setPacientes] = useState<Pacientes[]>([]);
+  const [prontuario, setProntuario] = useState<Prontuario | null>(null);
+
+
 
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCpf(e.target.value);
@@ -45,19 +57,23 @@ export const ConsultarProntuario = () => {
     }
 
     try {
-      const response = await axios.get<Pacientes[]>(
-        `http://localhost:3333`
-      );
+      const response = await api.get('Medico/ConsultarProntuarios', {
+        params: { cpf },
+      });
 
-      if (response.data.length === 0) {
-        setSnackbarMessage("Nenhum usuário encontrado para o CPF informado.");
+      console.log("Resposta da API:", response.data);
+
+      if (!response.data.message || !response.data.paciente) {
+        setSnackbarMessage("Nenhum prontuário encontrado para o CPF informado.");
         setOpenSnackbar(true);
+        return;
       }
 
-      setPacientes(response.data);
+      setPacientes([response.data.paciente]);
+      setProntuario(response.data.message);
     } catch (error) {
       console.error("Erro ao buscar dados da API:", error);
-      setSnackbarMessage("Erro ao buscar usuários. Tente novamente.");
+      setSnackbarMessage("Erro ao buscar prontuário. Tente novamente.");
       setOpenSnackbar(true);
     }
   };
@@ -116,6 +132,34 @@ export const ConsultarProntuario = () => {
           </Table>
         </TableContainer>
       )}
+
+      {prontuario && (
+  <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
+    <Table sx={{ minWidth: 650 }} aria-label="tabela de prontuário">
+      <TableHead>
+        <TableRow>
+          <TableCell>Paciente ID</TableCell>
+          <TableCell>Alergias</TableCell>
+          <TableCell>Tipo Sanguíneo</TableCell>
+          <TableCell>Medicamentos</TableCell>
+          <TableCell>Cirurgias</TableCell>
+          <TableCell>Doenças Infecciosas</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        <TableRow>
+          <TableCell>{prontuario.paciente_id}</TableCell>
+          <TableCell>{prontuario.alergias || "Nenhuma"}</TableCell>
+          <TableCell>{prontuario.tipo_sanguineo || "Não informado"}</TableCell>
+          <TableCell>{prontuario.medicamentos || "Nenhum"}</TableCell>
+          <TableCell>{prontuario.cirurgias || "Nenhuma"}</TableCell>
+          <TableCell>{prontuario.doencas_infecciosas || "Nenhuma"}</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </TableContainer>
+)}
+
 
       <Snackbar
         open={openSnackbar}

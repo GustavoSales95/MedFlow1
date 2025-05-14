@@ -10,11 +10,15 @@ async function buscarPaciente(cpf) {
   return paciente;
 }
 
+
+
 async function buscarProntuario(cpf) {
   const paciente = await buscarPaciente(cpf);
 
+  if (!paciente) return null; 
+
   const prontuario = await prisma.prontuario.findUnique({
-    where: { id_paciente: paciente.id_paciente },
+    where: { paciente_id: paciente.id_paciente },
   });
 
   return prontuario;
