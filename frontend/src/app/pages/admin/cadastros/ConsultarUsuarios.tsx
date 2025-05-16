@@ -24,7 +24,9 @@ interface UserData {
   nome: string;
   email: string;
   cpf: string;
-  perfil_id: number;
+  perfil: {
+    tipo: string
+  };
 }
 
 export const ConsultarUsuarios = () => {
@@ -115,7 +117,7 @@ export const ConsultarUsuarios = () => {
                 <TableCell>Nome</TableCell>
                 <TableCell>CPF</TableCell>
                 <TableCell>Email</TableCell>
-                <TableCell>Prefil id</TableCell>
+                <TableCell>Tipo de suário</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -124,7 +126,7 @@ export const ConsultarUsuarios = () => {
                   <TableCell>{user.nome}</TableCell>
                   <TableCell>{user.cpf}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.perfil_id}</TableCell>
+                  <TableCell>{user.perfil.tipo}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

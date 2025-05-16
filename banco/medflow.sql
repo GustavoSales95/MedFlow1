@@ -1,134 +1,83 @@
-CREATE DATABASE dbMedflow;
+create database medflow;
 
-USE dbMedflow;
+use medflow;
 
-/* Cria e define os tipos de usuário para serem usados como foreign key */
-CREATE TABLE Tipo_usuario(
-	id_tipo int primary key auto_increment,
-    tipo varchar(30)
-    );
-    
-INSERT INTO Tipo_usuario(id, tipo) VALUES ("Admin");
-INSERT INTO Tipo_usuario(id, tipo) VALUES ("Medico");
-INSERT INTO Tipo_usuario(id, tipo) VALUES ("Comum");
-
-/* Tabelas de pessoas e usuários */
-CREATE TABLE Pessoa (
-    id_pessoa int primary key auto_increment,
-    cpf CHAR(11) NOT NULL unique,
-	nome VARCHAR(30) NOT NULL,
-	telefone VARCHAR(11) NOT NULL,
-    data_nascimento DATE NOT NULL,
-    sexo enum('F','M') NOT NULL,
-    data_cadastro DATETIME NOT NULL
+CREATE TABLE perfis (
+    id_perfis int PRIMARY KEY,
+    tipo VARCHAR(50) NOT NULL -- Comum, Admin, Medico
 );
 
-CREATE TABLE Usuario (
-    id_usuario int PRIMARY KEY auto_increment,
-    id_pessoa INT NOT NULL,
-    id_tipo int not null,
-    login VARCHAR(50) NOT NULL unique,
-	senha VARCHAR(20) NOT NULL,
-    FOREIGN KEY (id_tipo) REFERENCES tipo_usuario (id_tipo),
-    FOREIGN KEY (id_pessoa) REFERENCES Pessoa (id_pessoa)
+CREATE TABLE usuarios (
+    id_usuario int auto_increment PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    senha VARCHAR(255) NOT NULL,
+    cpf VARCHAR(14) UNIQUE NOT NULL, -- formato: 000.000.000-00
+    perfil_id INT NOT NULL,
+    FOREIGN KEY (perfil_id) REFERENCES perfis(id_perfis)
 );
 
-CREATE TABLE Medico (
-    id_medico int PRIMARY KEY auto_increment,
-    id_usuario INT NOT NULL,
-    crm CHAR(6) NOT NULL unique,
-    email varchar(30)  default('') unique,
-    especialidade varchar(100),
-    FOREIGN KEY (id_usuario) REFERENCES Usuario (id_usuario)
+CREATE TABLE pacientes (
+    id_paciente int auto_increment PRIMARY KEY,
+    nome varchar(100) NOT NULL,
+    cpf VARCHAR(14) UNIQUE, -- redundante, mas pode ser útil se separar do usuário
+    data_nascimento DATE,
+    telefone VARCHAR(13),
+    endereco varchar(255)
 );
 
-CREATE TABLE Paciente (
-    id_paciente int PRIMARY KEY auto_increment,
-    id_pessoa INT NOT NULL,
-    cartao_sus VARCHAR(15),
-    convenio_medico VARCHAR(50),
-    nivel_emg varchar(15),
-    FOREIGN KEY (id_pessoa) REFERENCES Pessoa (id_pessoa)
+CREATE TABLE prontuario(
+	paciente_id int unique not null,
+	alergias varchar(50),
+    tipo_sanguineo Char(3),
+    medicamentos varchar(255),
+    cirurgias varchar(255),
+    doencas_infecciosas varchar(50),
+    FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente)
 );
 
-/* Tabelas de exame e consulta */
-CREATE TABLE Exame (
-    id_exame SERIAL PRIMARY KEY auto_increment,
-	id_medico int not null,
-    tipo VARCHAR(30),
-    resultado TEXT,
-    data_solicitada DATE,
-    data_realizada DATE,
-    veredito VARCHAR(15) CHECK(veredito IN('pendente' , 'realizado', 'cancelado')),
-    FOREIGN KEY (id_medico) REFERENCES Medico (id_medico)
+CREATE TABLE medicos (
+    id_medico int auto_increment PRIMARY KEY,
+    usuario_id INT UNIQUE NOT NULL,
+    crm VARCHAR(20) UNIQUE NOT NULL,
+    especialidade VARCHAR(50),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario)
 );
 
-
-create table Consulta(
-id_consulta int primary key auto_increment,
-nome varchar(40) not null,
-horario time not null,
-cpf varchar(11) not null,
-cartao_sus VARCHAR(15)
+CREATE TABLE agendamentos (
+    id_agendamento int auto_increment PRIMARY KEY,
+    paciente_id INT NOT NULL,
+    medico_id INT NOT NULL,
+    data_hora datetime NOT NULL,
+    status VARCHAR(30) DEFAULT 'agendado', -- agendado, cancelado, concluído
+    FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente),
+    FOREIGN KEY (medico_id) REFERENCES medicos(id_medico)
 );
 
-
-/* Tabelas de controle de estoque */
-CREATE TABLE Fornecedor (
-    id_fornecedor int PRIMARY KEY auto_increment,
-	cnpj VARCHAR(14) NOT NULL unique,
-    nome VARCHAR(30) NOT NULL,
-    telefone VARCHAR(11),
-    endereco VARCHAR(100) NOT NULL
+CREATE TABLE consultas (
+    id_consulta int auto_increment PRIMARY KEY,
+    agendamento_id INT UNIQUE NOT NULL,
+    descricao varchar(255),
+    receita varchar(255),
+    observacoes varchar(255),
+    data_consulta datetime,
+    FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id_agendamento)
 );
 
-CREATE TABLE Estoque_produto (
-    id_produto int PRIMARY KEY auto_increment,
-    nome VARCHAR(30),
-    data_validade DATE,
-    tipo VARCHAR(12),
-    descricao VARCHAR(150) NOT NULL,
-    fabricante VARCHAR(15),
-    lote INT,
-    quantidade INT NOT NULL
-);
+INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Comum'),(2, 'Admin'),(3, 'Medico');
 
-CREATE TABLE Nota_fiscal (
-    id_nota_fiscal int PRIMARY KEY auto_increment,
-    data_entrada DATE NOT NULL,
-    numero_nota VARCHAR(44) NOT NULL,
-    id_fornecedor INT NOT NULL,
-    valor_nota DECIMAL (10.2) NOT NULL,
-    data_cadastro_nota DATE NOT NULL,
-    FOREIGN KEY (id_fornecedor) REFERENCES Fornecedor (id_fornecedor)
-);
+INSERT INTO usuarios (nome, email, senha, cpf, perfil_id) VALUES ("David Ramos Mendes Cardoso", "daviddivad25.12@gmail.com", "Senha@123", "41143676831", 2);
 
-CREATE TABLE Produto_nota (
-    id_produto_nota int PRIMARY KEY auto_increment,
-    id_nota_fiscal INT NOT NULL,
-    id_produto INT NOT NULL,
-    quantidade INT NOT NULL,
-    FOREIGN KEY (id_nota_fiscal) REFERENCES Nota_fiscal (id_nota_fiscal),
-    FOREIGN KEY (id_produto) REFERENCES Estoque_produto (id_produto)
-);
+INSERT INTO medicos (usuario_id, crm, especialidade) Values (1, "12345678", "Cardiologista");
 
-CREATE TABLE Entrada_saida (
-    id_entrada_saida int PRIMARY KEY auto_increment,
-	id_produto INT not null,
-    id_produto_nota int not null,
-	quantidade INT NOT NULL,
-	id_exame int,
-    id_medico INT,
-    id_paciente INT,
-    id_usuario INT,
-    id_pessoa int,
-    tipo_transacao VARCHAR(7) NOT NULL,
-    data_transacao DATETIME NOT NULL,
-    FOREIGN KEY (id_exame) REFERENCES Exames (id_exame),
-    FOREIGN KEY (id_pessoa) REFERENCES pessoa (id_pessoa),
-    FOREIGN KEY (id_medico) REFERENCES Medico (id_medico),
-    FOREIGN KEY (id_produto_nota) REFERENCES produto_nota (id_produto_nota),
-    FOREIGN KEY (id_paciente) REFERENCES Paciente (id_paciente),
-    FOREIGN KEY (id_usuario) REFERENCES Usuario (id_usuario),
-    FOREIGN KEY (id_produto) REFERENCES Estoque_produto (id_produto)
-);
+INSERT INTO pacientes (nome, cpf, data_nascimento, telefone, endereco) VALUES ("David Ramos Mendes Cardoso", "41143676831", '2004-12-25', "119911007252", "Mario Latorre 245");
+
+INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Pelo de gato", "O-", "", "Transplante de rim", "Tuberculose");
+
+/*select * from usuarios;
+select * from pacientes;
+select * from medicos;
+select * from agendamentos;
+select * from prontuario;
+
+/*drop database medflow;

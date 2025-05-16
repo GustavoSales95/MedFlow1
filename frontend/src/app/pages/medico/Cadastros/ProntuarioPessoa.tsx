@@ -15,6 +15,8 @@ import {
   TableHead,
   TableRow,
   Paper,
+  FormControlLabel,
+  Checkbox
 } from "@mui/material";
 
 interface Pacientes {
@@ -23,6 +25,7 @@ interface Pacientes {
   cpf: string;
   telefone: string;
   data_nascimento: string;
+  endereco: string;
 }
 
 interface Prontuario {
@@ -78,10 +81,18 @@ export const ConsultarProntuario = () => {
     }
   };
 
+  function formatarData(dataNasc:string) {
+    const data = new Date(dataNasc);
+
+    const dataFormatada = data.toLocaleDateString("pt-BR");
+
+    return dataFormatada
+  }
+
   return (
     <Box sx={{ padding: "20px", maxWidth: 800, margin: "0 auto" }}>
       <Typography variant="h4" sx={{ marginBottom: "20px", textAlign: "center" }}>
-        Consulta de Usuários
+        Consulta de Porntuário
       </Typography>
 
       <Grid container spacing={2}>
@@ -108,56 +119,67 @@ export const ConsultarProntuario = () => {
         </Grid>
       </Grid>
 
-      {Pacientes.length > 0 && (
-        <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
-          <Table sx={{ minWidth: 650 }} aria-label="tabela de usuários">
-            <TableHead>
-              <TableRow>
-                <TableCell>Nome</TableCell>
-                <TableCell>CPF</TableCell>
-                <TableCell>Telefone</TableCell>
-                <TableCell>Data de Nascimento</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Pacientes.map((paciente) => (
-                <TableRow key={paciente.id_paciente}>
-                  <TableCell>{paciente.nome}</TableCell>
-                  <TableCell>{paciente.cpf}</TableCell>
-                  <TableCell>{paciente.telefone}</TableCell>
-                  <TableCell>{paciente.data_nascimento}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-
       {prontuario && (
-  <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
-    <Table sx={{ minWidth: 650 }} aria-label="tabela de prontuário">
-      <TableHead>
-        <TableRow>
-          <TableCell>Paciente ID</TableCell>
-          <TableCell>Alergias</TableCell>
-          <TableCell>Tipo Sanguíneo</TableCell>
-          <TableCell>Medicamentos</TableCell>
-          <TableCell>Cirurgias</TableCell>
-          <TableCell>Doenças Infecciosas</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        <TableRow>
-          <TableCell>{prontuario.paciente_id}</TableCell>
-          <TableCell>{prontuario.alergias || "Nenhuma"}</TableCell>
-          <TableCell>{prontuario.tipo_sanguineo || "Não informado"}</TableCell>
-          <TableCell>{prontuario.medicamentos || "Nenhum"}</TableCell>
-          <TableCell>{prontuario.cirurgias || "Nenhuma"}</TableCell>
-          <TableCell>{prontuario.doencas_infecciosas || "Nenhuma"}</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  </TableContainer>
+        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
+          <Typography variant="h4" align="center" marginBottom={1.5}>Prontuário Médico</Typography>
+
+          <Typography variant="h5" marginTop={3} marginBottom={1} >Dados Pessoais</Typography>
+          <Grid container spacing={2}>
+            {Pacientes.map((paciente) => (
+            <>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18}}>Nome</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.nome}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>CPF</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.cpf}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Data de Nascimento</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{formatarData(paciente.data_nascimento)}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Telefone</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.telefone || "Não informado"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Endereço</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.endereco || "Não informado"}</Typography>
+                </Grid>
+              </>
+            ))}
+          </Grid>
+
+        <Typography variant="h5" marginTop={3} marginBottom={1} >Histórico</Typography>
+        <Grid container spacing={2}>
+            <>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18}}>Alergias</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.alergias || "Nenhuma"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Doenças Infecciosas</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.doencas_infecciosas || "Nenhuma"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Medicamentos de Uso Contínuo</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.medicamentos || "Nenhum"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Cirurgias Anteriores</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.cirurgias || "Nenhuma"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Tipo Sanguíneo</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.tipo_sanguineo || "Não informado"}</Typography>
+                </Grid>
+              </>
+          </Grid>
+
+      </Paper>
+
+
 )}
 
 
