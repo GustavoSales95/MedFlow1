@@ -17,7 +17,11 @@ export const Lista1 = () => {
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
+<<<<<<< HEAD
           to={"Comum/"}
+=======
+          to={"/Comum"}
+>>>>>>> 06991008e3a2abf4c2e39ac67c1b4ed4ecea6f34
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -33,7 +37,11 @@ export const Lista1 = () => {
       <ListItem key={2} disablePadding>
         <ListItemButton
           component={Link}
+<<<<<<< HEAD
           to={"Comum/Cadastros"}
+=======
+          to={"/Comum/Cadastros"}
+>>>>>>> 06991008e3a2abf4c2e39ac67c1b4ed4ecea6f34
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -49,7 +57,11 @@ export const Lista1 = () => {
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
+<<<<<<< HEAD
           to={"Comum/ConsultarPessoas"}
+=======
+          to={"/Comum/ConsultarPessoas"}
+>>>>>>> 06991008e3a2abf4c2e39ac67c1b4ed4ecea6f34
           sx={{
             transition: "0.8s",
             "&:hover": {

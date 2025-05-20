@@ -19,13 +19,27 @@ route.get("/ConsultarUsuarios", async (req, resp) => {
 });
 
 route.post("/CadastrosUsuarios", async (req, resp) => {
-    const { nome, email, senha, cpf, perfil_id, crm, especialidade } = req.body;
+    const { nome, email, senha, cpf, data_nascimento, perfil_id, crm, especialidade, telefone } = req.body;
 
-    await service.criarUsuarios(nome, email, senha, cpf, perfil_id);
+    await service.criarUsuarios(nome, email, senha, cpf, data_nascimento, perfil_id);
 
-    await service.criarMedicos(cpf, crm, especialidade);
+    await service.criarMedicos(cpf, crm, especialidade, telefone);
 
     resp.status(201).json(req.body);
+});
+
+route.get("/CadastrosUsuarios", async (req, resp) => {
+    const { cpf, crm, email } = req.query;
+
+    const usuario = cpf ? await service.buscarUsuarios(cpf) : null;
+    const medico = crm ? await service.buscarMedico(crm) : null;
+    const usuarioEmail = email ? await service.buscarUsuarioEmail(email) : null;
+
+    if (!usuario && !medico && !usuarioEmail) {
+        return resp.status(204).end();
+    }
+
+    return resp.status(200).json({ usuario, medico, usuarioEmail });
 });
 
 
