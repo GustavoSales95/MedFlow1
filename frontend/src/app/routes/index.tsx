@@ -9,54 +9,49 @@ import {
   CadastrosUsuarios,
   ConsultarUsuarios,
   ConsultarPessoas,
-} from "../pages";
-//Import de medico
-import { 
-  ConsultarProntuario, 
+  ConsultarProntuario,
   DashboardMedico,
-  AgendaDia
-
-} from '../pages';
-
-
-// Import de Estoque
-import { Editar } from "../pages/editar/editar";
-import { Estoque } from "../pages/Estoque/Estoque";
-import { Entrada } from "../pages/Entrada/Entrada_sai";
+  AgendaDia,
+  Editar,
+  Estoque,
+  Entrada
+} from "../pages";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Dashboard></Dashboard>,
-    children: [
+    path: "/Estoque",
+    element: <Estoque/>,
+    children:[
       {
-        path: "/",
-        element: <Marcacao></Marcacao>,
-      },
-      {
-        path: "/cadastros",
-        element: <Cadastros></Cadastros>,
-      },
-      {
-        path: "/ConsultarPessoas",
-        element: <ConsultarPessoas></ConsultarPessoas>,
-      },
-      {
-        path: "/Entrada",
+        path: "Estoque/entrada",
         element: <Entrada></Entrada>,
       },
       {
-        path: "/estoque",
-        element: <Estoque></Estoque>,
-      },
-      {
-        path: "/editar",
+        path: "Estoque/editar",
         element: <Editar></Editar>,
       },
     ],
   },
   {
-    path: "/Login",
+    path: "/Comum",
+    element: <Dashboard></Dashboard>,
+    children: [
+      {
+        path: "Comum/",
+        element: <Marcacao></Marcacao>,
+      },
+      {
+        path: "Comum/cadastros",
+        element: <Cadastros></Cadastros>,
+      },
+      {
+        path: "Comum/ConsultarPessoas",
+        element: <ConsultarPessoas></ConsultarPessoas>,
+      },
+    ],
+  },
+  {
+    path: "/",
     element: <Login></Login>,
   },
   {
@@ -73,7 +68,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-  { 
+  {
     path: "/Medico",
     element: <DashboardMedico></DashboardMedico>,
     children: [
@@ -86,7 +81,6 @@ const router = createBrowserRouter([
         element: <AgendaDia></AgendaDia>,
       },
     ],
-
-  }
+  },
 ]);
 export default router;
