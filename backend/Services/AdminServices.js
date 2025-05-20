@@ -5,6 +5,13 @@ const prisma = new PrismaClient();
 async function buscarUsuarios(cpf) {
     const usuario = await prisma.usuarios.findUnique({
         where: { cpf },
+        include: {
+            perfil: {
+                select: {
+                    tipo: true
+                }
+            }
+        }
     });
 
     return usuario;

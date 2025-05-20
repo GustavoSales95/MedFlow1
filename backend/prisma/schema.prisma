@@ -18,7 +18,7 @@ datasource db {
 // Modelo da tabela dos tipos de usuário para serem usados como foreign key
 model Perfis {
   id_perfis Int    @id
-  nome      String
+  tipo      String
 
   Usuarios Usuarios[]
 }
@@ -37,6 +37,7 @@ model Usuarios {
 
 model Pacientes {
   id_paciente      Int      @id @default(autoincrement())
+  nome String?
   cpf              String?  @unique
   data_nascimento  DateTime? @db.Date
   telefone         String?

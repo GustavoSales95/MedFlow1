@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../../../services/api";
 import {
   TextField,
   Button,
@@ -15,6 +15,8 @@ import {
   TableHead,
   TableRow,
   Paper,
+  FormControlLabel,
+  Checkbox
 } from "@mui/material";
 
 interface Pacientes {
@@ -23,6 +25,16 @@ interface Pacientes {
   cpf: string;
   telefone: string;
   data_nascimento: string;
+  endereco: string;
+}
+
+interface Prontuario {
+  paciente_id: number;
+  alergias: string;
+  tipo_sanguineo: string;
+  medicamentos: string;
+  cirurgias: string;
+  doencas_infecciosas: string;
 }
 
 export const ConsultarProntuario = () => {
@@ -30,6 +42,9 @@ export const ConsultarProntuario = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [Pacientes, setPacientes] = useState<Pacientes[]>([]);
+  const [prontuario, setProntuario] = useState<Prontuario | null>(null);
+
+
 
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCpf(e.target.value);
@@ -45,27 +60,39 @@ export const ConsultarProntuario = () => {
     }
 
     try {
-      const response = await axios.get<Pacientes[]>(
-        `http://localhost:3333`
-      );
+      const response = await api.get('Medico/ConsultarProntuarios', {
+        params: { cpf },
+      });
 
-      if (response.data.length === 0) {
-        setSnackbarMessage("Nenhum usuário encontrado para o CPF informado.");
+      console.log("Resposta da API:", response.data);
+
+      if (!response.data.message || !response.data.paciente) {
+        setSnackbarMessage("Nenhum prontuário encontrado para o CPF informado.");
         setOpenSnackbar(true);
+        return;
       }
 
-      setPacientes(response.data);
+      setPacientes([response.data.paciente]);
+      setProntuario(response.data.message);
     } catch (error) {
       console.error("Erro ao buscar dados da API:", error);
-      setSnackbarMessage("Erro ao buscar usuários. Tente novamente.");
+      setSnackbarMessage("Erro ao buscar prontuário. Tente novamente.");
       setOpenSnackbar(true);
     }
   };
 
+  function formatarData(dataNasc:string) {
+    const data = new Date(dataNasc);
+
+    const dataFormatada = data.toLocaleDateString("pt-BR");
+
+    return dataFormatada
+  }
+
   return (
     <Box sx={{ padding: "20px", maxWidth: 800, margin: "0 auto" }}>
       <Typography variant="h4" sx={{ marginBottom: "20px", textAlign: "center" }}>
-        Consulta de Usuários
+        Consulta de Porntuário
       </Typography>
 
       <Grid container spacing={2}>
@@ -92,30 +119,69 @@ export const ConsultarProntuario = () => {
         </Grid>
       </Grid>
 
-      {Pacientes.length > 0 && (
-        <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
-          <Table sx={{ minWidth: 650 }} aria-label="tabela de usuários">
-            <TableHead>
-              <TableRow>
-                <TableCell>Nome</TableCell>
-                <TableCell>CPF</TableCell>
-                <TableCell>Telefone</TableCell>
-                <TableCell>Data de Nascimento</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {Pacientes.map((paciente) => (
-                <TableRow key={paciente.id_paciente}>
-                  <TableCell>{paciente.nome}</TableCell>
-                  <TableCell>{paciente.cpf}</TableCell>
-                  <TableCell>{paciente.telefone}</TableCell>
-                  <TableCell>{paciente.data_nascimento}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+      {prontuario && (
+        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
+          <Typography variant="h4" align="center" marginBottom={1.5}>Prontuário Médico</Typography>
+
+          <Typography variant="h5" marginTop={3} marginBottom={1} >Dados Pessoais</Typography>
+          <Grid container spacing={2}>
+            {Pacientes.map((paciente) => (
+            <>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18}}>Nome</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.nome}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>CPF</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.cpf}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Data de Nascimento</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{formatarData(paciente.data_nascimento)}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Telefone</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.telefone || "Não informado"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Endereço</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.endereco || "Não informado"}</Typography>
+                </Grid>
+              </>
+            ))}
+          </Grid>
+
+        <Typography variant="h5" marginTop={3} marginBottom={1} >Histórico</Typography>
+        <Grid container spacing={2}>
+            <>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18}}>Alergias</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.alergias || "Nenhuma"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Doenças Infecciosas</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.doencas_infecciosas || "Nenhuma"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Medicamentos de Uso Contínuo</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.medicamentos || "Nenhum"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Cirurgias Anteriores</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.cirurgias || "Nenhuma"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Tipo Sanguíneo</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.tipo_sanguineo || "Não informado"}</Typography>
+                </Grid>
+              </>
+          </Grid>
+
+      </Paper>
+
+
+)}
+
 
       <Snackbar
         open={openSnackbar}
