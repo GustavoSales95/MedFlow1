@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import api from '../../../../services/api.js';
+import { insertMaskCpf } from '../../../functions/InsertMasks';
 
 
 interface UserData {
@@ -59,12 +60,12 @@ export const ConsultarUsuarios = () => {
 
   // Função para atualizar o valor do CPF
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCpf(e.target.value);
+    setCpf(e.target.value.replace(/\D/g, ''));
   };
 
   // Função para simular a pesquisa de usuários
   const handleSearch = async () => {
-    if (cpf.length !== 11) {
+    if (cpf.length != 11) {
       setSnackbarMessage(
         "CPF inválido! Por favor, digite um CPF válido com 11 dígitos."
       );
@@ -90,7 +91,8 @@ export const ConsultarUsuarios = () => {
             label="Digite o CPF"
             variant="outlined"
             fullWidth
-            value={cpf}
+            inputProps={{ maxLength: 14 }}
+            value={insertMaskCpf(cpf)}
             onChange={handleCpfChange}
             sx={{ marginBottom: "20px" }}
           />
@@ -124,7 +126,7 @@ export const ConsultarUsuarios = () => {
               {users.map((user) => (
                 <TableRow key={user.id_usuario}>
                   <TableCell>{user.nome}</TableCell>
-                  <TableCell>{user.cpf}</TableCell>
+                  <TableCell>{insertMaskCpf(user.cpf)}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.perfil.tipo}</TableCell>
                 </TableRow>

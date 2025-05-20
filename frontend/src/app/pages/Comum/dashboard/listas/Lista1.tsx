@@ -18,7 +18,7 @@ export const Lista1 = () => {
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/"}
+          to={"/Comum"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -35,7 +35,7 @@ export const Lista1 = () => {
       <ListItem key={2} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/Cadastros"}
+          to={"/Comum/Cadastros"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -51,7 +51,7 @@ export const Lista1 = () => {
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/ConsultarPessoas"}
+          to={"/Comum/ConsultarPessoas"}
           sx={{
             transition: "0.8s",
             "&:hover": {

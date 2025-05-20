@@ -1,44 +1,130 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid2, Box, Typography } from '@mui/material';
+import { TextField, Button, Grid2, Box, Typography, Paper, Snackbar, Alert } from '@mui/material';
+import { insertMaskCpf, insertMaskTel } from '../../../functions/InsertMasks';
+import api from '../../../../services/api';
 
 export const Cadastros = () => {
   // Estado para armazenar os dados do formulário
   const [formData, setFormData] = useState({
     nome: '',
-    idade: '',
-    endereco: '',
+    data_nascimento: '',
+    telefone: '',
     cpf: '',
-    cartaoSUS: '',
-    nomeResponsavel: '',
+    cep: '',
+    endereco: '',
+    cartao_sus: '',
+    nome_responsavel: ''
   });
 
   // Estado para controlar se a pessoa é menor de idade
   const [isMenorIdade, setIsMenorIdade] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   // Função para atualizar o estado com o valor do input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    const rawValue = value.replace(/\D/g, '').slice(0, name === "cpf" ? 11 : name === "telefone" ? 11 : undefined);
+    
+    const maskedValue = name === "cpf" ? insertMaskCpf(rawValue) :
+                        name === "telefone" ? insertMaskTel(rawValue) :
+                        value;
+
+    setFormData({ ...formData, [name]: maskedValue });
   };
 
   // Função para verificar se a pessoa é menor de idade
   const handleIdadeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const idade = e.target.value;
-    setFormData({ ...formData, idade });
-    setIsMenorIdade(parseInt(idade) < 18); // Verifica se é menor de idade
+    const data_nascimento = e.target.value;
+
+    const nascimento = new Date(data_nascimento);
+    const data = new Date();
+
+    let idade = data.getFullYear() - nascimento.getFullYear();
+
+    const monthDiff = data.getMonth() - nascimento.getMonth();
+    const dayDiff = data.getDate() - nascimento.getDate();
+
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      idade--; 
+    }
+
+    setFormData({ ...formData, data_nascimento });
+    setIsMenorIdade(idade < 18); 
   };
 
   // Função para simular o envio dos dados
-  const handleSubmit = (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Dados enviados:', formData);
-    // Aqui você pode conectar com a API para salvar os dados
+
+    try {
+
+      if (formData.cpf.length != 14) {
+        setSnackbarMessage("Insira um CPF válido.");
+        setOpenSnackbar(true);
+        return;
+      }
+      if (formData.telefone.length < 14) {
+        setSnackbarMessage("Insira um número de telefone válido.");
+        setOpenSnackbar(true);
+        return;
+      }
+      
+      const checkResponseCpf = await api.get('/Cadastros', {
+        params: {
+          cpf: formData.cpf.replace(/\D/g, ''),
+        }
+      });
+
+      if (checkResponseCpf.status === 200) {
+        setSnackbarMessage("CPF já cadastrado.");
+        setOpenSnackbar(true);
+        return;
+      }
+
+      const checkResponseSus = await api.get('/Cadastros', {
+        params: {
+          cartao_sus: formData.cartao_sus.replace(/\D/g, ''),
+        }
+      });
+
+      if (checkResponseSus.status === 200) {
+        setSnackbarMessage("Cartão SUS já cadastrado.");
+        setOpenSnackbar(true);
+        return;
+      }
+
+    } catch (checkError: any) {
+      if (checkError.response && checkError.response.status !== 204) {
+        console.error("Erro na verificação de duplicidade:", checkError);
+        setSnackbarMessage("Erro ao verificar duplicidade.");
+        setOpenSnackbar(true);
+        return;
+      }
+    }
+
+    try {
+      const response = await api.post('/Cadastros', {
+        ...formData,
+        cpf: formData.cpf.replace(/\D/g, ''), 
+        telefone: formData.telefone.replace(/\D/g, '') 
+      });
+
+      console.log('Paciente cadastrado com sucesso:', response.data);
+      setSnackbarMessage("Paciente cadastrado com sucesso.");
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error('Erro ao cadastrar Paciente:', error);
+      setSnackbarMessage("Erro ao cadastrar Paciente.");
+      setOpenSnackbar(true);
+    }
   };
 
   return (
-    <Box sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
+    <Paper elevation={4} sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Cadastro de Pessoa na Clínica
+        Cadastro de Paciente na Clínica
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid2 container spacing={2}>
@@ -48,19 +134,44 @@ export const Cadastros = () => {
               variant="outlined"
               fullWidth
               name="nome"
+              required
               value={formData.nome}
               onChange={handleChange}
             />
           </Grid2>
           <Grid2 size={12}>
             <TextField
-              label="Idade"
+              label="Data de nascimento"
               variant="outlined"
               fullWidth
-              type="number"
-              name="idade"
-              value={formData.idade}
+              type="date"
+              name="data_nascimento"
+              InputLabelProps={{ shrink: true }}
+              required
+              value={formData.data_nascimento}
               onChange={handleIdadeChange}
+            />
+          </Grid2>
+          <Grid2 size={12}>
+            <TextField
+              label="Telefone"
+              variant="outlined"
+              fullWidth
+              name="telefone"
+              required
+              value={insertMaskTel(formData.telefone)}
+              onChange={handleChange}
+            />
+          </Grid2>
+          <Grid2 size={12}>
+            <TextField
+              label="CEP"
+              variant="outlined"
+              fullWidth
+              name="cep"
+              inputProps={{ maxLenght: 3 }}
+              value={formData.cep}
+              onChange={handleChange}
             />
           </Grid2>
           <Grid2 size={12}>
@@ -79,7 +190,8 @@ export const Cadastros = () => {
               variant="outlined"
               fullWidth
               name="cpf"
-              value={formData.cpf}
+              required
+              value={insertMaskCpf(formData.cpf)}
               onChange={handleChange}
             />
           </Grid2>
@@ -88,8 +200,8 @@ export const Cadastros = () => {
               label="Cartão do SUS"
               variant="outlined"
               fullWidth
-              name="cartaoSUS"
-              value={formData.cartaoSUS}
+              name="cartao_sus"
+              value={formData.cartao_sus}
               onChange={handleChange}
             />
           </Grid2>
@@ -101,8 +213,9 @@ export const Cadastros = () => {
                 label="Nome do Responsável"
                 variant="outlined"
                 fullWidth
-                name="nomeResponsavel"
-                value={formData.nomeResponsavel}
+                name="nome_responsavel"
+                required
+                value={formData.nome_responsavel}
                 onChange={handleChange}
               />
             </Grid2>
@@ -115,7 +228,17 @@ export const Cadastros = () => {
           </Grid2>
         </Grid2>
       </form>
-    </Box>
+      {/* Snackbar para mensagens de feedback */}
+              <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={() => setOpenSnackbar(false)}
+              >
+                <Alert onClose={() => setOpenSnackbar(false)} severity="info">
+                  {snackbarMessage}
+                </Alert>
+              </Snackbar>
+    </Paper>
   );
 };
 

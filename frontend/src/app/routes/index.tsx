@@ -23,11 +23,11 @@ const router = createBrowserRouter([
     element: <Estoque/>,
     children:[
       {
-        path: "Estoque/entrada",
+        path: "Entrada",
         element: <Entrada></Entrada>,
       },
       {
-        path: "Estoque/editar",
+        path: "Editar",
         element: <Editar></Editar>,
       },
     ],
@@ -37,15 +37,15 @@ const router = createBrowserRouter([
     element: <Dashboard></Dashboard>,
     children: [
       {
-        path: "Comum/",
+        index: true,
         element: <Marcacao></Marcacao>,
       },
       {
-        path: "Comum/cadastros",
+        path: "Cadastros",
         element: <Cadastros></Cadastros>,
       },
       {
-        path: "Comum/ConsultarPessoas",
+        path: "ConsultarPessoas",
         element: <ConsultarPessoas></ConsultarPessoas>,
       },
     ],
@@ -59,28 +59,29 @@ const router = createBrowserRouter([
     element: <DashboardAdmin></DashboardAdmin>,
     children: [
       {
-        path: "/Admin/CadastrosUsuarios",
+        path: "CadastrosUsuarios",
         element: <CadastrosUsuarios></CadastrosUsuarios>,
       },
       {
-        path: "/Admin/ConsultarUsuarios",
+        path: "ConsultarUsuarios",
         element: <ConsultarUsuarios></ConsultarUsuarios>,
       },
     ],
   },
   {
-    path: "/Medico",
+    path: "Medico",
     element: <DashboardMedico></DashboardMedico>,
     children: [
       {
-        path: "/Medico/ConsultarProntuarios",
+        path: "ConsultarProntuarios",
         element: <ConsultarProntuario></ConsultarProntuario>,
       },
       {
-        path: "/Medico/AgendaDia",
+        path: "AgendaDia",
         element: <AgendaDia></AgendaDia>,
       },
     ],
   },
 ]);
+
 export default router;

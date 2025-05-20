@@ -13,6 +13,8 @@ CREATE TABLE usuarios (
     email VARCHAR(100) UNIQUE NOT NULL,
     senha VARCHAR(255) NOT NULL,
     cpf VARCHAR(14) UNIQUE NOT NULL, -- formato: 000.000.000-00
+    data_nascimento date NOT NULL,
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     perfil_id INT NOT NULL,
     FOREIGN KEY (perfil_id) REFERENCES perfis(id_perfis)
 );
@@ -22,8 +24,18 @@ CREATE TABLE pacientes (
     nome varchar(100) NOT NULL,
     cpf VARCHAR(14) UNIQUE, -- redundante, mas pode ser útil se separar do usuário
     data_nascimento DATE,
-    telefone VARCHAR(13),
-    endereco varchar(255)
+    telefone VARCHAR(20),
+    endereco varchar(255),
+    data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE medicos (
+    id_medico int auto_increment PRIMARY KEY,
+    usuario_id INT UNIQUE NOT NULL,
+    crm VARCHAR(20) UNIQUE NOT NULL,
+    especialidade VARCHAR(50),
+    telefone VARCHAR(20),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario)
 );
 
 CREATE TABLE prontuario(
@@ -34,14 +46,6 @@ CREATE TABLE prontuario(
     cirurgias varchar(255),
     doencas_infecciosas varchar(50),
     FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente)
-);
-
-CREATE TABLE medicos (
-    id_medico int auto_increment PRIMARY KEY,
-    usuario_id INT UNIQUE NOT NULL,
-    crm VARCHAR(20) UNIQUE NOT NULL,
-    especialidade VARCHAR(50),
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario)
 );
 
 CREATE TABLE agendamentos (
@@ -66,11 +70,11 @@ CREATE TABLE consultas (
 
 INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Comum'),(2, 'Admin'),(3, 'Medico');
 
-INSERT INTO usuarios (nome, email, senha, cpf, perfil_id) VALUES ("David Ramos Mendes Cardoso", "daviddivad25.12@gmail.com", "Senha@123", "41143676831", 2);
+INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("David Ramos Mendes Cardoso", "daviddivad25.12@gmail.com", "Senha@123", "41143676831", "2004-12-25", 2);
 
-INSERT INTO medicos (usuario_id, crm, especialidade) Values (1, "12345678", "Cardiologista");
+INSERT INTO medicos (usuario_id, crm, especialidade, telefone) Values (1, "12345678", "Cardiologista", "+55 (11) 99238-2152");
 
-INSERT INTO pacientes (nome, cpf, data_nascimento, telefone, endereco) VALUES ("David Ramos Mendes Cardoso", "41143676831", '2004-12-25', "119911007252", "Mario Latorre 245");
+INSERT INTO pacientes (nome, cpf, data_nascimento, telefone, endereco) VALUES ("David Ramos Mendes Cardoso", "41143676831", '2004-12-25', "(11) 91100-7252", "Mario Latorre 245");
 
 INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Pelo de gato", "O-", "", "Transplante de rim", "Tuberculose");
 
@@ -80,4 +84,4 @@ select * from medicos;
 select * from agendamentos;
 select * from prontuario;
 
-/*drop database medflow;
+drop database medflow;

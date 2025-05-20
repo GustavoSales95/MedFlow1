@@ -26,22 +26,38 @@ model Perfis {
 model Usuarios {
   id_usuario Int    @id @default(autoincrement())
   nome       String
-  email      String @unique
+  email      String @unique 
   senha      String
   cpf        String @unique
+  data_nascimento DateTime @db.Date
+  data_Cadastro DateTime @default(now())
   perfil_id  Int
   perfil     Perfis @relation(fields: [perfil_id], references: [id_perfis])
 
   Medicos    Medicos?
 }
 
+model Medicos {
+  id_medico     Int      @id @default(autoincrement())
+  usuario_id    Int      @unique
+  crm           String   @unique
+  especialidade String?
+  telefone      String?
+
+  Usuarios Usuarios @relation(fields: [usuario_id], references: [id_usuario])
+  Agendamentos Agendamentos[]
+}
+
 model Pacientes {
   id_paciente      Int      @id @default(autoincrement())
   nome String?
   cpf              String?  @unique
+  cartao_sus String? @unique
   data_nascimento  DateTime? @db.Date
   telefone         String?
+  cep String?
   endereco         String?
+  data_cadastro DateTime @default(now())
 
   Prontuario Prontuario?
   Agendamentos Agendamentos[]
@@ -58,15 +74,7 @@ model Prontuario {
   Pacientes Pacientes @relation(fields: [paciente_id], references: [id_paciente])
 }
 
-model Medicos {
-  id_medico     Int      @id @default(autoincrement())
-  usuario_id    Int      @unique
-  crm           String   @unique
-  especialidade String?
 
-  Usuarios Usuarios @relation(fields: [usuario_id], references: [id_usuario])
-  Agendamentos Agendamentos[]
-}
 
 model Agendamentos {
   id_agendamento Int       @id @default(autoincrement())
