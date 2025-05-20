@@ -9,8 +9,7 @@ import { Link } from "react-router-dom";
 //Icones
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-
+import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 
 export const Lista1 = () => {
   return (
@@ -18,7 +17,7 @@ export const Lista1 = () => {
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/"}
+          to={"Comum/"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -29,13 +28,12 @@ export const Lista1 = () => {
         >
           <ListItemIcon>{<InsertInvitationIcon />}</ListItemIcon>
           <ListItemText primary={"Marcação de Consultas"} />
-          
         </ListItemButton>
       </ListItem>
       <ListItem key={2} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/Cadastros"}
+          to={"Comum/Cadastros"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -51,7 +49,7 @@ export const Lista1 = () => {
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/ConsultarPessoas"}
+          to={"Comum/ConsultarPessoas"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -62,7 +60,6 @@ export const Lista1 = () => {
         >
           <ListItemIcon>{<PersonSearchIcon />}</ListItemIcon>
           <ListItemText primary={"Registros"} />
-          
         </ListItemButton>
       </ListItem>
     </List>

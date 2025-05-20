@@ -4,7 +4,7 @@ use medflow;
 
 CREATE TABLE perfis (
     id_perfis int PRIMARY KEY,
-    tipo VARCHAR(50) NOT NULL -- Comum, Admin, Medico
+    nome VARCHAR(50) NOT NULL -- Comum, Admin, Medico
 );
 
 CREATE TABLE usuarios (
@@ -19,7 +19,6 @@ CREATE TABLE usuarios (
 
 CREATE TABLE pacientes (
     id_paciente int auto_increment PRIMARY KEY,
-    nome varchar(100) NOT NULL,
     cpf VARCHAR(14) UNIQUE, -- redundante, mas pode ser útil se separar do usuário
     data_nascimento DATE,
     telefone VARCHAR(13),
@@ -64,20 +63,18 @@ CREATE TABLE consultas (
     FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id_agendamento)
 );
 
-INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Comum'),(2, 'Admin'),(3, 'Medico');
+INSERT INTO perfis (id_perfis, nome) VALUES (1, 'Comum'),(2, 'Admin'),(3, 'Medico');
 
 INSERT INTO usuarios (nome, email, senha, cpf, perfil_id) VALUES ("David Ramos Mendes Cardoso", "daviddivad25.12@gmail.com", "Senha@123", "41143676831", 2);
 
 INSERT INTO medicos (usuario_id, crm, especialidade) Values (1, "12345678", "Cardiologista");
 
-INSERT INTO pacientes (nome, cpf, data_nascimento, telefone, endereco) VALUES ("David Ramos Mendes Cardoso", "41143676831", '2004-12-25', "119911007252", "Mario Latorre 245");
+INSERT INTO pacientes (cpf, data_nascimento, telefone, endereco) VALUES ("12345678907", '2005-05-05', "119911007252", "Mario Latorre 245");
 
 INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Pelo de gato", "O-", "", "Transplante de rim", "Tuberculose");
 
-/*select * from usuarios;
+select * from usuarios;
 select * from pacientes;
 select * from medicos;
 select * from agendamentos;
 select * from prontuario;
-
-/*drop database medflow;
