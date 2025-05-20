@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema file
 
 generator client {
   provider = "prisma-client-js"
@@ -13,7 +9,6 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
 
 // Modelo da tabela dos tipos de usuário para serem usados como foreign key
 model Perfis {
@@ -112,16 +107,23 @@ model Fornecedor {
 }
 
 model Estoque_produto {
-  id_produto Int @id @default(autoincrement())
-  nome String
-  data_validade DateTime @db.Date
-  tipo String
-  descricao String
-  fabricante String
-  lote Int
-  quantidade Int
+  id_produto     Int         @id @default(autoincrement())
+  nome           String
+  valor          Float
+  fornecedor     String
+  data_pedido    DateTime
+  validade       DateTime
+  embalagem      String
+  unidade_medida String
+  temperatura    Temperatura
 
-  produto_nota Produto_nota?
+  produto_nota Produto_nota[] // Relacionamento 1:N com Produto_nota
+}
+
+enum Temperatura {
+  PERECIVEL
+  RESFRIADO
+  TERMOSSENSIVEL
 }
 
 model Nota_fiscal {
@@ -134,7 +136,7 @@ model Nota_fiscal {
 
   fornecedor Fornecedor @relation(fields: [id_fornecedor], references: [id_fornecedor])
 
-  produto_nota Produto_nota?
+  produto_nota Produto_nota? // Relacionamento 1:1 com Produto_nota
 }
 
 model Produto_nota {
@@ -146,4 +148,3 @@ model Produto_nota {
   nota_fiscal Nota_fiscal @relation(fields: [id_nota_fiscal], references: [id_nota_fiscal])
   estoque_produto Estoque_produto @relation(fields: [id_produto], references: [id_produto])
 }
-
