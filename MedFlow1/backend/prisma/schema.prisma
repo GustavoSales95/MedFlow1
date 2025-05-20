@@ -1,0 +1,149 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Conecta com o banco de dados
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+// Modelo da tabela dos tipos de usuário para serem usados como foreign key
+model Perfis {
+  id_perfis Int    @id
+  tipo      String
+
+  Usuarios Usuarios[]
+}
+
+model Usuarios {
+  id_usuario Int    @id @default(autoincrement())
+  nome       String
+  email      String @unique 
+  senha      String
+  cpf        String @unique
+  data_nascimento DateTime @db.Date
+  data_Cadastro DateTime @default(now())
+  perfil_id  Int
+  perfil     Perfis @relation(fields: [perfil_id], references: [id_perfis])
+
+  Medicos    Medicos?
+}
+
+model Medicos {
+  id_medico     Int      @id @default(autoincrement())
+  usuario_id    Int      @unique
+  crm           String   @unique
+  especialidade String?
+  telefone      String?
+
+  Usuarios Usuarios @relation(fields: [usuario_id], references: [id_usuario])
+  Agendamentos Agendamentos[]
+}
+
+model Pacientes {
+  id_paciente      Int      @id @default(autoincrement())
+  nome String?
+  cpf              String?  @unique
+  cartao_sus String? @unique
+  data_nascimento  DateTime? @db.Date
+  telefone         String?
+  cep String?
+  endereco         String?
+  data_cadastro DateTime @default(now())
+
+  Prontuario Prontuario?
+  Agendamentos Agendamentos[]
+}
+
+model Prontuario {
+  paciente_id          Int    @unique
+  alergias             String?
+  tipo_sanguineo       String? @db.Char(3)
+  medicamentos         String?
+  cirurgias            String?
+  doencas_infecciosas  String?
+  
+  Pacientes Pacientes @relation(fields: [paciente_id], references: [id_paciente])
+}
+
+
+
+model Agendamentos {
+  id_agendamento Int       @id @default(autoincrement())
+  paciente_id    Int
+  medico_id      Int
+  data_hora      DateTime
+  status         String    @default("agendado")
+
+  Pacientes Pacientes @relation(fields: [paciente_id], references: [id_paciente])
+  Medicos   Medicos   @relation(fields: [medico_id], references: [id_medico])
+  Consultas Consultas?
+}
+
+model Consultas {
+  id_consulta    Int      @id @default(autoincrement())
+  agendamento_id Int      @unique
+  descricao      String?
+  receita        String?
+  observacoes    String?
+  data_consulta  DateTime?
+
+  Agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id_agendamento])
+}
+
+
+// Modelo das tabelas de controle de estoque
+model Fornecedor {
+  id_fornecedor Int @id @default(autoincrement())
+  cnpj String @unique
+  nome String
+  telefone String
+  endereco String
+
+  nota_fiscal Nota_fiscal?
+}
+
+model Estoque_produto {
+  id_produto Int @id @default(autoincrement())
+  nome String
+  data_validade DateTime @db.Date
+  tipo String
+  descricao String
+  fabricante String
+  lote Int
+  quantidade Int
+
+  produto_nota Produto_nota?
+}
+
+model Nota_fiscal {
+  id_nota_fiscal Int @id @default(autoincrement())
+  id_fornecedor Int @unique
+  data_entrada DateTime @db.Date
+  numero_nota String
+  valor_nota Decimal @db.Decimal(10, 2)
+  data_cadastro_nota DateTime @db.Date
+
+  fornecedor Fornecedor @relation(fields: [id_fornecedor], references: [id_fornecedor])
+
+  produto_nota Produto_nota?
+}
+
+model Produto_nota {
+  id_produto_nota Int @id @default(autoincrement())
+  id_nota_fiscal Int @unique
+  id_produto Int @unique
+  quantidade Int
+
+  nota_fiscal Nota_fiscal @relation(fields: [id_nota_fiscal], references: [id_nota_fiscal])
+  estoque_produto Estoque_produto @relation(fields: [id_produto], references: [id_produto])
+}
+
