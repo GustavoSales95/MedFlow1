@@ -11,7 +11,7 @@ route.post("/Cadastros", async (req, resp) => {
     resp.status(201).json(req.body);
 });
 
-route.get("Cadastros", async (req, resp) => {
+route.get("/Cadastros", async (req, resp) => {
     const { cpf, cartao_sus } = req.query;
 
     const pacienteCpf = cpf ? await service.buscarPacienteCpf(cpf) : null;
@@ -22,7 +22,22 @@ route.get("Cadastros", async (req, resp) => {
     }
 
     return resp.status(200).json({ pacienteCpf, pacienteSus });
-})
+});
+
+route.get("/ConsultarPessoas", async (req, resp) => {
+    const { cpf } = req.query;
+
+    if (!cpf) {
+        return resp.status(400).json({ error: "CPF não informado" });
+    }
+
+    const paciente = await service.buscarPacienteCpf(cpf);
+
+    if (!paciente) {
+        return resp.status(204).end();
+    }
+    return resp.status(200).json({ message: paciente });
+});
 
 
 export default route;

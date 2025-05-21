@@ -32,7 +32,7 @@ async function buscarMedico(crm) {
     return usuario;
 }
 
-async function criarUsuarios(nome, email, senha, cpf, data_nascimento) {
+async function criarUsuarios(nome, email, senha, cpf, data_nascimento, id_perfis) {
     await prisma.usuarios.create({
         data: {
             nome,
@@ -41,7 +41,7 @@ async function criarUsuarios(nome, email, senha, cpf, data_nascimento) {
             cpf,
             data_nascimento: new Date(data_nascimento).toISOString(),
             perfil: {
-                connect: { id_perfis: 3 } 
+                connect: { id_perfis } 
             }
 
 

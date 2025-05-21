@@ -40,6 +40,18 @@ CREATE TABLE medicos (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id_usuario)
 );
 
+CREATE TABLE escala (
+	id_escala int auto_increment PRIMARY KEY,
+	id_medico INT UNIQUE NOT NULL,
+    segunda ENUM('Escalado', 'Folga'),
+    terca ENUM('Escalado', 'Folga'),
+    quarta ENUM('Escalado', 'Folga'),
+    quinta ENUM('Escalado', 'Folga'),
+    sexta ENUM('Escalado', 'Folga'),
+    sabado ENUM('Escalado', 'Folga'),
+    domingo ENUM('Escalado', 'Folga')
+);
+
 CREATE TABLE prontuario(
 	paciente_id int unique not null,
 	alergias varchar(50),
@@ -80,7 +92,7 @@ INSERT INTO pacientes (nome, cpf, cartao_sus, data_nascimento, telefone, cep, en
 
 INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Pelo de gato", "O-", "", "Transplante de rim", "Tuberculose");
 
-/*select * from usuarios;
+select * from usuarios;
 select * from pacientes;
 select * from medicos;
 select * from agendamentos;

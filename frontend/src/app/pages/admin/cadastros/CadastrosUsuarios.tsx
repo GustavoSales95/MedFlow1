@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid2, Box, Typography, Paper, Snackbar, Alert } from '@mui/material';
+import { TextField, Button, Grid2, Box, Typography, Paper, Snackbar, Alert, Radio, RadioGroup, FormControl, FormLabel, FormControlLabel } from '@mui/material';
 import api from '../../../../services/api';
 import { insertMaskCpf, insertMaskTel } from '../../../functions/InsertMasks';
 
@@ -28,10 +28,12 @@ export const CadastrosUsuarios = () => {
     data_nascimento: '',
     crm: '',
     especialidade: '',
-    telefone: ''
+    telefone: '',
+    id_perfis: ''
   });
   const [usuario, setUsuario] = useState<UserData | null>(null);
   const [medico, setMedico] = useState<MedicoData | null>(null);
+  const [isMedic, setIsMedic] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -49,6 +51,19 @@ export const CadastrosUsuarios = () => {
     setFormData({ ...formData, [name]: maskedValue });
   };
 
+  const handlePerfilChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id_perfis = e.target.value;
+
+      if(id_perfis == '3') {
+        setIsMedic(true);
+        setFormData({ ...formData, id_perfis });
+      }
+      else {
+        setIsMedic(false);
+        setFormData({ ...formData, crm: '', especialidade: '', telefone: '', id_perfis});
+      }
+  }
+
   // Função para simular o envio dos dados
  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,17 +75,19 @@ export const CadastrosUsuarios = () => {
         setOpenSnackbar(true);
         return;
       }
-      if (formData.crm.length < 6) {
-        setSnackbarMessage("Insira um CRM válido.");
-        setOpenSnackbar(true);
-        return;
+
+      if (formData.id_perfis == '3') {
+        if (formData.crm.length < 6) {
+          setSnackbarMessage("Insira um CRM válido.");
+          setOpenSnackbar(true);
+          return;
+        }
+        if (formData.telefone.length < 14) {
+          setSnackbarMessage("Insira um número de telefone válido.");
+          setOpenSnackbar(true);
+          return;
+        }
       }
-      if (formData.telefone.length < 14) {
-        setSnackbarMessage("Insira um número de telefone válido.");
-        setOpenSnackbar(true);
-        return;
-      }
-      
       // Verifica se já existe um médico/usuário com o mesmo CPF ou CRM
       const checkResponseCpf = await api.get('/Admin/CadastrosUsuarios', {
         params: {
@@ -179,17 +196,6 @@ export const CadastrosUsuarios = () => {
           </Grid2>
           <Grid2 size={12}>
             <TextField
-              label="Telefone"
-              variant="outlined"
-              fullWidth
-              name="telefone"
-              required
-              value={insertMaskTel(formData.telefone)}
-              onChange={handleChange}
-            />
-          </Grid2>
-          <Grid2 size={12}>
-            <TextField
               label="CPF"
               variant="outlined"
               fullWidth
@@ -197,28 +203,6 @@ export const CadastrosUsuarios = () => {
               required
               inputProps={{ maxLength: 14 }}
               value={insertMaskCpf(formData.cpf)}
-              onChange={handleChange}
-            />
-          </Grid2>
-          <Grid2 size={12}>
-            <TextField
-              label="CRM"
-              variant="outlined"
-              fullWidth
-              name="crm"
-              required
-              value={formData.crm}
-              onChange={handleChange}
-            />
-          </Grid2>
-          <Grid2 size={12}>
-            <TextField
-              label="Especialidade"
-              variant="outlined"
-              fullWidth
-              name="especialidade"
-              required
-              value={formData.especialidade}
               onChange={handleChange}
             />
           </Grid2>
@@ -258,7 +242,56 @@ export const CadastrosUsuarios = () => {
               onChange={handleChange}
             />
           </Grid2>
-          {/* Campo de nome do responsável aparece apenas se a pessoa for menor de idade */}
+          <Grid2 size={12}>
+            <FormControl>
+              <FormLabel id="id_perfis">Tipo de Usuário</FormLabel>
+              <RadioGroup
+                name="id_perfis"
+                row
+                value={formData.id_perfis}
+                onChange={handlePerfilChange}
+              >
+                <FormControlLabel value='1' control={<Radio />} label="Comum" />
+                <FormControlLabel value='2' control={<Radio />} label="Admin" />
+                <FormControlLabel value='3' control={<Radio />} label="Medico" />
+              </RadioGroup>
+            </FormControl>
+          </Grid2>
+
+          {isMedic && (
+            <>
+            <Grid2 size={12}>
+              <TextField
+                label="CRM"
+                variant="outlined"
+                fullWidth
+                name="crm"
+                required
+                inputProps={{ maxLength: 6 }}
+                value={formData.crm}
+                onChange={handleChange} />
+            </Grid2><Grid2 size={12}>
+                <TextField
+                  label="Especialidade"
+                  variant="outlined"
+                  fullWidth
+                  name="especialidade"
+                  required
+                  value={formData.especialidade}
+                  onChange={handleChange} />
+              </Grid2><Grid2 size={12}>
+                <TextField
+                  label="Telefone"
+                  variant="outlined"
+                  fullWidth
+                  name="telefone"
+                  required
+                  value={insertMaskTel(formData.telefone)}
+                  onChange={handleChange} />
+              </Grid2>
+              </>
+          )}
+
           <Grid2 size={12}>
             <Button variant="contained" color="primary" type="submit">
               Cadastrar

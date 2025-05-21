@@ -21,6 +21,24 @@ const insertMaskTel = (telefone: string) => {
   return telefone;
 };
 
+const insertMaskCep = (cep: string) => {
+  cep = cep.replace(/\D/g, '');
+
+  cep = cep.replace(/(\d{5})(\d)/, "$1-$2");
+
+  return cep
+};
+
+const insertMaskSus = (cartaoSus: string) => {
+  cartaoSus = cartaoSus.replace(/\D/g, '');
+
+  return cartaoSus
+    .replace(/^(\d{3})(\d)/, "$1 $2")
+    .replace(/^(\d{3}) (\d{4})(\d)/, "$1 $2 $3")
+    .replace(/^(\d{3}) (\d{4}) (\d{4})(\d)/, "$1 $2 $3 $4");
+};
 
 
-export { insertMaskCpf, insertMaskTel }
+
+
+export { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus }
