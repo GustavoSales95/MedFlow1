@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import MoreTimeIcon from '@mui/icons-material/MoreTime';
 
 
 export const ListaAdmin1 = () => {
@@ -45,6 +46,22 @@ export const ListaAdmin1 = () => {
         >
           <ListItemIcon>{<PersonAddIcon />}</ListItemIcon>
           <ListItemText primary={"Gestão de Usuários"} />
+        </ListItemButton>
+      </ListItem>
+      <ListItem key={1} disablePadding>
+        <ListItemButton
+          component={Link}
+          to={"/admin/EditarEscala"}
+          sx={{
+            transition: "0.8s",
+            "&:hover": {
+              backgroundColor: "#019C9B",
+              color: "white",
+            },
+          }}
+        >
+          <ListItemIcon>{<MoreTimeIcon/>}</ListItemIcon>
+          <ListItemText primary={"Editar escala"} />
         </ListItemButton>
       </ListItem>
     </List>

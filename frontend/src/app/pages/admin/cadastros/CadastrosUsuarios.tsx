@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid2, Box, Typography, Paper, Snackbar, Alert, Radio, RadioGroup, FormControl, FormLabel, FormControlLabel } from '@mui/material';
+import { TextField, Button, Grid2, Box, Typography, Paper, Snackbar, Alert, Radio, RadioGroup, FormControl, FormGroup, FormLabel, FormControlLabel, Checkbox, FormHelperText } from '@mui/material';
 import api from '../../../../services/api';
 import { insertMaskCpf, insertMaskTel } from '../../../functions/InsertMasks';
 
@@ -29,7 +29,14 @@ export const CadastrosUsuarios = () => {
     crm: '',
     especialidade: '',
     telefone: '',
-    id_perfis: ''
+    id_perfis: '',
+    segunda: 'Folga',
+    terca: 'Folga',
+    quarta: 'Folga',
+    quinta: 'Folga',
+    sexta: 'Folga',
+    sabado: 'Folga',
+    domingo: 'Folga'
   });
   const [usuario, setUsuario] = useState<UserData | null>(null);
   const [medico, setMedico] = useState<MedicoData | null>(null);
@@ -60,9 +67,18 @@ export const CadastrosUsuarios = () => {
       }
       else {
         setIsMedic(false);
-        setFormData({ ...formData, crm: '', especialidade: '', telefone: '', id_perfis});
+        setFormData({ ...formData, crm: '', especialidade: '', telefone: '', segunda: '', terca: '', quarta: '', quinta: '', sexta: '', sabado: '', domingo: '', id_perfis});
       }
   }
+
+  const handleEscalaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: checked ? 'Escalado' : 'Folga' 
+    }));
+  };
 
   // Função para simular o envio dos dados
  const handleSubmit = async (e: React.FormEvent) => {
@@ -108,7 +124,7 @@ export const CadastrosUsuarios = () => {
       });
 
       if (checkResponseCrm.status === 200) {
-        setSnackbarMessage("Já exite um Médico com esse CRM.");
+        setSnackbarMessage("Já exite um Usuário com esse CRM.");
         setOpenSnackbar(true);
         return;
       }
@@ -151,11 +167,11 @@ export const CadastrosUsuarios = () => {
         telefone: formData.telefone.replace(/\D/g, '') 
       });
 
-      console.log('Médico cadastrado com sucesso:', response.data);
-      setSnackbarMessage("Médico cadastrado com sucesso.");
+      console.log('Usuário cadastrado com sucesso:', response.data);
+      setSnackbarMessage("Usuário cadastrado com sucesso.");
       setOpenSnackbar(true);
     } catch (error) {
-      console.error('Erro ao cadastrar médico:', error);
+      console.error('Erro ao cadastrar usuário:', error);
       setSnackbarMessage("Erro ao cadastrar médico.");
       setOpenSnackbar(true);
     }
@@ -166,7 +182,7 @@ export const CadastrosUsuarios = () => {
   return (
     <Paper elevation={4} sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
       <Typography variant="h4" gutterBottom alignItems={'center'}>
-        Cadastro de Médico
+        Cadastro de Usuário
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid2 container spacing={2}>
@@ -270,7 +286,8 @@ export const CadastrosUsuarios = () => {
                 inputProps={{ maxLength: 6 }}
                 value={formData.crm}
                 onChange={handleChange} />
-            </Grid2><Grid2 size={12}>
+            </Grid2>
+            <Grid2 size={12}>
                 <TextField
                   label="Especialidade"
                   variant="outlined"
@@ -279,7 +296,8 @@ export const CadastrosUsuarios = () => {
                   required
                   value={formData.especialidade}
                   onChange={handleChange} />
-              </Grid2><Grid2 size={12}>
+              </Grid2>
+              <Grid2 size={12}>
                 <TextField
                   label="Telefone"
                   variant="outlined"
@@ -288,6 +306,64 @@ export const CadastrosUsuarios = () => {
                   required
                   value={insertMaskTel(formData.telefone)}
                   onChange={handleChange} />
+              </Grid2>
+
+              <Grid2 size={12}>
+                <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+                  <FormLabel component="legend">Escala semanal</FormLabel>
+                  <FormGroup row sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 2, 
+                    justifyContent: 'flex-start',
+                    '& > *': { flex: '1 1 calc(100% / 3 - 16px)' } 
+                  }}>
+
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.segunda === 'Escalado'} onChange={handleEscalaChange} name="segunda" />
+                      }
+                      label="Segunda"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.terca === 'Escalado'} onChange={handleEscalaChange} name="terca" />
+                      }
+                      label="Terça"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.quarta === 'Escalado'} onChange={handleEscalaChange} name="quarta" />
+                      }
+                      label="Quarta"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.quinta === 'Escalado'} onChange={handleEscalaChange} name="quinta" />
+                      }
+                      label="Quinta"
+                    />
+                                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.sexta === 'Escalado'} onChange={handleEscalaChange} name="sexta" />
+                      }
+                      label="Sexta"
+                    />
+                                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.sabado === 'Escalado'} onChange={handleEscalaChange} name="sabado" />
+                      }
+                      label="Sabado"
+                    />
+                                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.domingo === 'Escalado'} onChange={handleEscalaChange} name="domingo" />
+                      }
+                      label="Domingo"
+                    />
+                  </FormGroup>
+                  <FormHelperText>*Defina os horários em: Editar Escala</FormHelperText>
+                </FormControl>
               </Grid2>
               </>
           )}

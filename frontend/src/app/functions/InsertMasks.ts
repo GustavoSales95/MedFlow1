@@ -38,7 +38,16 @@ const insertMaskSus = (cartaoSus: string) => {
     .replace(/^(\d{3}) (\d{4}) (\d{4})(\d)/, "$1 $2 $3 $4");
 };
 
+const insertMaskHora = (horario: string) => {
+  horario = horario.replace(/\D/g, '');
+  horario = horario.replace(/^(\d{2})(\d)/, "$1:$2");
+  horario = horario.replace(/^(\d{2}:\d{2})(\d{1,4})/, "$1 - $2");
+  horario = horario.replace(/( - \d{2})(\d)/, "$1:$2");
+  
+  return horario;
+};
 
 
 
-export { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus }
+
+export { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus, insertMaskHora }

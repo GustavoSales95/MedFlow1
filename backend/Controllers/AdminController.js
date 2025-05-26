@@ -19,13 +19,15 @@ route.get("/ConsultarUsuarios", async (req, resp) => {
 });
 
 route.post("/CadastrosUsuarios", async (req, resp) => {
-    let { nome, email, senha, cpf, data_nascimento, id_perfis, crm, especialidade, telefone } = req.body;
+    let { nome, email, senha, cpf, data_nascimento, id_perfis, crm, especialidade, telefone, segunda, terca, quarta, quinta, sexta, sabado, domingo } = req.body;
     id_perfis = parseInt(id_perfis);
 
     if (id_perfis == 3) {
         await service.criarUsuarios(nome, email, senha, cpf, data_nascimento, id_perfis);
 
         await service.criarMedicos(cpf, crm, especialidade, telefone);
+
+        await service.criarEscala(crm, segunda, terca, quarta, quinta, sexta, sabado, domingo )
 
         resp.status(201).json(req.body);
     }
@@ -48,6 +50,42 @@ route.get("/CadastrosUsuarios", async (req, resp) => {
 
     return resp.status(200).json({ usuario, medico, usuarioEmail });
 });
+
+route.get("/EditarEscala", async (req, resp) => {
+    const { cpf, crm, dia } = req.query;
+
+    if (cpf) {
+    const user = await service.buscarUsuarios(cpf);
+
+    return resp.status(200).json({ message: user});
+    }
+
+    if (crm) {
+    const user = await service.buscarMedico(crm);
+
+    return resp.status(200).json({ message: user});
+    }
+
+    if (dia) {
+    const users = await service.buscarEscalas(dia);
+
+    return resp.status(200).json({ message: users});
+    }
+
+    return resp.status(400).json({ error: "Um dos parâmetros (cpf, crm ou dia) é necessário."});
+});
+
+route.put("/EditarEscala", async (req,resp) => {
+    const { segunda, terca, quarta, quinta, sexta, sabado, domingo, segunda_horario, terca_horario, quarta_horario, quinta_horario, sexta_horario, sabado_horario, domingo_horario, id_medico } = req.body;
+
+    try {
+        const nova_escala = await service.editarEscala( segunda, terca, quarta, quinta, sexta, sabado, domingo, segunda_horario, terca_horario, quarta_horario, quinta_horario, sexta_horario, sabado_horario, domingo_horario, id_medico );
+
+        return resp.status(200).json({ message: nova_escala});
+    } catch (error) {
+        return resp.status(400).json({ error: "Ocorreu um erro ao atualizar a escala" });
+    }
+})
 
 
 export default route;

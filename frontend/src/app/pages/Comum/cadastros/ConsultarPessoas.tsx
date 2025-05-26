@@ -87,7 +87,7 @@ async function getUsers(cpf: string) {
         variant="h4"
         sx={{ marginBottom: "20px", textAlign: "center" }}
       >
-        Consulta de Usuários
+        Consulta de Pacientes
       </Typography>
 
       {/* Campo de pesquisa por CPF */}

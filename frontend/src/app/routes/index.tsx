@@ -8,6 +8,7 @@ import {
   DashboardAdmin,
   CadastrosUsuarios,
   ConsultarUsuarios,
+  EditarEscala,
   ConsultarPessoas,
   ConsultarProntuario,
   DashboardMedico,
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
       {
         path: "ConsultarUsuarios",
         element: <ConsultarUsuarios></ConsultarUsuarios>,
+      },
+      {
+        path: "EditarEscala",
+        element: <EditarEscala></EditarEscala>,
       },
     ],
   },

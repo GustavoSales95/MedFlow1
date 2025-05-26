@@ -72,6 +72,11 @@ export const Cadastros = () => {
         setOpenSnackbar(true);
         return;
       }
+      if (formData.cartao_sus.length != 18) {
+        setSnackbarMessage("Insira um número de cartão SUS válido.");
+        setOpenSnackbar(true);
+        return;
+      }
       
       const checkResponseCpf = await api.get('/Comum/Cadastros', {
         params: {

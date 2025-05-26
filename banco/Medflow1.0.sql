@@ -44,12 +44,19 @@ CREATE TABLE escala (
 	id_escala int auto_increment PRIMARY KEY,
 	id_medico INT UNIQUE NOT NULL,
     segunda ENUM('Escalado', 'Folga'),
+    segunga_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
     terca ENUM('Escalado', 'Folga'),
+    terca_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
     quarta ENUM('Escalado', 'Folga'),
+    quarta_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
     quinta ENUM('Escalado', 'Folga'),
+    quinta_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
     sexta ENUM('Escalado', 'Folga'),
+    sexta_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
     sabado ENUM('Escalado', 'Folga'),
-    domingo ENUM('Escalado', 'Folga')
+    sabado_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
+    domingo ENUM('Escalado', 'Folga'),
+    domingo_horario VARCHAR(13) DEFAULT "09:00 - 17:00"
 );
 
 CREATE TABLE prontuario(
@@ -92,9 +99,10 @@ INSERT INTO pacientes (nome, cpf, cartao_sus, data_nascimento, telefone, cep, en
 
 INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Pelo de gato", "O-", "", "Transplante de rim", "Tuberculose");
 
-select * from usuarios;
+/*select * from usuarios;
 select * from pacientes;
 select * from medicos;
+select* from escala;
 select * from agendamentos;
 select * from prontuario;
 
