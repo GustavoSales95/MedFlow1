@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../../services/api";
+import { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus } from '../../../functions/InsertMasks';
 import {
   TextField,
   Button,
@@ -23,9 +24,11 @@ interface Pacientes {
   id_paciente: number;
   nome: string;
   cpf: string;
+  cartao_sus: string;
   telefone: string;
-  data_nascimento: string;
+  cep: string;
   endereco: string;
+  data_nascimento: string;
 }
 
 interface Prontuario {
@@ -47,7 +50,7 @@ export const ConsultarProntuario = () => {
 
 
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCpf(e.target.value);
+    setCpf(e.target.value.replace(/\D/g, ''));
   };
 
   const handleSearch = async () => {
@@ -101,7 +104,8 @@ export const ConsultarProntuario = () => {
             label="Digite o CPF"
             variant="outlined"
             fullWidth
-            value={cpf}
+            inputProps={{ maxLength: 14 }}
+            value={insertMaskCpf(cpf)}
             onChange={handleCpfChange}
             sx={{ marginBottom: "20px" }}
           />
@@ -133,7 +137,11 @@ export const ConsultarProntuario = () => {
                 </Grid>
                 <Grid item sm={6} md={6}>
                   <Typography sx={{fontSize: 18,}}>CPF</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.cpf}</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskCpf(paciente.cpf)}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Cartão do SUS</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskSus(paciente.cartao_sus) || "Não informado"}</Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
                   <Typography sx={{fontSize: 18,}}>Data de Nascimento</Typography>
@@ -141,7 +149,11 @@ export const ConsultarProntuario = () => {
                 </Grid>
                 <Grid item sm={6} md={6}>
                   <Typography sx={{fontSize: 18,}}>Telefone</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.telefone || "Não informado"}</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskTel(paciente.telefone) || "Não informado"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>CEP</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskCep(paciente.cep) || "Não informado"}</Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
                   <Typography sx={{fontSize: 18,}}>Endereço</Typography>

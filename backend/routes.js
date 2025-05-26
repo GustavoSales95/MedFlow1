@@ -6,7 +6,7 @@ import estoqueController from "./Controllers/EstoqueController.js";
 
 const routes = express();
 
-routes.use("/", comumController)
+routes.use("/Comum", comumController)
 routes.use("/Admin", adminController);
 routes.use("/Medico", medicoController);
 routes.use ("/Estoque", estoqueController);

@@ -9,54 +9,49 @@ import {
   CadastrosUsuarios,
   ConsultarUsuarios,
   ConsultarPessoas,
-} from "../pages";
-//Import de medico
-import { 
-  ConsultarProntuario, 
+  ConsultarProntuario,
   DashboardMedico,
-  AgendaDia
-
-} from '../pages';
-
-
-// Import de Estoque
-import { Editar } from "../pages/editar/editar";
-import { Estoque } from "../pages/Estoque/Estoque";
-import { Entrada } from "../pages/Entrada/Entrada_sai";
+  AgendaDia,
+  Editar,
+  Estoque,
+  Entrada
+} from "../pages";
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Dashboard></Dashboard>,
-    children: [
+    path: "/Estoque",
+    element: <Estoque/>,
+    children:[
       {
-        path: "/",
-        element: <Marcacao></Marcacao>,
-      },
-      {
-        path: "/cadastros",
-        element: <Cadastros></Cadastros>,
-      },
-      {
-        path: "/ConsultarPessoas",
-        element: <ConsultarPessoas></ConsultarPessoas>,
-      },
-      {
-        path: "/Entrada",
+        path: "Entrada",
         element: <Entrada></Entrada>,
       },
       {
-        path: "/estoque",
-        element: <Estoque></Estoque>,
-      },
-      {
-        path: "/editar",
+        path: "Editar",
         element: <Editar></Editar>,
       },
     ],
   },
   {
-    path: "/Login",
+    path: "/Comum",
+    element: <Dashboard></Dashboard>,
+    children: [
+      {
+        index: true,
+        element: <Marcacao></Marcacao>,
+      },
+      {
+        path: "Cadastros",
+        element: <Cadastros></Cadastros>,
+      },
+      {
+        path: "ConsultarPessoas",
+        element: <ConsultarPessoas></ConsultarPessoas>,
+      },
+    ],
+  },
+  {
+    path: "/",
     element: <Login></Login>,
   },
   {
@@ -64,29 +59,30 @@ const router = createBrowserRouter([
     element: <DashboardAdmin></DashboardAdmin>,
     children: [
       {
-        path: "/Admin/CadastrosUsuarios",
+        path: "CadastrosUsuarios",
         element: <CadastrosUsuarios></CadastrosUsuarios>,
       },
       {
-        path: "/Admin/ConsultarUsuarios",
+        path: "ConsultarUsuarios",
         element: <ConsultarUsuarios></ConsultarUsuarios>,
       },
     ],
   },
-  { 
-    path: "/Medico",
+  {
+    path: "Medico",
     element: <DashboardMedico></DashboardMedico>,
     children: [
       {
-        path: "/Medico/ConsultarProntuarios",
+        path: "ConsultarProntuarios",
         element: <ConsultarProntuario></ConsultarProntuario>,
       },
       {
-        path: "/Medico/AgendaDia",
+        path: "AgendaDia",
         element: <AgendaDia></AgendaDia>,
       },
     ],
   },
+<<<<<<< HEAD
   { 
     path: "/Estoque",
     element: <DashboardMedico></DashboardMedico>,
@@ -101,5 +97,8 @@ const router = createBrowserRouter([
       },
     ],
   }
+=======
+>>>>>>> main
 ]);
+
 export default router;
