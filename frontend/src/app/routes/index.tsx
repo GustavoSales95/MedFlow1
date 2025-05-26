@@ -82,7 +82,6 @@ const router = createBrowserRouter([
       },
     ],
   },
-<<<<<<< HEAD
   { 
     path: "/Estoque",
     element: <DashboardMedico></DashboardMedico>,
@@ -97,8 +96,6 @@ const router = createBrowserRouter([
       },
     ],
   }
-=======
->>>>>>> main
 ]);
 
 export default router;
