@@ -86,7 +86,20 @@ const router = createBrowserRouter([
         element: <AgendaDia></AgendaDia>,
       },
     ],
-
+  },
+  { 
+    path: "/Estoque",
+    element: <DashboardMedico></DashboardMedico>,
+    children: [
+      {
+        path: "/Estoque/Registrar",
+        element: <ConsultarProntuario></ConsultarProntuario>,
+      },
+      {
+        path: "/Estoque/Atualizar",
+        element: <AgendaDia></AgendaDia>,
+      },
+    ],
   }
 ]);
 export default router;
