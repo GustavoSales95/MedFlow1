@@ -44,8 +44,35 @@ model Medicos {
   especialidade String?
   telefone      String?
 
-  Usuarios Usuarios @relation(fields: [usuario_id], references: [id_usuario])
-  Agendamentos Agendamentos[]
+  Usuarios      Usuarios @relation(fields: [usuario_id], references: [id_usuario])
+  Escala        Escala?
+  Agendamentos  Agendamentos[]
+}
+
+enum Status {
+  Escalado
+  Folga
+}
+
+model Escala {
+  id_escala       Int       @id @default(autoincrement())
+  id_medico       Int       @unique 
+  segunda         Status
+  segunda_horario String ? @default("09:00 - 17:00") @db.VarChar(13)
+  terca           Status
+  terca_horario   String ? @default("09:00 - 17:00") @db.VarChar(13)
+  quarta          Status
+  quarta_horario  String ? @default("09:00 - 17:00") @db.VarChar(13)
+  quinta          Status
+  quinta_horario  String ? @default("09:00 - 17:00") @db.VarChar(13)
+  sexta           Status
+  sexta_horario   String ? @default("09:00 - 17:00") @db.VarChar(13)
+  sabado          Status
+  sabado_horario  String ? @default("09:00 - 17:00") @db.VarChar(13)
+  domingo         Status
+  domingo_horario String ? @default("09:00 - 17:00") @db.VarChar(13)
+  Medico          Medicos @relation(fields: [id_medico], references: [id_medico])
+
 }
 
 model Pacientes {

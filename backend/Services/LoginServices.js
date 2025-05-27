@@ -28,7 +28,7 @@ export const loginService = {
         id_usuario: usuario.id_usuario,
         nome: usuario.nome,
         email: usuario.email,
-        perfil_id: usuario.id_usuario,
+        perfil_id: usuario.perfil_id,
       },
     ];
   },

@@ -11,6 +11,7 @@ export { ConsultarPessoas } from "./Comum/cadastros/ConsultarPessoas";
 export { CadastrosUsuarios } from "./admin/cadastros/CadastrosUsuarios";
 export { DashboardAdmin } from "./admin/dashboardAdmin/DashboardAdmin";
 export { ConsultarUsuarios } from "./admin/cadastros/ConsultarUsuarios";
+export { EditarEscala } from "./admin/cadastros/EditarEscala";
 
 
 //Rotas Estoque

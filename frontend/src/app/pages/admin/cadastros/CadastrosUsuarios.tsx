@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Button, Grid2, Box, Typography, Paper, Snackbar, Alert } from '@mui/material';
+import { TextField, Button, Grid2, Box, Typography, Paper, Snackbar, Alert, Radio, RadioGroup, FormControl, FormGroup, FormLabel, FormControlLabel, Checkbox, FormHelperText } from '@mui/material';
 import api from '../../../../services/api';
 import { insertMaskCpf, insertMaskTel } from '../../../functions/InsertMasks';
 
@@ -28,10 +28,19 @@ export const CadastrosUsuarios = () => {
     data_nascimento: '',
     crm: '',
     especialidade: '',
-    telefone: ''
+    telefone: '',
+    id_perfis: '',
+    segunda: 'Folga',
+    terca: 'Folga',
+    quarta: 'Folga',
+    quinta: 'Folga',
+    sexta: 'Folga',
+    sabado: 'Folga',
+    domingo: 'Folga'
   });
   const [usuario, setUsuario] = useState<UserData | null>(null);
   const [medico, setMedico] = useState<MedicoData | null>(null);
+  const [isMedic, setIsMedic] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -49,6 +58,28 @@ export const CadastrosUsuarios = () => {
     setFormData({ ...formData, [name]: maskedValue });
   };
 
+  const handlePerfilChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id_perfis = e.target.value;
+
+      if(id_perfis == '3') {
+        setIsMedic(true);
+        setFormData({ ...formData, id_perfis });
+      }
+      else {
+        setIsMedic(false);
+        setFormData({ ...formData, crm: '', especialidade: '', telefone: '', segunda: '', terca: '', quarta: '', quinta: '', sexta: '', sabado: '', domingo: '', id_perfis});
+      }
+  }
+
+  const handleEscalaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: checked ? 'Escalado' : 'Folga' 
+    }));
+  };
+
   // Função para simular o envio dos dados
  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,17 +91,19 @@ export const CadastrosUsuarios = () => {
         setOpenSnackbar(true);
         return;
       }
-      if (formData.crm.length < 6) {
-        setSnackbarMessage("Insira um CRM válido.");
-        setOpenSnackbar(true);
-        return;
+
+      if (formData.id_perfis == '3') {
+        if (formData.crm.length < 6) {
+          setSnackbarMessage("Insira um CRM válido.");
+          setOpenSnackbar(true);
+          return;
+        }
+        if (formData.telefone.length < 14) {
+          setSnackbarMessage("Insira um número de telefone válido.");
+          setOpenSnackbar(true);
+          return;
+        }
       }
-      if (formData.telefone.length < 14) {
-        setSnackbarMessage("Insira um número de telefone válido.");
-        setOpenSnackbar(true);
-        return;
-      }
-      
       // Verifica se já existe um médico/usuário com o mesmo CPF ou CRM
       const checkResponseCpf = await api.get('/Admin/CadastrosUsuarios', {
         params: {
@@ -91,7 +124,7 @@ export const CadastrosUsuarios = () => {
       });
 
       if (checkResponseCrm.status === 200) {
-        setSnackbarMessage("Já exite um Médico com esse CRM.");
+        setSnackbarMessage("Já exite um Usuário com esse CRM.");
         setOpenSnackbar(true);
         return;
       }
@@ -134,11 +167,11 @@ export const CadastrosUsuarios = () => {
         telefone: formData.telefone.replace(/\D/g, '') 
       });
 
-      console.log('Médico cadastrado com sucesso:', response.data);
-      setSnackbarMessage("Médico cadastrado com sucesso.");
+      console.log('Usuário cadastrado com sucesso:', response.data);
+      setSnackbarMessage("Usuário cadastrado com sucesso.");
       setOpenSnackbar(true);
     } catch (error) {
-      console.error('Erro ao cadastrar médico:', error);
+      console.error('Erro ao cadastrar usuário:', error);
       setSnackbarMessage("Erro ao cadastrar médico.");
       setOpenSnackbar(true);
     }
@@ -149,7 +182,7 @@ export const CadastrosUsuarios = () => {
   return (
     <Paper elevation={4} sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
       <Typography variant="h4" gutterBottom alignItems={'center'}>
-        Cadastro de Médico
+        Cadastro de Usuário
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid2 container spacing={2}>
@@ -179,17 +212,6 @@ export const CadastrosUsuarios = () => {
           </Grid2>
           <Grid2 size={12}>
             <TextField
-              label="Telefone"
-              variant="outlined"
-              fullWidth
-              name="telefone"
-              required
-              value={insertMaskTel(formData.telefone)}
-              onChange={handleChange}
-            />
-          </Grid2>
-          <Grid2 size={12}>
-            <TextField
               label="CPF"
               variant="outlined"
               fullWidth
@@ -197,28 +219,6 @@ export const CadastrosUsuarios = () => {
               required
               inputProps={{ maxLength: 14 }}
               value={insertMaskCpf(formData.cpf)}
-              onChange={handleChange}
-            />
-          </Grid2>
-          <Grid2 size={12}>
-            <TextField
-              label="CRM"
-              variant="outlined"
-              fullWidth
-              name="crm"
-              required
-              value={formData.crm}
-              onChange={handleChange}
-            />
-          </Grid2>
-          <Grid2 size={12}>
-            <TextField
-              label="Especialidade"
-              variant="outlined"
-              fullWidth
-              name="especialidade"
-              required
-              value={formData.especialidade}
               onChange={handleChange}
             />
           </Grid2>
@@ -258,7 +258,116 @@ export const CadastrosUsuarios = () => {
               onChange={handleChange}
             />
           </Grid2>
-          {/* Campo de nome do responsável aparece apenas se a pessoa for menor de idade */}
+          <Grid2 size={12}>
+            <FormControl>
+              <FormLabel id="id_perfis">Tipo de Usuário</FormLabel>
+              <RadioGroup
+                name="id_perfis"
+                row
+                value={formData.id_perfis}
+                onChange={handlePerfilChange}
+              >
+                <FormControlLabel value='1' control={<Radio />} label="Comum" />
+                <FormControlLabel value='2' control={<Radio />} label="Admin" />
+                <FormControlLabel value='3' control={<Radio />} label="Medico" />
+              </RadioGroup>
+            </FormControl>
+          </Grid2>
+
+          {isMedic && (
+            <>
+            <Grid2 size={12}>
+              <TextField
+                label="CRM"
+                variant="outlined"
+                fullWidth
+                name="crm"
+                required
+                inputProps={{ maxLength: 6 }}
+                value={formData.crm}
+                onChange={handleChange} />
+            </Grid2>
+            <Grid2 size={12}>
+                <TextField
+                  label="Especialidade"
+                  variant="outlined"
+                  fullWidth
+                  name="especialidade"
+                  required
+                  value={formData.especialidade}
+                  onChange={handleChange} />
+              </Grid2>
+              <Grid2 size={12}>
+                <TextField
+                  label="Telefone"
+                  variant="outlined"
+                  fullWidth
+                  name="telefone"
+                  required
+                  value={insertMaskTel(formData.telefone)}
+                  onChange={handleChange} />
+              </Grid2>
+
+              <Grid2 size={12}>
+                <FormControl sx={{ m: 3 }} component="fieldset" variant="standard">
+                  <FormLabel component="legend">Escala semanal</FormLabel>
+                  <FormGroup row sx={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 2, 
+                    justifyContent: 'flex-start',
+                    '& > *': { flex: '1 1 calc(100% / 3 - 16px)' } 
+                  }}>
+
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.segunda === 'Escalado'} onChange={handleEscalaChange} name="segunda" />
+                      }
+                      label="Segunda"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.terca === 'Escalado'} onChange={handleEscalaChange} name="terca" />
+                      }
+                      label="Terça"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.quarta === 'Escalado'} onChange={handleEscalaChange} name="quarta" />
+                      }
+                      label="Quarta"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.quinta === 'Escalado'} onChange={handleEscalaChange} name="quinta" />
+                      }
+                      label="Quinta"
+                    />
+                                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.sexta === 'Escalado'} onChange={handleEscalaChange} name="sexta" />
+                      }
+                      label="Sexta"
+                    />
+                                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.sabado === 'Escalado'} onChange={handleEscalaChange} name="sabado" />
+                      }
+                      label="Sabado"
+                    />
+                                    <FormControlLabel
+                      control={
+                        <Checkbox checked={formData.domingo === 'Escalado'} onChange={handleEscalaChange} name="domingo" />
+                      }
+                      label="Domingo"
+                    />
+                  </FormGroup>
+                  <FormHelperText>*Defina os horários em: Editar Escala</FormHelperText>
+                </FormControl>
+              </Grid2>
+              </>
+          )}
+
           <Grid2 size={12}>
             <Button variant="contained" color="primary" type="submit">
               Cadastrar

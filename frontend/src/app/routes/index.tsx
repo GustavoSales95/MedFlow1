@@ -10,6 +10,7 @@ import {
   DashboardAdmin,
   CadastrosUsuarios,
   ConsultarUsuarios,
+  EditarEscala,
   ConsultarPessoas,
   ConsultarProntuario,
   DashboardMedico,
@@ -25,12 +26,10 @@ const PrivateRoute = ({ allowedRoles }: { allowedRoles: string[] }) => {
   const { logado, usuario } = useContext(AppContext);
 
   if (!logado || !usuario) {
-    // Usuário não está logado
     return <Navigate to="/" replace />;
   }
 
   if (!allowedRoles.includes(usuario.typeUser)) {
-    // Usuário não tem permissão para essa rota
     return <Navigate to="/" replace />;
   }
 
@@ -46,6 +45,8 @@ const router = createBrowserRouter([
         index: true,
         element: <Login />,
       },
+
+      // Rotas para usuários "comum"
       {
         element: <PrivateRoute allowedRoles={["comum"]} />,
         children: [
@@ -60,6 +61,8 @@ const router = createBrowserRouter([
           },
         ],
       },
+
+      // Rotas para usuários "admin"
       {
         element: <PrivateRoute allowedRoles={["admin"]} />,
         children: [
@@ -69,10 +72,13 @@ const router = createBrowserRouter([
             children: [
               { path: "CadastrosUsuarios", element: <CadastrosUsuarios /> },
               { path: "ConsultarUsuarios", element: <ConsultarUsuarios /> },
+              { path: "EditarEscala", element: <EditarEscala /> },
             ],
           },
         ],
       },
+
+      // Rotas para usuários "medico"
       {
         element: <PrivateRoute allowedRoles={["medico"]} />,
         children: [
@@ -85,12 +91,23 @@ const router = createBrowserRouter([
                 element: <ConsultarProntuario />,
               },
               { path: "AgendaDia", element: <AgendaDia /> },
+              {
+                path: "ConsultarProntuarios",
+                element: <ConsultarProntuario />,
+              },
             ],
           },
         ],
       },
+    ],
+  },
+
+  {
+    path: "Medico",
+    element: <DashboardMedico />,
+    children: [
       {
-        element: <PrivateRoute allowedRoles={["admin"]} />, // Se quiser proteger o estoque só para admin
+        element: <PrivateRoute allowedRoles={["admin"]} />, // Protegendo estoque só para admin
         children: [
           {
             path: "Estoque",

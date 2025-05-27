@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Grid2, Box, Typography, Paper, Snackbar, Alert } from '@mui/material';
-import { insertMaskCpf, insertMaskTel } from '../../../functions/InsertMasks';
+import { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus } from '../../../functions/InsertMasks';
 import api from '../../../../services/api';
 
 export const Cadastros = () => {
@@ -29,6 +29,8 @@ export const Cadastros = () => {
     
     const maskedValue = name === "cpf" ? insertMaskCpf(rawValue) :
                         name === "telefone" ? insertMaskTel(rawValue) :
+                        name === "cep" ? insertMaskCep(rawValue) :
+                        name === "cartao_sus" ? insertMaskSus(rawValue) :
                         value;
 
     setFormData({ ...formData, [name]: maskedValue });
@@ -70,8 +72,13 @@ export const Cadastros = () => {
         setOpenSnackbar(true);
         return;
       }
+      if (formData.cartao_sus.length != 18) {
+        setSnackbarMessage("Insira um número de cartão SUS válido.");
+        setOpenSnackbar(true);
+        return;
+      }
       
-      const checkResponseCpf = await api.get('/Cadastros', {
+      const checkResponseCpf = await api.get('/Comum/Cadastros', {
         params: {
           cpf: formData.cpf.replace(/\D/g, ''),
         }
@@ -83,7 +90,7 @@ export const Cadastros = () => {
         return;
       }
 
-      const checkResponseSus = await api.get('/Cadastros', {
+      const checkResponseSus = await api.get('/Comum/Cadastros', {
         params: {
           cartao_sus: formData.cartao_sus.replace(/\D/g, ''),
         }
@@ -105,10 +112,12 @@ export const Cadastros = () => {
     }
 
     try {
-      const response = await api.post('/Cadastros', {
+      const response = await api.post('/Comum/Cadastros', {
         ...formData,
         cpf: formData.cpf.replace(/\D/g, ''), 
-        telefone: formData.telefone.replace(/\D/g, '') 
+        telefone: formData.telefone.replace(/\D/g, ''), 
+        cep: formData.cep.replace(/\D/g, ''),
+        cartao_sus: formData.cartao_sus.replace(/\D/g, '')
       });
 
       console.log('Paciente cadastrado com sucesso:', response.data);
@@ -169,8 +178,8 @@ export const Cadastros = () => {
               variant="outlined"
               fullWidth
               name="cep"
-              inputProps={{ maxLenght: 3 }}
-              value={formData.cep}
+              inputProps={{ maxLength: 9 }}
+              value={insertMaskCep(formData.cep)}
               onChange={handleChange}
             />
           </Grid2>
@@ -201,7 +210,8 @@ export const Cadastros = () => {
               variant="outlined"
               fullWidth
               name="cartao_sus"
-              value={formData.cartao_sus}
+              inputProps={{ maxLength: 18 }}
+              value={insertMaskSus(formData.cartao_sus)}
               onChange={handleChange}
             />
           </Grid2>
