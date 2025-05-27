@@ -1,43 +1,91 @@
-import React from 'react';
-import { createContext, ReactNode, useState } from 'react';
+import React, { createContext, useState, ReactNode, useContext } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
+// Defina seus tipos aqui
 type Usuario = {
-  userName: string,
-  idUser: Number,
-  token: string,
-  typeUser: string
-}
+  userName: string;
+  idUser: number;
+  token: string;
+  typeUser: string;
+};
+
 type AppContextData = {
-  usuario: Usuario | undefined,
-  logado: boolean,
-  logar:(email: string, password: string)=>Promise<string|null>,
-  deslogar:()=> void,
-}
+  usuario?: Usuario;
+  logado: boolean;
+  logar: (email: string, senha: string) => Promise<Usuario | null>;
+  deslogar: () => void;
+};
+
 type AppProviderData = {
-  children: ReactNode
-}
-export const AppProvider = ({children}: AppProviderData)=>{
-  const [usuario, setUsuario] = useState<Usuario>();
-  
-  
-  const logado = Boolean(usuario);                          /*verificação para ver se o usuário esta logado*/
-  
-  
-  const logar = async (email:string, senha: string)=>{               /*Função criada para logar o usuário*/
-      alert("Chamou a função logar");
-      return (null)
-  
+  children: ReactNode;
+};
+
+export const AppContext = createContext<AppContextData>({} as AppContextData);
+
+export const AppProvider = ({ children }: AppProviderData) => {
+  const [usuario, setUsuario] = useState<Usuario | undefined>();
+  const logado = Boolean(usuario);
+  const navigate = useNavigate();
+
+  const logar = async (
+    email: string,
+    senha: string
+  ): Promise<Usuario | null> => {
+    try {
+      const response = await axios.post("http://localhost:3333/login", {
+        email,
+        senha,
+      });
+
+      if (response.data?.token) {
+        const decoded: any = jwtDecode(response.data.token);
+        console.log("Usuário logado:", decoded);
+
+        const perfilMap: Record<number, string> = {
+          1: "admin",
+          2: "comum",
+          3: "medico",
+        };
+
+        const typeUser = perfilMap[decoded.perfil_id] || "comum";
+
+        const user: Usuario = {
+          idUser: decoded.id,
+          userName: decoded.nome,
+          token: response.data.token,
+          typeUser,
+        };
+
+        setUsuario(user);
+
+        // Redirecionar depois do login
+        if (typeUser === "admin") navigate("/Admin");
+        else if (typeUser === "medico") navigate("/Medico");
+        else if (typeUser === "comum") navigate("/Comum");
+        else navigate("/");
+
+        return user;
+      }
+
+      alert("Email ou senha inválidos");
+      return null;
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      alert("Erro ao fazer login");
+      return null;
     }
-  const deslogar = ()=>{
-      alert("Você foi desconectado");
-      return(null)
-  
-  }
-  
-  return(
-    <AppContext.Provider value= {{logar,deslogar,logado,usuario /*valores passados para a aplicação*/ }}>
+  };
+
+  const deslogar = () => {
+    setUsuario(undefined);
+    navigate("/");
+  };
+
+  return (
+    <AppContext.Provider value={{ logar, deslogar, logado, usuario }}>
       {children}
     </AppContext.Provider>
-  )
-}
-export const AppContext = createContext({} as AppContextData)
+  );
+};

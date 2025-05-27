@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../../services/api";
-import { insertMaskCpf, insertMaskTel } from '../../../functions/InsertMasks';
+import { insertMaskCpf, insertMaskTel } from "../../../functions/InsertMasks";
 import {
   TextField,
   Button,
@@ -17,7 +17,7 @@ import {
   TableRow,
   Paper,
   FormControlLabel,
-  Checkbox
+  Checkbox,
 } from "@mui/material";
 
 interface Pacientes {
@@ -45,10 +45,8 @@ export const ConsultarProntuario = () => {
   const [Pacientes, setPacientes] = useState<Pacientes[]>([]);
   const [prontuario, setProntuario] = useState<Prontuario | null>(null);
 
-
-
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCpf(e.target.value.replace(/\D/g, ''));
+    setCpf(e.target.value.replace(/\D/g, ""));
   };
 
   const handleSearch = async () => {
@@ -61,14 +59,16 @@ export const ConsultarProntuario = () => {
     }
 
     try {
-      const response = await api.get('Medico/ConsultarProntuarios', {
+      const response = await api.get("Medico/ConsultarProntuarios", {
         params: { cpf },
       });
 
       console.log("Resposta da API:", response.data);
 
       if (!response.data.message || !response.data.paciente) {
-        setSnackbarMessage("Nenhum prontuário encontrado para o CPF informado.");
+        setSnackbarMessage(
+          "Nenhum prontuário encontrado para o CPF informado."
+        );
         setOpenSnackbar(true);
         return;
       }
@@ -82,17 +82,20 @@ export const ConsultarProntuario = () => {
     }
   };
 
-  function formatarData(dataNasc:string) {
+  function formatarData(dataNasc: string) {
     const data = new Date(dataNasc);
 
     const dataFormatada = data.toLocaleDateString("pt-BR");
 
-    return dataFormatada
+    return dataFormatada;
   }
 
   return (
     <Box sx={{ padding: "20px", maxWidth: 800, margin: "0 auto" }}>
-      <Typography variant="h4" sx={{ marginBottom: "20px", textAlign: "center" }}>
+      <Typography
+        variant="h4"
+        sx={{ marginBottom: "20px", textAlign: "center" }}
+      >
         Consulta de Porntuário
       </Typography>
 
@@ -123,68 +126,97 @@ export const ConsultarProntuario = () => {
 
       {prontuario && (
         <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
-          <Typography variant="h4" align="center" marginBottom={1.5}>Prontuário Médico</Typography>
+          <Typography variant="h4" align="center" marginBottom={1.5}>
+            Prontuário Médico
+          </Typography>
 
-          <Typography variant="h5" marginTop={3} marginBottom={1} >Dados Pessoais</Typography>
+          <Typography variant="h5" marginTop={3} marginBottom={1}>
+            Dados Pessoais
+          </Typography>
           <Grid container spacing={2}>
             {Pacientes.map((paciente) => (
-            <>
+              <>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18}}>Nome</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.nome}</Typography>
+                  <Typography sx={{ fontSize: 18 }}>Nome</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                    {paciente.nome}
+                  </Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>CPF</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskCpf(paciente.cpf)}</Typography>
+                  <Typography sx={{ fontSize: 18 }}>CPF</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                    {insertMaskCpf(paciente.cpf)}
+                  </Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Data de Nascimento</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{formatarData(paciente.data_nascimento)}</Typography>
+                  <Typography sx={{ fontSize: 18 }}>
+                    Data de Nascimento
+                  </Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                    {formatarData(paciente.data_nascimento)}
+                  </Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Telefone</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskTel(paciente.telefone) || "Não informado"}</Typography>
+                  <Typography sx={{ fontSize: 18 }}>Telefone</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                    {insertMaskTel(paciente.telefone) || "Não informado"}
+                  </Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Endereço</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.endereco || "Não informado"}</Typography>
+                  <Typography sx={{ fontSize: 18 }}>Endereço</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                    {paciente.endereco || "Não informado"}
+                  </Typography>
                 </Grid>
               </>
             ))}
           </Grid>
 
-        <Typography variant="h5" marginTop={3} marginBottom={1} >Histórico</Typography>
-        <Grid container spacing={2}>
+          <Typography variant="h5" marginTop={3} marginBottom={1}>
+            Histórico
+          </Typography>
+          <Grid container spacing={2}>
             <>
-                <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18}}>Alergias</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.alergias || "Nenhuma"}</Typography>
-                </Grid>
-                <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Doenças Infecciosas</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.doencas_infecciosas || "Nenhuma"}</Typography>
-                </Grid>
-                <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Medicamentos de Uso Contínuo</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.medicamentos || "Nenhum"}</Typography>
-                </Grid>
-                <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Cirurgias Anteriores</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.cirurgias || "Nenhuma"}</Typography>
-                </Grid>
-                <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Tipo Sanguíneo</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{prontuario.tipo_sanguineo || "Não informado"}</Typography>
-                </Grid>
-              </>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>Alergias</Typography>
+                <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                  {prontuario.alergias || "Nenhuma"}
+                </Typography>
+              </Grid>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>
+                  Doenças Infecciosas
+                </Typography>
+                <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                  {prontuario.doencas_infecciosas || "Nenhuma"}
+                </Typography>
+              </Grid>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>
+                  Medicamentos de Uso Contínuo
+                </Typography>
+                <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                  {prontuario.medicamentos || "Nenhum"}
+                </Typography>
+              </Grid>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>
+                  Cirurgias Anteriores
+                </Typography>
+                <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                  {prontuario.cirurgias || "Nenhuma"}
+                </Typography>
+              </Grid>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>Tipo Sanguíneo</Typography>
+                <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                  {prontuario.tipo_sanguineo || "Não informado"}
+                </Typography>
+              </Grid>
+            </>
           </Grid>
-
-      </Paper>
-
-
-)}
-
-
+        </Paper>
+      )}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}

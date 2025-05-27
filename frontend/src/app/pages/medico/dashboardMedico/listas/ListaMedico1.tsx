@@ -17,7 +17,7 @@ export const ListaMedico1 = () => {
       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/"}
+          to={"/Medico"}
           sx={{
             transition: "0.8s",
             "&:hover": {

@@ -11,7 +11,7 @@ route.post("/Cadastros", async (req, resp) => {
     resp.status(201).json(req.body);
 });
 
-route.get("Cadastros", async (req, resp) => {
+route.get("/Cadastros", async (req, resp) => {
     const { cpf, cartao_sus } = req.query;
 
     const pacienteCpf = cpf ? await service.buscarPacienteCpf(cpf) : null;

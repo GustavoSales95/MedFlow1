@@ -1,8 +1,12 @@
+import React from "react";
+import { Outlet } from "react-router-dom";
+import { AppProvider } from "../src/app/shared/contexts/AppContext";
+
 function App() {
   return (
-    <div className="App">
-      <h1>Hello World</h1>
-    </div>
+    <AppProvider>
+      <Outlet />
+    </AppProvider>
   );
 }
 
