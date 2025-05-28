@@ -48,19 +48,14 @@ const router = createBrowserRouter([
 
       // Rotas para usuários "comum"
       {
-        element: <PrivateRoute allowedRoles={["comum"]} />,
-        children: [
-          {
-            path: "Comum",
-            element: <Dashboard />,
-            children: [
-              { index: true, element: <Marcacao /> },
-              { path: "Cadastros", element: <Cadastros /> },
-              { path: "ConsultarPessoas", element: <ConsultarPessoas /> },
-            ],
-          },
-        ],
-      },
+  path: "Comum",
+  element: <Dashboard />,
+  children: [
+    { index: true, element: <Marcacao /> },
+    { path: "Cadastros", element: <Cadastros /> },
+    { path: "ConsultarPessoas", element: <ConsultarPessoas /> },
+  ],
+},
 
       // Rotas para usuários "admin"
       {

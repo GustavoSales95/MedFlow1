@@ -14,7 +14,7 @@ import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 export const ListaMedico1 = () => {
   return (
     <List>
-      <ListItem key={1} disablePadding>
+{/*       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
           to={"/Medico"}
@@ -29,7 +29,7 @@ export const ListaMedico1 = () => {
           <ListItemIcon>{<InsertInvitationIcon />}</ListItemIcon>
           <ListItemText primary={"Marcação de Consultas"} />
         </ListItemButton>
-      </ListItem>
+      </ListItem> */}
       <ListItem key={2} disablePadding>
         
         
@@ -49,7 +49,7 @@ export const ListaMedico1 = () => {
         </ListItemButton>
       </ListItem>
       
-      <ListItem key={1} disablePadding>
+ {/*      <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
           to={"/"}
@@ -64,7 +64,7 @@ export const ListaMedico1 = () => {
           <ListItemIcon>{<PersonSearchIcon />}</ListItemIcon>
           <ListItemText primary={"Registros"} />
         </ListItemButton>
-      </ListItem>
+      </ListItem> */}
     </List>
   );
 };
