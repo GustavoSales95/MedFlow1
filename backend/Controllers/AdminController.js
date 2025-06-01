@@ -163,9 +163,7 @@ route.put("/EditarEscala", async (req, resp) => {
 
     return resp.status(200).json({ message: nova_escala });
   } catch (error) {
-    return resp
-      .status(400)
-      .json({ error: "Ocorreu um erro ao atualizar a escala" });
+    return resp.status(400).json({ error: "Ocorreu um erro ao atualizar a escala" });
   }
 });
 

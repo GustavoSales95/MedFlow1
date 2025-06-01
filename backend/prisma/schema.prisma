@@ -102,16 +102,22 @@ model Prontuario {
 }
 
 
+enum Situacao {
+  Agendado
+  Cancelado
+  Concluído
+}
 
 model Agendamentos {
   id_agendamento Int       @id @default(autoincrement())
   paciente_id    Int
   medico_id      Int
+  nome_paciente  String
   data_hora      DateTime
-  status         String    @default("agendado")
+  status         Situacao  @default(Agendado)
 
-  Pacientes Pacientes @relation(fields: [paciente_id], references: [id_paciente])
-  Medicos   Medicos   @relation(fields: [medico_id], references: [id_medico])
+  paciente Pacientes @relation(fields: [paciente_id], references: [id_paciente])
+  medico   Medicos   @relation(fields: [medico_id], references: [id_medico])
   Consultas Consultas?
 }
 

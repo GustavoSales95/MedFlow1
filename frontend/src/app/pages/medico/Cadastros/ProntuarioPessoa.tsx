@@ -19,6 +19,9 @@ import {
   FormControlLabel,
   Checkbox,
 } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 
 interface Pacientes {
   id_paciente: number;
@@ -32,12 +35,12 @@ interface Pacientes {
 }
 
 interface Prontuario {
-  paciente_id: number;
-  alergias: string;
-  tipo_sanguineo: string;
-  medicamentos: string;
-  cirurgias: string;
-  doencas_infecciosas: string;
+  paciente_id?: number;
+  alergias?: string;
+  tipo_sanguineo?: string;
+  medicamentos?: string;
+  cirurgias?: string;
+  doencas_infecciosas?: string;
 }
 
 export const ConsultarProntuario = () => {
@@ -46,6 +49,8 @@ export const ConsultarProntuario = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [Pacientes, setPacientes] = useState<Pacientes[]>([]);
   const [prontuario, setProntuario] = useState<Prontuario | null>(null);
+  const [startEdit, setStartEdit] = useState(false);
+  const [formData, setFormData] = useState<Prontuario | null>(null);
 
   const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCpf(e.target.value.replace(/\D/g, ""));
@@ -77,9 +82,36 @@ export const ConsultarProntuario = () => {
 
       setPacientes([response.data.paciente]);
       setProntuario(response.data.message);
+      setFormData(response.data.message);
     } catch (error) {
       console.error("Erro ao buscar dados da API:", error);
       setSnackbarMessage("Erro ao buscar prontuário. Tente novamente.");
+      setOpenSnackbar(true);
+    }
+  };
+
+  const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setFormData({ ...formData, [name]: value });
+  }
+
+  const handleSave = async (e: React.FormEvent, user: any) => {
+    try {
+      const cpf = Pacientes[0].cpf;
+      const response = await api.put('/Medico/ConsultarProntuarios', formData);
+      const paciente = await api.get("Medico/ConsultarProntuarios", {
+        params: { cpf },
+      });
+      
+      setProntuario(paciente.data.message);
+      setStartEdit(false);
+      console.log('Prontuário atualizado com sucesso:', (await response).data);
+      setSnackbarMessage("Prontuário atualizado com sucesso.");
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error('Erro ao atualizar prontuário:', error);
+      setSnackbarMessage("Erro ao atualizar prontuário.");
       setOpenSnackbar(true);
     }
   };
@@ -121,12 +153,13 @@ export const ConsultarProntuario = () => {
             fullWidth
             sx={{ marginBottom: "20px" }}
           >
+            <PersonSearchIcon/>
             Pesquisar
           </Button>
         </Grid>
       </Grid>
 
-      {prontuario && (
+      {prontuario && !startEdit && (
         <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
           <Typography variant="h4" align="center" marginBottom={1.5}>
             Prontuário Médico
@@ -218,10 +251,171 @@ export const ConsultarProntuario = () => {
                   {prontuario.tipo_sanguineo || "Não informado"}
                 </Typography>
               </Grid>
+              <Grid item sm={6} md={6} sx={{ alignContent: 'center' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={()=>setStartEdit(true)}
+                  fullWidth
+                  startIcon={<EditIcon />}
+                >
+                  Editar
+                </Button>
+
+              </Grid>
             </>
           </Grid>
         </Paper>
       )}
+
+      {prontuario && startEdit && (
+        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
+          <Typography variant="h4" align="center" marginBottom={1.5}>
+            Prontuário Médico
+          </Typography>
+
+          <Typography variant="h5" marginTop={3} marginBottom={1}>
+            Dados Pessoais
+          </Typography>
+          <Grid container spacing={2}>
+            {Pacientes.map((paciente) => (
+              <>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{ fontSize: 18 }}>Nome</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                    {paciente.nome}
+                  </Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{ fontSize: 18 }}>CPF</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                    {insertMaskCpf(paciente.cpf)}
+                  </Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+
+                  <Typography sx={{fontSize: 18,}}>Cartão do SUS</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskSus(paciente.cartao_sus) || "Não informado"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Data de Nascimento</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{formatarData(paciente.data_nascimento)}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{ fontSize: 18 }}>Telefone</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
+                    {insertMaskTel(paciente.telefone) || "Não informado"}
+                  </Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>CEP</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskCep(paciente.cep) || "Não informado"}</Typography>
+                </Grid>
+                <Grid item sm={6} md={6}>
+                  <Typography sx={{fontSize: 18,}}>Endereço</Typography>
+                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.endereco || "Não informado"}</Typography>
+                </Grid>
+              </>
+            ))}
+          </Grid>
+
+          <Typography variant="h5" marginTop={3} marginBottom={1}>
+            Histórico
+          </Typography>
+          <Grid container spacing={2}>
+            <>
+              <Grid item sm={6} md={6}>
+                  <Typography sx={{ fontSize: 18 }}>Alergias</Typography>
+                  <TextField
+                    name="alergias"
+                    variant="standard"
+                    fullWidth
+                    size="small"
+                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                    value={
+                      formData?.alergias
+                    }
+                    onChange={handleEdit}
+                  />
+              </Grid>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>
+                  Doenças Infecciosas
+                </Typography>
+                <TextField
+                    name="doencas_infecciosas"
+                    variant="standard"
+                    fullWidth
+                    size="small"
+                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                    value={
+                      formData?.doencas_infecciosas
+                    }
+                    onChange={handleEdit}
+                  />
+              </Grid>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>
+                  Medicamentos de Uso Contínuo
+                </Typography>
+                <TextField
+                    name="medicamentos"
+                    variant="standard"
+                    fullWidth
+                    size="small"
+                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                    value={
+                      formData?.medicamentos
+                    }
+                    onChange={handleEdit}
+                  />
+              </Grid>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>
+                  Cirurgias Anteriores
+                </Typography>
+                <TextField
+                    name="cirurgias"
+                    variant="standard"
+                    fullWidth
+                    size="small"
+                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                    value={
+                      formData?.cirurgias
+                    }
+                    onChange={handleEdit}
+                  />
+              </Grid>
+              <Grid item sm={6} md={6}>
+                <Typography sx={{ fontSize: 18 }}>Tipo Sanguíneo</Typography>
+                <TextField
+                    name="tipo_sanguineo"
+                    variant="standard"
+                    fullWidth
+                    size="small"
+                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                    value={
+                      formData?.tipo_sanguineo
+                    }
+                    onChange={handleEdit}
+                  />
+              </Grid>
+              <Grid item sm={6} md={6} sx={{ alignContent: 'center' }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={(e) => handleSave(e, prontuario)}
+                  fullWidth
+                  startIcon={<SaveAltIcon />}
+                >
+                  Salvar
+                </Button>
+              </Grid>
+            </>
+          </Grid>
+        </Paper>
+      )}
+
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}

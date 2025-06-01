@@ -7,6 +7,7 @@ import {
   Login,
   Marcacao,
   Cadastros,
+  MedicosDisponiveis,
   DashboardAdmin,
   CadastrosUsuarios,
   ConsultarUsuarios,
@@ -54,6 +55,7 @@ const router = createBrowserRouter([
     { index: true, element: <Marcacao /> },
     { path: "Cadastros", element: <Cadastros /> },
     { path: "ConsultarPessoas", element: <ConsultarPessoas /> },
+    { path: "MedicosDisponiveis", element: <MedicosDisponiveis /> },
   ],
 },
 

@@ -48,6 +48,22 @@ const insertMaskHora = (horario: string) => {
 };
 
 
+const formatarDataHora = (dataHora: string | Date) => {
+  const date = typeof dataHora === "string" ? new Date(dataHora) : dataHora;
+
+  const dia = String(date.getDate()).padStart(2, "0");
+  const mes = String(date.getMonth() + 1).padStart(2, "0"); // Os meses começam em 0
+  const ano = date.getFullYear();
+
+  const hora = String(date.getHours()).padStart(2, "0");
+  const minuto = String(date.getMinutes()).padStart(2, "0");
+
+  return {
+    data: `${dia}/${mes}/${ano}`,  
+    horario: `${hora}:${minuto}`  
+  };
+}
 
 
-export { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus, insertMaskHora }
+
+export { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus, insertMaskHora, formatarDataHora }

@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
+import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 
 export const Lista1 = () => {
   return (
@@ -28,6 +29,22 @@ export const Lista1 = () => {
         >
           <ListItemIcon>{<InsertInvitationIcon />}</ListItemIcon>
           <ListItemText primary={"Marcação de Consultas"} />
+        </ListItemButton>
+      </ListItem>
+      <ListItem key={1} disablePadding>
+        <ListItemButton
+          component={Link}
+          to={"/Comum/MedicosDisponiveis"}
+          sx={{
+            transition: "0.8s",
+            "&:hover": {
+              backgroundColor: "#019C9B",
+              color: "white",
+            },
+          }}
+        >
+          <ListItemIcon>{<MedicalServicesIcon />}</ListItemIcon>
+          <ListItemText primary={"Médicos disponíveis"} />
         </ListItemButton>
       </ListItem>
       <ListItem key={2} disablePadding>

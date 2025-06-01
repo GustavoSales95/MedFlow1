@@ -6,6 +6,7 @@ export { Dashboard } from "./Comum/dashboard/Dashboard";
 export { Marcacao } from "./Comum/marcacao/Marcacao";
 export { Cadastros } from "./Comum/cadastros/Cadastros";
 export { ConsultarPessoas } from "./Comum/cadastros/ConsultarPessoas";
+export { MedicosDisponiveis } from "./Comum/marcacao/MedicosDisponiveis";
 
 //Rotas Administrador
 export { CadastrosUsuarios } from "./admin/cadastros/CadastrosUsuarios";
@@ -23,3 +24,4 @@ export { Estoque } from "./Estoque/Estoque";
 export { DashboardMedico } from "./medico/dashboardMedico/Dashboard";
 export { ConsultarProntuario } from "./medico/Cadastros/ProntuarioPessoa";
 export { AgendaDia } from "./medico/agenda/agendaDiaria";
+

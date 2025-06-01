@@ -8,7 +8,7 @@ route.post("/Cadastros", async (req, resp) => {
 
     await service.criarPacientes( nome, data_nascimento, telefone, cep, endereco, cpf, cartao_sus );
 
-    resp.status(201).json(req.body);
+    return resp.status(201).json(req.body);
 });
 
 route.get("/Cadastros", async (req, resp) => {
@@ -37,6 +37,45 @@ route.get("/ConsultarPessoas", async (req, resp) => {
         return resp.status(204).end();
     }
     return resp.status(200).json({ message: paciente });
+});
+
+route.get("/MedicosDisponiveis", async (req, resp) => {
+    const { dia } = req.query;
+
+    try {
+        const medicos = await service.buscarMedicos(dia);
+
+        return resp.status(200).json({ message: medicos});
+    } catch (error) {
+        return resp.status(400).json({ error: "Ocorreu um erro ao buscar os medicos" });
+    }    
+});
+
+route.post("/", async (req, resp) => {
+    const { nome_paciente, data_hora, cpf, crm } = req.body;
+    try {
+        const paciente = await service.buscarPacienteCpf(cpf);
+        const id_paciente = paciente.id_paciente;
+
+        const medico = await service.buscarMedico(crm);
+        const id_medico = medico.id_medico; 
+
+        await service.criarAgendamento(nome_paciente, data_hora, id_paciente, id_medico);
+
+        return resp.status(201).json({ message: "Agendamento cadastrado com sucesso." });
+    } catch (error) {
+        console.error(error);
+        return resp.status(400).json({ error: "Ocorreu um erro ao cadastrar o agendamento" });
+    }
+});
+
+route.get("/", async (req, resp) => {
+    const { cpf, crm } = req.query;
+
+    const paciente = await service.buscarPacienteCpf(cpf);
+    const medico = await service.buscarMedico(crm);
+
+    return resp.status(200).json({medico, paciente});
 });
 
 

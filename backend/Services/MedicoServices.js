@@ -24,4 +24,17 @@ async function buscarProntuario(cpf) {
   return prontuario;
 }
 
-export default { buscarPaciente, buscarProntuario };
+async function editarProntuario( paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas ) {
+  return await prisma.prontuario.update({
+    where: { paciente_id },
+    data: {
+      alergias,
+      tipo_sanguineo,
+      medicamentos,
+      cirurgias,
+      doencas_infecciosas
+    }
+  }); 
+}
+
+export default { buscarPaciente, buscarProntuario, editarProntuario };

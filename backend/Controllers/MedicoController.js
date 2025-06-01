@@ -21,4 +21,18 @@ route.get("/ConsultarProntuarios", async (req, resp) => {
   return resp.status(200).json({ message: prontuario, paciente});
 });
 
+route.put("/ConsultarProntuarios", async (req, resp) => {
+  const { paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas } = req.body;
+
+  try {
+    const novo_prontuario = await service.editarProntuario(paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas);
+
+    return resp.status(200).json({ message: novo_prontuario });
+  } catch (error) {
+    return resp
+      .status(400)
+      .json({ error: "Ocorreu um erro ao atualizar o prontuário" });
+  }
+});
+
 export default route;
