@@ -1,223 +1,183 @@
-
 import React, { useState } from 'react';
-import { TextField, Button, Grid2, Box, Typography } from '@mui/material';
-import { Radio, RadioGroup, FormControlLabel, FormLabel, FormControl } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Grid,
+  Box,
+  Typography,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
+  FormControl,
+  Alert,
+  Snackbar
+} from '@mui/material';
+import api from '../../../../services/api'; 
 
 export const Editar = () => {
-
-  const [formData, setFormData] = useState({
-    id:'',
+  const [idBusca, setIdBusca] = useState('');
+  const [produto, setProduto] = useState({
+    id_produto: '',
     unidade_medida: '',
     nome: '',
-    Valor: '',
-    Fornecedor: '',
-    Data_Pedido: '',
-    Validade: '',
-    Embalagem: '',
-    Perecivel: '',
-    Tipo: '',
+    valor: '',
+    fornecedor: '',
+    data_pedido: '',
+    validade: '',
+    embalagem: '',
+    temperatura: ''
   });
+  const [produtoEncontrado, setProdutoEncontrado] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const handleChangeBusca = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); 
+    setIdBusca(value);
+    setProduto({ ...produto, id_produto: value });
   };
 
-  
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChangeProduto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProduto({ ...produto, [name]: value });
+  };
+
+  const handleBuscar = async () => {
+    if (!idBusca) {
+      setSnackbarMessage('Digite um ID válido.');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    try {
+      const response = await api.get(`/Estoque/Editar/`, {
+        params: { id_produto: idBusca }
+      });
+
+      
+
+      if (!response.data || Object.keys(response.data).length === 0) {
+        setSnackbarMessage('Produto não encontrado.');
+        setProdutoEncontrado(false);
+      } else {
+        setProduto(response.data);
+        setProdutoEncontrado(true);
+      }
+    } catch (error) {
+      console.error(error);
+      setSnackbarMessage('Erro ao buscar o produto.');
+      setProdutoEncontrado(false);
+    } finally {
+      setOpenSnackbar(true);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Dados enviados:', formData);
-   
+
+    try {
+      await api.put(`/Estoque/Editar/`, produto);
+      setSnackbarMessage('Produto atualizado com sucesso!');
+    } catch (error) {
+      console.error(error);
+      setSnackbarMessage('Erro ao atualizar o produto.');
+    } finally {
+      setOpenSnackbar(true);
+    }
   };
 
   return (
-    <Box sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box sx={{ maxWidth: 700, margin: 'auto', padding: 3 }}>
+      <Typography variant="h4" align="center" gutterBottom>
         Editar Produto
       </Typography>
-      <form onSubmit={handleSubmit}>
-        <Grid2 container spacing={2}>
-         
 
-          <Grid2 size={12}>
-            <TextField
-              label="ID"
-              variant="outlined"
-              fullWidth
-              type='string'
-              margin="normal" 
-              name="id"
-              value={formData.id}
-              onChange={handleChange}
-            />
-          </Grid2>
-
-
-         
-          <Grid2 size={12}>
-            <TextField
-              label="Nome"
-              variant="outlined"
-              fullWidth
-              type='string'
-              name="nome"
-              margin="normal" 
-              value={formData.nome}
-              onChange={handleChange}
-            />
-            </Grid2>
-          
-          
-          <Grid2 size={12}>
-            <TextField
-              label="Valor"
-              variant="outlined"
-              fullWidth
-              type="number"
-              name="Valor"
-              value={formData.Valor}
-              onChange={handleChange}
-              margin="normal" 
-              InputLabelProps={{
-                shrink: true,
-              }}
-              required
-            />
-          </Grid2>
-
-
-          
-          <Grid2 size={12}>
-            <TextField
-              label="Fornecedor"
-              variant="outlined"
-              fullWidth
-              name="Fornecedor"
-              margin="normal"
-              type='string'
-              value={formData.Fornecedor}
-              onChange={handleChange}
-            />
-          </Grid2>
-
-
-          <Grid2 size={12}>
-            <TextField
-              label="Data do Pedido"
-              variant="outlined"
-              fullWidth
-              type='date'
-              margin="normal"
-              name="Data_Pedido"
-              value={formData.Data_Pedido}
-              onChange={handleChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              required
-            />
-          </Grid2>
-
-
-          <Grid2 size={12}>
-            <TextField
-              label="Validade"
-              variant="outlined"
-              fullWidth
-              type='date'
-              margin="normal"
-              name="Validade"
-              value={formData.Validade}
-              onChange={handleChange}
-              InputLabelProps={{
-                shrink: true,
-              }}
-              required
-            />
-          </Grid2>
-
-
-          <Grid2 size={12}>
-            <TextField
-              label="Embalagem"
-              variant="outlined"
-              fullWidth
-              type='string'
-              margin="normal"
-              name="Embalagem"
-              value={formData.Embalagem}
-              onChange={handleChange}
-            />
-          </Grid2>
-
-          <Grid2 size={12}>
-            <TextField
-            label="Unidadne de Medída"
-            variant='outlined'
+      <Grid container spacing={2}>
+        <Grid item xs={9}>
+          <TextField
+            label="Buscar por ID"
+            name='id_produto'
+            value={idBusca}
+            onChange={handleChangeBusca}
             fullWidth
-            type='string'
-            margin='normal'
-            name='Unidade de médida'
-            value={formData.unidade_medida}
-            onChange={handleChange}/>
-            </Grid2>
+          />
+        </Grid>
+        <Grid item xs={3}>
+          <Button variant="contained" color="primary" onClick={handleBuscar} fullWidth>
+            Buscar
+          </Button>
+        </Grid>
+      </Grid>
 
+      {produtoEncontrado && (
+        <form onSubmit={handleSubmit}>
+          <Grid container spacing={2} mt={2}>
+            <Grid item xs={12}>
+              <TextField label="Nome" name="nome" value={produto.nome} onChange={handleChangeProduto} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="Valor" name="valor" value={produto.valor} onChange={handleChangeProduto} type="number" fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="Fornecedor" name="fornecedor" value={produto.fornecedor} onChange={handleChangeProduto} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Data do Pedido"
+                name="data_pedido"
+                value={produto.data_pedido}
+                onChange={handleChangeProduto}
+                type="date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Validade"
+                name="validade"
+                value={produto.validade}
+                onChange={handleChangeProduto}
+                type="date"
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="Embalagem" name="embalagem" value={produto.embalagem} onChange={handleChangeProduto} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="Unidade de Medida" name="unidade_medida" value={produto.unidade_medida} onChange={handleChangeProduto} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <FormLabel>Tipo de Produto</FormLabel>
+                <RadioGroup row name="temperatura" value={produto.temperatura} onChange={handleChangeProduto}>
+                  <FormControlLabel value="PERECIVEL" control={<Radio />} label="Perecível" />
+                  <FormControlLabel value="RESFRIADO" control={<Radio />} label="Resfriado" />
+                  <FormControlLabel value="TERMOSSENSIVEL" control={<Radio />} label="Termossensível" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <Button type="submit" variant="contained" color="secondary" fullWidth>
+                Salvar Alterações
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      )}
 
-            <Grid2 size={12}>
-  <FormControl component="fieldset">
-    <FormLabel component="legend">Temperatura</FormLabel>
-    <RadioGroup
-      row
-      name="produtoAtivo"
-      value={formData.Tipo}
-      onChange={handleChange}
-    >
-      <FormControlLabel value="Perecível" control={<Radio />} label="Perecível" />
-      <FormControlLabel value="Resfriado" control={<Radio />} label="Resfriado" />
-      <FormControlLabel value="Termossensível" control={<Radio />} label="Termossensível" />
-    </RadioGroup>
-  </FormControl>
-</Grid2>
-
-          <Grid2 size={12}>
-            <Button variant="contained" color="primary" type="submit">
-              Editar
-            </Button>
-          </Grid2>
-        </Grid2>
-      </form>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackbar(false)}
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity="info">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -129,54 +129,26 @@ model Consultas {
   observacoes    String?
   data_consulta  DateTime?
 
-  Agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id_agendamento])
+  agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id_agendamento])
 }
 
 
 // Modelo das tabelas de controle de estoque
-model Fornecedor {
-  id_fornecedor Int @id @default(autoincrement())
-  cnpj String @unique
-  nome String
-  telefone String
-  endereco String
-
-  nota_fiscal Nota_fiscal?
+model Produtos {
+  id_produto    Int         @id @default(autoincrement())
+  nome           String
+  valor          Float
+  fornecedor     String
+  data_pedido    DateTime @db.Date
+  validade       DateTime @db.Date
+  embalagem      String
+  unidade_medida String
+  temperatura    Temperatura
 }
 
-model Estoque_produto {
-  id_produto Int @id @default(autoincrement())
-  nome String
-  data_validade DateTime @db.Date
-  tipo String
-  descricao String
-  fabricante String
-  lote Int
-  quantidade Int
 
-  produto_nota Produto_nota?
+enum Temperatura {
+  PERECIVEL
+  RESFRIADO
+  TERMOSSENSIVEL
 }
-
-model Nota_fiscal {
-  id_nota_fiscal Int @id @default(autoincrement())
-  id_fornecedor Int @unique
-  data_entrada DateTime @db.Date
-  numero_nota String
-  valor_nota Decimal @db.Decimal(10, 2)
-  data_cadastro_nota DateTime @db.Date
-
-  fornecedor Fornecedor @relation(fields: [id_fornecedor], references: [id_fornecedor])
-
-  produto_nota Produto_nota?
-}
-
-model Produto_nota {
-  id_produto_nota Int @id @default(autoincrement())
-  id_nota_fiscal Int @unique
-  id_produto Int @unique
-  quantidade Int
-
-  nota_fiscal Nota_fiscal @relation(fields: [id_nota_fiscal], references: [id_nota_fiscal])
-  estoque_produto Estoque_produto @relation(fields: [id_produto], references: [id_produto])
-}
-

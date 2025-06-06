@@ -71,20 +71,35 @@ async function buscarMedico(crm) {
 }
 
 async function criarAgendamento(nome_paciente, data_hora, id_paciente, id_medico) {
-    await prisma.agendamentos.create({
+    const agendamento = await prisma.agendamentos.create({
         data: {
             paciente: {
-            connect: { id_paciente }
+                connect: { id_paciente } 
             },
             medico: {
                 connect: { id_medico }
             },
             nome_paciente,
             data_hora: new Date(data_hora)
-            }
+        }
+    });
+    return agendamento;
+}
+
+async function criarConsulta(id_agendamento, data_hora) {
+    await prisma.consultas.create({
+        data: {
+            agendamentos: {
+                connect: { id_agendamento }
+            },
+            descricao: '',
+            receita: '',
+            observacoes: '',
+            data_consulta: new Date(data_hora)
+        }
     });
 }
 
 
 
-export default { criarPacientes, buscarPacienteCpf, buscarPacienteSus, buscarMedicos, buscarMedico, criarAgendamento }
+export default { criarPacientes, buscarPacienteCpf, buscarPacienteSus, buscarMedicos, buscarMedico, criarAgendamento, criarConsulta }

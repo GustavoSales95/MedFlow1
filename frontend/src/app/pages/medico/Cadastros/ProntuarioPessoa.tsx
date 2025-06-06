@@ -100,7 +100,7 @@ export const ConsultarProntuario = () => {
     try {
       const cpf = Pacientes[0].cpf;
       const response = await api.put('/Medico/ConsultarProntuarios', formData);
-      const paciente = await api.get("Medico/ConsultarProntuarios", {
+      const paciente = await api.get("/Medico/ConsultarProntuarios", {
         params: { cpf },
       });
       

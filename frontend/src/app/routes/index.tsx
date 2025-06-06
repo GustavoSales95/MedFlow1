@@ -16,8 +16,12 @@ import {
   ConsultarProntuario,
   DashboardMedico,
   AgendaDia,
+  Agendamentos,
+  FinalizarConsulta,
+  ConsultarEscala,
   Editar,
-  Estoque,
+  CadastroEstoque,
+  DashboardEstoque,
   Entrada,
 } from "../pages";
 import { AppContext } from "../shared/contexts/AppContext";
@@ -49,15 +53,15 @@ const router = createBrowserRouter([
 
       // Rotas para usuários "comum"
       {
-  path: "Comum",
-  element: <Dashboard />,
-  children: [
-    { index: true, element: <Marcacao /> },
-    { path: "Cadastros", element: <Cadastros /> },
-    { path: "ConsultarPessoas", element: <ConsultarPessoas /> },
-    { path: "MedicosDisponiveis", element: <MedicosDisponiveis /> },
-  ],
-},
+        path: "Comum",
+        element: <Dashboard />,
+        children: [
+          { index: true, element: <Marcacao /> },
+          { path: "Cadastros", element: <Cadastros /> },
+          { path: "ConsultarPessoas", element: <ConsultarPessoas /> },
+          { path: "MedicosDisponiveis", element: <MedicosDisponiveis /> },
+        ],
+      },
 
       // Rotas para usuários "admin"
       {
@@ -88,32 +92,28 @@ const router = createBrowserRouter([
                 element: <ConsultarProntuario />,
               },
               { path: "AgendaDia", element: <AgendaDia /> },
+              { path: "Agendamentos", element: <Agendamentos /> },
               {
-                path: "ConsultarProntuarios",
-                element: <ConsultarProntuario />,
+                path: "FinalizarConsulta",
+                element: <FinalizarConsulta />,
+              },
+              {
+                path: "ConsultarEscala",
+                element: <ConsultarEscala />,
               },
             ],
           },
         ],
       },
-    ],
-  },
 
-  {
-    path: "Medico",
-    element: <DashboardMedico />,
-    children: [
+      // Rotas para o setor de Estoque
       {
-        element: <PrivateRoute allowedRoles={["admin"]} />, // Protegendo estoque só para admin
+        path: "Estoque",
+        element: <DashboardEstoque />,
         children: [
-          {
-            path: "Estoque",
-            element: <Estoque />,
-            children: [
-              { path: "Entrada", element: <Entrada /> },
-              { path: "Editar", element: <Editar /> },
-            ],
-          },
+          { path: "Cadastro", element: <CadastroEstoque /> },
+          { path: "Entrada", element: <Entrada /> },
+          { path: "Editar", element: <Editar /> },
         ],
       },
     ],

@@ -35,4 +35,40 @@ route.put("/ConsultarProntuarios", async (req, resp) => {
   }
 });
 
+route.get("/Agendamentos", async (req, resp) => {
+  const { crm } = req.query;
+
+  try {
+    const agendamentos = await service.buscarAgenda(crm);
+
+    return resp.status(200).json({ message: agendamentos});
+  } catch (error) {
+    return resp.status(404).json({ error: "Ocorreu um erro ao buscar agendamentos" });
+  }
+});
+
+route.get("/FinalizarConsulta", async (req, resp) => {
+  const { agendamento_id } = req.query;
+
+  try {
+    const consulta = await service.buscarConsulta(agendamento_id);
+
+    return resp.status(200).json({ message: consulta});
+  } catch (error) {
+    return resp.status(404).json({ error: "Ocorreu um erro ao buscar a consulta" });
+  }
+});
+
+route.put("/FinalizarConsulta", async (req, resp) => {
+  const { descricao, receita, observacoes, id_consulta } = req.body;
+  try {
+    const consulta = await service.editarConsulta(descricao, receita, observacoes, id_consulta);
+
+    return resp.status(200).json({ message: consulta});
+
+  } catch (error) {
+    return resp.status(404).json({ error: "Ocorreu um erro ao buscar a consulta" });
+  }
+});
+
 export default route;

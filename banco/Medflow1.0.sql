@@ -44,7 +44,7 @@ CREATE TABLE escala (
 	id_escala int auto_increment PRIMARY KEY,
 	id_medico INT UNIQUE NOT NULL,
     segunda ENUM('Escalado', 'Folga'),
-    segunga_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
+    segunda_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
     terca ENUM('Escalado', 'Folga'),
     terca_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
     quarta ENUM('Escalado', 'Folga'),
@@ -73,8 +73,9 @@ CREATE TABLE agendamentos (
     id_agendamento int auto_increment PRIMARY KEY,
     paciente_id INT NOT NULL,
     medico_id INT NOT NULL,
+    nome_paciente varchar(100),
     data_hora datetime NOT NULL,
-    status VARCHAR(30) DEFAULT 'agendado', -- agendado, cancelado, concluído
+    status ENUM("Agendado", "Cancelado", "Concluído") DEFAULT 'Agendado',
     FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente),
     FOREIGN KEY (medico_id) REFERENCES medicos(id_medico)
 );
@@ -89,21 +90,49 @@ CREATE TABLE consultas (
     FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id_agendamento)
 );
 
-INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Comum'),(2, 'Admin'),(3, 'Medico');
+CREATE TABLE produtos (
+    id_produto INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    valor DECIMAL(10,2) NOT NULL,
+    fornecedor VARCHAR(255),
+    data_pedido DATE NOT NULL,
+    validade DATE NOT NULL,
+    embalagem VARCHAR(255),
+    unidade_medida VARCHAR(100),
+    temperatura ENUM('PERECIVEL', 'RESFRIADO', 'TERMOSSENSIVEL') NOT NULL,
+    quantidade INT NOT NULL
+);
 
-INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("David Ramos Mendes Cardoso", "daviddivad25.12@gmail.com", "Senha@123", "41143676831", "2004-12-25", 2);
+INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Admin'),(2, 'Comum'),(3, 'Medico');
 
-INSERT INTO medicos (usuario_id, crm, especialidade, telefone) Values (1, "12345678", "Cardiologista", "11992382152");
+INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("David Ramos", "david@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676831", "2004-12-25", 1);
 
-INSERT INTO pacientes (nome, cpf, cartao_sus, data_nascimento, telefone, cep, endereco) VALUES ("David Ramos Mendes Cardoso", "41143676831", "123456789012345", '2004-12-25', "11911007252", "06767230", "Mario Latorre 245");
+/* Inserts de usuários teste para o login. Senha: senha@123 */
+INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Admin Teste", "admin@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676834", "2004-12-25", 1);
 
-INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Pelo de gato", "O-", "", "Transplante de rim", "Tuberculose");
+INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Médico Teste", "medico@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676832", "1990-02-22", 3);
 
-/*select * from usuarios;
+INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Comum Teste", "comum@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676833", "1990-02-22", 2);
+
+INSERT INTO medicos (usuario_id, crm, especialidade, telefone) Values (2, "123456", "Cardiologista", "11992382152");
+
+INSERT INTO escala(id_medico, segunda, terca, quarta, quinta, sexta,sabado, domingo) VALUES (1, "Escalado", "Escalado", "Escalado", "Escalado", "Escalado", "Folga", "Folga");
+
+INSERT INTO pacientes (nome, cpf, cartao_sus, data_nascimento, telefone, cep, endereco) VALUES ("Evandro de Almeida", "41143676830", "123456789012345", '1975-10-12', "11911007252", "06767230", "Mario Latorre 245");
+
+INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Penicilina, intolerância a lactose ", "O-", "", "Transplante de rim", "Tuberculose");
+
+INSERT INTO produtos (nome, valor, fornecedor, data_pedido, validade, embalagem, unidade_medida, temperatura, quantidade) VALUES 
+("Medicamento A", 50.00, "Farmácia XYZ", '2023-09-01', '2025-09-01', "Caixa com 30 comprimidos", "Comprimido", "Perecível", 2),
+("Medicamento B", 30.00, "Distribuidora ABC", '2023-08-15', '2024-08-15', "Frasco com 100ml", "Líquido", "Resfriado", 30);
+
+/*select * from perfis;
+select * from usuarios;
 select * from pacientes;
 select * from medicos;
 select* from escala;
 select * from agendamentos;
+select * from consultas;
 select * from prontuario;
 
 drop database medflow;

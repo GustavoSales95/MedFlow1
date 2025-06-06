@@ -10,7 +10,13 @@ async function buscarPaciente(cpf) {
   return paciente;
 }
 
+async function buscarMedico(crm) {
+  const medico = await prisma.medicos.findUnique({
+    where: { crm }
+  });
 
+  return medico
+}
 
 async function buscarProntuario(cpf) {
   const paciente = await buscarPaciente(cpf);
@@ -37,4 +43,47 @@ async function editarProntuario( paciente_id, alergias, tipo_sanguineo, medicame
   }); 
 }
 
-export default { buscarPaciente, buscarProntuario, editarProntuario };
+async function buscarAgenda(crm) {
+  const medico = await buscarMedico(crm);
+  
+  if (!medico) return null;
+
+  const agendamentos = await prisma.agendamentos.findMany({
+    where: { medico_id: medico.id_medico },
+    include: { Consultas: true },
+  });
+  
+  return agendamentos
+}
+
+async function buscarConsulta(agendamento_id) {
+  const id = Number(agendamento_id);
+
+  const consulta = await prisma.consultas.findUnique({
+    where: { agendamento_id: id },
+    include: { agendamentos: true }
+  });
+  return consulta;
+}
+
+async function editarConsulta(descricao, receita, observacoes, id_consulta) {
+  const consulta_editada = await prisma.consultas.update({
+    where: { id_consulta },
+    data: {
+      descricao,
+      receita,
+      observacoes
+    }
+  });
+
+  const id_agendamento = consulta_editada.agendamento_id;
+  const agendamento_editado = await prisma.agendamentos.update({
+    where: { id_agendamento },
+    data: {
+      status: "Concluído"
+    }
+  });
+  return { consulta_editada, agendamento_editado}
+}
+
+export default { buscarPaciente, buscarMedico, buscarProntuario, editarProntuario, buscarAgenda, buscarConsulta, editarConsulta  };
