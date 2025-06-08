@@ -22,11 +22,9 @@ export const Editar = () => {
     unidade_medida: '',
     nome: '',
     valor: '',
-    fornecedor: '',
-    data_pedido: '',
-    validade: '',
     embalagem: '',
-    temperatura: ''
+    temperatura: '',
+    quantidade: ''
   });
   const [produtoEncontrado, setProdutoEncontrado] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -120,35 +118,13 @@ export const Editar = () => {
               <TextField label="Valor" name="valor" value={produto.valor} onChange={handleChangeProduto} type="number" fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Fornecedor" name="fornecedor" value={produto.fornecedor} onChange={handleChangeProduto} fullWidth />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Data do Pedido"
-                name="data_pedido"
-                value={produto.data_pedido}
-                onChange={handleChangeProduto}
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Validade"
-                name="validade"
-                value={produto.validade}
-                onChange={handleChangeProduto}
-                type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12}>
               <TextField label="Embalagem" name="embalagem" value={produto.embalagem} onChange={handleChangeProduto} fullWidth />
             </Grid>
             <Grid item xs={12}>
               <TextField label="Unidade de Medida" name="unidade_medida" value={produto.unidade_medida} onChange={handleChangeProduto} fullWidth />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField label="Quantidade" name="quantidade" value={produto.quantidade} onChange={handleChangeProduto} type="number" fullWidth />
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth>

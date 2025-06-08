@@ -23,6 +23,7 @@ import {
   CadastroEstoque,
   DashboardEstoque,
   Entrada,
+  ProdutoEstoque
 } from "../pages";
 import { AppContext } from "../shared/contexts/AppContext";
 
@@ -114,6 +115,7 @@ const router = createBrowserRouter([
           { path: "Cadastro", element: <CadastroEstoque /> },
           { path: "Entrada", element: <Entrada /> },
           { path: "Editar", element: <Editar /> },
+          { path: "ProdutoEstoque/:id_produto", element: <ProdutoEstoque /> },
         ],
       },
     ],

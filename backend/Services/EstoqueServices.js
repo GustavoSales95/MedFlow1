@@ -4,7 +4,7 @@ const { PrismaClient, Temperatura } = pkg;
 const prisma = new PrismaClient();
 
 
-async function registroProduto(nome, valor, fornecedor, data_pedido, validade, embalagem, unidade_medida, temperatura) {
+async function registroProduto(nome, valor, embalagem, unidade_medida, temperatura, quantidade) {
   if (!temperatura) {
     throw new Error('Temperatura não fornecida.');
   }
@@ -17,17 +17,16 @@ async function registroProduto(nome, valor, fornecedor, data_pedido, validade, e
   }
   
   const valorNumerico = parseFloat(valor);
+  const quantidadeNumero = parseInt(quantidade);
   
   const novoProduto = await prisma.produtos.create({
     data: {
       nome,
       valor: valorNumerico, 
-      fornecedor,
-      data_pedido: new Date(data_pedido),
-      validade: new Date(validade),
       embalagem,
       unidade_medida,
-      temperatura: Temperatura[temperaturaUpper] 
+      temperatura: Temperatura[temperaturaUpper],
+      quantidade: quantidadeNumero
     }
   });
   
@@ -45,7 +44,7 @@ try {
 }
 
 
-async function atualizarProduto(id_produto, nome, valor, fornecedor, data_pedido, validade, embalagem, unidade_medida, temperatura) {
+async function atualizarProduto(id_produto, nome, valor, embalagem, unidade_medida, temperatura, quantidade) {
 try {
     const id = parseInt(id_produto);
     if (isNaN(id)) {
@@ -53,6 +52,7 @@ try {
     }
 
     const valorNumerico = parseFloat(valor);
+    const quantidadeNumero = parseInt(quantidade);
 
 
     const produtoAtualizado = await prisma.produtos.update({
@@ -60,11 +60,10 @@ try {
       data: {
         nome,
         valor: valorNumerico,
-        data_pedido: new Date(data_pedido),
-        validade: new Date(validade),
         embalagem,
         unidade_medida,
-        temperatura
+        temperatura,
+        quantidade: quantidadeNumero
       }, 
     });
     return produtoAtualizado;
@@ -75,14 +74,13 @@ try {
   }
 }
 
-async function deletarProduto(id_produto) {
+async function deletarProduto(id_produto_estoque) {
   try {
-    const produtoDeletado = await prisma.produtos.delete({
-      where: { id_produto: parseInt(id_produto) },
+    const produtoDeletado = await prisma.produto_estoque.delete({
+      where: { id_produto_estoque: parseInt(id_produto_estoque) },
     });
     return produtoDeletado;
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Erro ao deletar produto:", error);
     throw new Error("Erro ao deletar produto");
   }
@@ -107,5 +105,38 @@ async function getById(id_produto) {
   }
 }
 
+async function BuscarProdutoEstoque(id_produto) {
+  const id = parseInt(id_produto);
+  try {
+    const produtosEstoue = await prisma.produto_estoque.findMany({
+      where: { id_produto: id },
+      include: { produtos: true}
+    });
 
-export default { registroProduto, atualizarProduto, deletarProduto, getTodosProdutos, getById}
+    return produtosEstoue
+  } catch (error) {
+    console.error("Erro ao buscar produto:", error);
+    throw new Error("Erro ao buscar produto");
+  } 
+}
+
+async function adicionarProdutoEstoque(id_produto, validade, quantidade) {
+  const id = parseInt(id_produto);
+  try {
+    const produtoEstoque = await prisma.produto_estoque.create({
+      data: {
+        validade: new Date(validade),
+        quantidade,
+        produtos: { connect: { id_produto: id} },
+        
+      } 
+    });
+    return produtoEstoque;
+  } catch (error) {
+    console.error("Erro ao buscar produto:", error);
+    throw new Error("Erro ao buscar produto");
+  } 
+}
+
+
+export default { registroProduto, atualizarProduto, deletarProduto, getTodosProdutos, getById, BuscarProdutoEstoque, adicionarProdutoEstoque}

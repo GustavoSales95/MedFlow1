@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { 
   Grid,
   Box,
   Typography,
   Snackbar,
   Alert,
   Paper,
-  Button
+  Button,
+  TableCell,
+  TableBody,
+  TableHead,
+  TableRow,
+  Table,
+  TableContainer
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import api from "../../../../services/api";
 
 interface Produtos {
   id_produto: number;
   nome: string;
   valor: number;
-  data_pedido: string;
-  validade: string;
+  quantidade: number;
   embalagem: string;
   unidade_medida: string;
   temperatura: string;
@@ -25,8 +31,7 @@ export const Entrada = () => {
   const [produtos, setProdutos] = useState<Produtos[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  // Estado que controla se os detalhes de um produto já foram expandidos.
-  const [expandedProducts, setExpandedProducts] = useState<{ [id: number]: boolean }>({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     api.get("/Estoque/entrada")
@@ -38,11 +43,6 @@ export const Entrada = () => {
         console.error("Erro ao buscar os produtos:", err);
       });
   }, []);
-
-  // Função para alternar a exibição dos detalhes de um produto
-  const handleToggleDetails = (id: number) => {
-    setExpandedProducts(prev => ({ ...prev, [id]: !prev[id] }));
-  };
 
   return (
     <Box
@@ -71,77 +71,44 @@ export const Entrada = () => {
       )}
 
       {produtos.length > 0 && (
-        <Grid sx={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', width: "90%" }}>
-          {produtos.map((produto) => (
-            <Paper key={produto.id_produto} elevation={3} sx={{ padding: 3, margin: 3, width: "20%" }}>
-              <Grid container spacing={2}>
-                {/* Sempre exibe Nome e Id */}
-                <Grid item xs={12}>
-                  <Typography sx={{ fontSize: 18 }}>Nome do Produto</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
-                    {produto.nome}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography sx={{ fontSize: 18 }}>Id do Produto</Typography>
-                  <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
-                    {produto.id_produto}
-                  </Typography>
-                </Grid>
-                {/* Exibe os detalhes adicionais somente se o produto estiver expandido */}
-                {expandedProducts[produto.id_produto] && (
-                  <>
-                    <Grid item xs={12}>
-                      <Typography sx={{ fontSize: 18 }}>Valor do Produto</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
-                        {produto.valor}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography sx={{ fontSize: 18 }}>Data do Pedido</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
-                        {produto.data_pedido}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography sx={{ fontSize: 18 }}>Data de Validade</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
-                        {produto.validade}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography sx={{ fontSize: 18 }}>Temperatura</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
-                        {produto.temperatura}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography sx={{ fontSize: 18 }}>Embalagem</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
-                        {produto.embalagem || "Não informado"}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Typography sx={{ fontSize: 18 }}>Unidade de Medida</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>
-                        {produto.unidade_medida || "Não informado"}
-                      </Typography>
-                    </Grid>
-                  </>
-                )}
-                {/* Botão que alterna a exibição dos detalhes */}
-                <Grid item xs={12} sx={{ mt: 2 }}>
-                  <Button
-                    variant="contained"
-                    onClick={() => handleToggleDetails(produto.id_produto)}
-                  >
-                    {expandedProducts[produto.id_produto] ? "Ocultar Detalhes" : "Detalhes"}
-                  </Button>
-                </Grid>
-              </Grid>
-            </Paper>
-          ))}
-        </Grid>
+        <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
+          <Table sx={{ minWidth: 650 }} aria-label="tabela de usuários">
+            <TableHead>
+              <TableRow>
+                <TableCell>Nome</TableCell>
+                <TableCell>Quantidade</TableCell>
+                <TableCell>Valor</TableCell>
+                <TableCell>Embalagem</TableCell>
+                <TableCell>Unidade de Medida</TableCell>
+                <TableCell>Temperatura</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {produtos.map((produto) => (
+                <TableRow key={produto.id_produto}>
+                  <TableCell>{produto.nome}</TableCell>
+                  <TableCell>
+                    {produto.quantidade}
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      sx={{ ml: 1 }}
+                      onClick={() =>
+                        navigate(`/Estoque/ProdutoEstoque/${produto.id_produto}`)
+                      }
+                    >
+                      Ver Estoque
+                    </Button>
+                  </TableCell>
+                  <TableCell>R${produto.valor}</TableCell>
+                  <TableCell>{produto.embalagem || "Não informado"}</TableCell>
+                  <TableCell>{produto.unidade_medida || "Não informado"}</TableCell>
+                  <TableCell>{produto.temperatura}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
 
       <Snackbar

@@ -21,6 +21,7 @@ export { DashboardEstoque } from "./Estoque/dashboardEstoque/DashboardEst";
 export { Entrada } from "./Estoque/Entrada/Entrada_sai";
 export { Editar } from "./Estoque/editar/editar";
 export { CadastroEstoque } from "./Estoque/CadastroEstoque";
+export { ProdutoEstoque } from "./Estoque/Entrada/ProdutoEstoque";
 
 // Imports medicos
 export { DashboardMedico } from "./medico/dashboardMedico/Dashboard";

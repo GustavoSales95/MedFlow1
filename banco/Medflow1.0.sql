@@ -62,7 +62,7 @@ CREATE TABLE escala (
 CREATE TABLE prontuario(
 	paciente_id int unique not null,
 	alergias varchar(50),
-    tipo_sanguineo Char(3),
+    tipo_sanguineo varchar(14),
     medicamentos varchar(255),
     cirurgias varchar(255),
     doencas_infecciosas varchar(50),
@@ -79,7 +79,6 @@ CREATE TABLE agendamentos (
     FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente),
     FOREIGN KEY (medico_id) REFERENCES medicos(id_medico)
 );
-
 CREATE TABLE consultas (
     id_consulta int auto_increment PRIMARY KEY,
     agendamento_id INT UNIQUE NOT NULL,
@@ -89,32 +88,75 @@ CREATE TABLE consultas (
     data_consulta datetime,
     FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id_agendamento)
 );
-
 CREATE TABLE produtos (
     id_produto INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     valor DECIMAL(10,2) NOT NULL,
-    fornecedor VARCHAR(255),
-    data_pedido DATE NOT NULL,
-    validade DATE NOT NULL,
+    quantidade INT NOT NULL,
     embalagem VARCHAR(255),
     unidade_medida VARCHAR(100),
-    temperatura ENUM('PERECIVEL', 'RESFRIADO', 'TERMOSSENSIVEL') NOT NULL,
-    quantidade INT NOT NULL
+    temperatura ENUM('PERECIVEL', 'RESFRIADO', 'TERMOSSENSIVEL') NOT NULL
 );
+CREATE TABLE receitas (
+	id_receita INT auto_increment PRIMARY KEY ,
+    medico_id INT  NOT NULL,
+    paciente_id INT NOT NULL,
+    produto_id INT NOT NULL,
+    data_emissao DATE NOT NULL,
+    medicamentos varchar(255) NOT NULL,
+    orientacoes varchar(255),
+    FOREIGN KEY (produto_id) REFERENCES produtos(id_produto),
+    FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente),
+    FOREIGN KEY (medico_id) REFERENCES medicos(id_medico)
+);
+CREATE TABLE produto_estoque (
+	id_produto_estoque INT AUTO_INCREMENT PRIMARY KEY,
+    id_produto INT NOT NULL,
+    quantidade VARCHAR(20) NOT NULL,
+    validade DATE NOT NULL,
+    FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
+);
+
+CREATE TABLE pedidos (
+	id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    id_produto_estoque INT NOT NULL,
+    quantidade VARCHAR(20),
+    fornecedor VARCHAR(100) NOT NULL,
+    data_pedido DATE NOT NULL,
+    FOREIGN KEY (id_produto_estoque) REFERENCES produto_estoque(id_produto_estoque)
+);
+
+CREATE TABLE Entrada_saida (
+    id_entrada_saida int PRIMARY KEY auto_increment,
+	id_produto_estoque INT not null,
+	quantidade INT NOT NULL,
+	id_consulta int,
+    id_medico INT,
+    id_paciente INT,
+    id_usuario INT,
+    id_pedido INT,
+    tipo_transacao VARCHAR(7) NOT NULL,
+    data_transacao DATETIME NOT NULL,
+    FOREIGN KEY (id_consulta) REFERENCES consultas (id_consulta),
+    FOREIGN KEY (id_medico) REFERENCES medicos (id_medico),
+    FOREIGN KEY (id_paciente) REFERENCES pacientes (id_paciente),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
+    FOREIGN KEY (id_produto_estoque) REFERENCES produto_estoque (id_produto_estoque)
+);
+
 
 INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Admin'),(2, 'Comum'),(3, 'Medico');
 
-INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("David Ramos", "david@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676831", "2004-12-25", 1);
+INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("David Ramos", "david@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676835", "2004-12-25", 1);
 
 /* Inserts de usuários teste para o login. Senha: senha@123 */
-INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Admin Teste", "admin@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676834", "2004-12-25", 1);
+INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Admin Teste", "admin@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676831", "2004-12-25", 1);
 
 INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Médico Teste", "medico@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676832", "1990-02-22", 3);
 
 INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Comum Teste", "comum@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676833", "1990-02-22", 2);
 
-INSERT INTO medicos (usuario_id, crm, especialidade, telefone) Values (2, "123456", "Cardiologista", "11992382152");
+INSERT INTO medicos (usuario_id, crm, especialidade, telefone) Values (3, "123456", "Cardiologista", "11992382152");
 
 INSERT INTO escala(id_medico, segunda, terca, quarta, quinta, sexta,sabado, domingo) VALUES (1, "Escalado", "Escalado", "Escalado", "Escalado", "Escalado", "Folga", "Folga");
 
@@ -122,9 +164,9 @@ INSERT INTO pacientes (nome, cpf, cartao_sus, data_nascimento, telefone, cep, en
 
 INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Penicilina, intolerância a lactose ", "O-", "", "Transplante de rim", "Tuberculose");
 
-INSERT INTO produtos (nome, valor, fornecedor, data_pedido, validade, embalagem, unidade_medida, temperatura, quantidade) VALUES 
-("Medicamento A", 50.00, "Farmácia XYZ", '2023-09-01', '2025-09-01', "Caixa com 30 comprimidos", "Comprimido", "Perecível", 2),
-("Medicamento B", 30.00, "Distribuidora ABC", '2023-08-15', '2024-08-15', "Frasco com 100ml", "Líquido", "Resfriado", 30);
+INSERT INTO produtos (nome, valor, embalagem, unidade_medida, temperatura, quantidade) VALUES 
+("Medicamento A", 50.00, "Caixa com 30 comprimidos", "Comprimido", "Perecível", 2),
+("Medicamento B", 30.00, "Frasco com 100ml", "Líquido", "Resfriado", 30);
 
 /*select * from perfis;
 select * from usuarios;

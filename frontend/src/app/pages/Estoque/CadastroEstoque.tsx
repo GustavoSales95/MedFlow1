@@ -20,11 +20,9 @@ export const CadastroEstoque = () => {
     nome: '',
     unidade_medida: '',
     valor: '',
-    fornecedor: '',
-    data_pedido: '',
-    validade: '',
     embalagem: '',
     temperatura: '', 
+    quantidade: '',
   });
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -90,47 +88,6 @@ export const CadastroEstoque = () => {
 
           <Grid item xs={12}>
             <TextField
-              label="Fornecedor"
-              variant="outlined"
-              fullWidth
-              name="fornecedor"
-              value={formData.fornecedor}
-              onChange={handleChange}
-            />
-          </Grid>
-
-   
-          <Grid item xs={12}>
-            <TextField
-              label="Data do Pedido"
-              variant="outlined"
-              fullWidth
-              type="date"
-              name="data_pedido"
-              value={formData.data_pedido}
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <TextField
-              label="Validade"
-              variant="outlined"
-              fullWidth
-              type="date"
-              name="validade" 
-              value={formData.validade}
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
-            />
-          </Grid>
-
-
-          <Grid item xs={12}>
-            <TextField
               label="Embalagem"
               variant="outlined"
               fullWidth
@@ -151,6 +108,22 @@ export const CadastroEstoque = () => {
               onChange={handleChange}
             />
           </Grid>
+
+
+          <Grid item xs={12}>
+            <TextField
+              label="Quantidade"
+              variant="outlined"
+              fullWidth
+              type="number"
+              name="quantidade"
+              value={formData.quantidade}
+              onChange={handleChange}
+              InputLabelProps={{ shrink: true }}
+              required
+            />
+          </Grid>
+
 
           {/* Tipo (Temperatura) */}
           <Grid item xs={12}>
