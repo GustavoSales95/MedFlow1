@@ -51,7 +51,6 @@ export const Entrada = () => {
         backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
         color: 'black'
       }}

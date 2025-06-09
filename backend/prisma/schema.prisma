@@ -150,7 +150,7 @@ enum Temperatura {
 model produto_estoque {
   id_produto_estoque Int         @id @default(autoincrement())
   id_produto         Int
-  quantidade         String      @db.VarChar(20)
+  quantidade         Int      
   validade           DateTime    @db.Date
 
   produtos       Produtos     @relation(fields: [id_produto], references: [id_produto])
@@ -178,8 +178,8 @@ model EntradaSaida {
   id_paciente        Int?
   id_usuario         Int?
   id_pedido          Int?
-  tipo_transacao     String       @db.VarChar(7)
-  data_transacao     DateTime
+  tipo_transacao     String       @db.VarChar(10)
+  data_transacao     DateTime  @default(now())
 
   Consultas      Consultas?      @relation(fields: [id_consulta], references: [id_consulta])
   Medicos        Medicos?        @relation(fields: [id_medico], references: [id_medico])

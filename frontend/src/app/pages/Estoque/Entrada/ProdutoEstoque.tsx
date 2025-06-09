@@ -91,21 +91,38 @@ export const ProdutoEstoque = () => {
   };
 
   const handleSaveForm = async () => {
-    console.log("Dados do formulário:", formData);
-    try {
-      const response = await api.post(`/Estoque/ProdutoEstoque/${id_produto}`, { ...formData });
-      const resp = await api.get(`/Estoque/ProdutoEstoque/${id_produto}`);
-      setProdutos(resp.data);
-      console.log('Produto cadastrado com sucesso:', response.data);
-      setSnackbarMessage("Produto cadastrado com sucesso.");
-      setOpenSnackbar(true);
-    } catch (error) {
-      console.error('Erro ao cadastrar produto:', error);
-      setSnackbarMessage("Erro ao cadastrar produto.");
-      setOpenSnackbar(true);
-    }
-    setAdicionar(false);
-  };
+  // Converte a data informada para um objeto Date
+  const validadeDate = new Date(formData.validade);
+  
+  // Define a data de hoje sem considerar as horas
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  // Checa se a data de validade é menor ou igual à data atual
+  if (validadeDate <= hoje) {
+    setSnackbarMessage("Produtos vencidos não podem ser cadastrados.");
+    setOpenSnackbar(true);
+    return; // Interrompe a execução se a validação falhar
+  }
+
+  console.log("Dados do formulário:", formData);
+  try {
+    const response = await api.post(
+      `/Estoque/ProdutoEstoque/${id_produto}`,
+      { ...formData }
+    );
+    const resp = await api.get(`/Estoque/ProdutoEstoque/${id_produto}`);
+    setProdutos(resp.data);
+    console.log("Produto cadastrado com sucesso:", response.data);
+    setSnackbarMessage("Produto cadastrado com sucesso.");
+    setOpenSnackbar(true);
+  } catch (error) {
+    console.error("Erro ao cadastrar produto:", error);
+    setSnackbarMessage("Erro ao cadastrar produto.");
+    setOpenSnackbar(true);
+  }
+  setAdicionar(false);
+};
 
   const deleteProduto = async (id_produto_estoque: number) => {
     try {
@@ -142,8 +159,8 @@ export const ProdutoEstoque = () => {
 
   try {
     // Use o id do produto selecionado para realizar o post.
-    const response = await api.post(
-      `/Estoque/ProdutoEstoque/${selectedProduct.id_produto_estoque}`,
+    const response = await api.put(
+      `/Estoque/Retirada/${selectedProduct.id_produto_estoque}`,
       { produtoId: selectedProduct.id_produto_estoque, ...retiradaFormData }
     );
     
@@ -338,6 +355,7 @@ export const ProdutoEstoque = () => {
     <TextField
       label="Retirado para (Paciente ID)"
       name="retiradoPara"
+      type="number"
       value={retiradaFormData.retiradoPara}
       onChange={handleRetiradaInputChange}
       fullWidth
@@ -346,6 +364,7 @@ export const ProdutoEstoque = () => {
     <TextField
       label="Retirado por (CRM do Médico)"
       name="retiradoPor"
+      type="number"
       value={retiradaFormData.retiradoPor}
       onChange={handleRetiradaInputChange}
       fullWidth
@@ -354,6 +373,7 @@ export const ProdutoEstoque = () => {
     <TextField
       label="Consulta realizada (ID da Consulta)"
       name="consultaRealizada"
+      type="number"
       value={retiradaFormData.consultaRealizada}
       onChange={handleRetiradaInputChange}
       fullWidth

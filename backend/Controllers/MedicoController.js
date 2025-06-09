@@ -60,14 +60,14 @@ route.get("/FinalizarConsulta", async (req, resp) => {
 });
 
 route.put("/FinalizarConsulta", async (req, resp) => {
-  const { descricao, receita, observacoes, id_consulta } = req.body;
+  const { descricao, receita, observacoes, id_consulta, agendamento_id } = req.body;
   try {
-    const consulta = await service.editarConsulta(descricao, receita, observacoes, id_consulta);
+    const consulta = await service.editarConsulta(descricao, receita, observacoes, id_consulta, agendamento_id);
 
     return resp.status(200).json({ message: consulta});
 
   } catch (error) {
-    return resp.status(404).json({ error: "Ocorreu um erro ao buscar a consulta" });
+    return resp.status(404).json({ error: "Ocorreu um erro ao finalizar a consulta" });
   }
 });
 

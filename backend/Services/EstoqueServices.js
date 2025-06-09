@@ -44,7 +44,7 @@ try {
 }
 
 
-async function atualizarProduto(id_produto, nome, valor, embalagem, unidade_medida, temperatura, quantidade) {
+async function atualizarProduto(id_produto, nome, valor, embalagem, unidade_medida, temperatura) {
 try {
     const id = parseInt(id_produto);
     if (isNaN(id)) {
@@ -52,7 +52,6 @@ try {
     }
 
     const valorNumerico = parseFloat(valor);
-    const quantidadeNumero = parseInt(quantidade);
 
 
     const produtoAtualizado = await prisma.produtos.update({
@@ -63,7 +62,6 @@ try {
         embalagem,
         unidade_medida,
         temperatura,
-        quantidade: quantidadeNumero
       }, 
     });
     return produtoAtualizado;
@@ -126,7 +124,7 @@ async function adicionarProdutoEstoque(id_produto, validade, quantidade) {
     const produtoEstoque = await prisma.produto_estoque.create({
       data: {
         validade: new Date(validade),
-        quantidade,
+        quantidade: parseInt(quantidade),
         produtos: { connect: { id_produto: id} },
         
       } 
@@ -138,5 +136,47 @@ async function adicionarProdutoEstoque(id_produto, validade, quantidade) {
   } 
 }
 
+async function realizarRetirada(id_produto_estoque, quantidadeRetirada, retiradoPara, retiradoPor, consultaRealizada) {
+  const agendamento_id = parseInt(consultaRealizada);
+  const id_paciente = parseInt(retiradoPara);
+  const quantidade = parseInt(quantidadeRetirada)
 
-export default { registroProduto, atualizarProduto, deletarProduto, getTodosProdutos, getById, BuscarProdutoEstoque, adicionarProdutoEstoque}
+  const medico = await prisma.medicos.findUnique({
+    where: { crm: retiradoPor },
+  });
+  const consulta = await prisma.consultas.findUnique({
+    where: { agendamento_id}
+  });
+
+  const id = parseInt(id_produto_estoque);
+  const id_consulta = consulta.id_consulta;
+  const id_medico = medico.id_medico;
+
+  const saida = await prisma.entradaSaida.create({
+    data: {
+      ProdutoEstoque: { connect: { id_produto_estoque: id} },
+      Consultas: { connect: {id_consulta} },
+      Medicos: { connect: {id_medico} },
+      Pacientes: { connect: {id_paciente}},
+      quantidade,
+      tipo_transacao: "Retirada"
+    }
+  });
+
+  return saida
+}
+
+async function retiradaProduto(id_produto_estoque, quantidadeRetirada) { 
+  const id = parseInt(id_produto_estoque);
+  const quantidadeRemovida = parseInt(quantidadeRetirada)
+  const produto_estoque = await prisma.produto_estoque.update({
+    where: { id_produto_estoque: id },
+    data: {
+      quantidade: { decrement: quantidadeRemovida }
+    }
+  });
+  return produto_estoque
+}
+
+
+export default { registroProduto, atualizarProduto, deletarProduto, getTodosProdutos, getById, BuscarProdutoEstoque, adicionarProdutoEstoque, realizarRetirada, retiradaProduto}

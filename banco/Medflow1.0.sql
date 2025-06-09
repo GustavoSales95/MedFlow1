@@ -97,6 +97,15 @@ CREATE TABLE produtos (
     unidade_medida VARCHAR(100),
     temperatura ENUM('PERECIVEL', 'RESFRIADO', 'TERMOSSENSIVEL') NOT NULL
 );
+
+CREATE TABLE produto_estoque (
+	id_produto_estoque INT AUTO_INCREMENT PRIMARY KEY,
+    id_produto INT NOT NULL,
+    quantidade VARCHAR(20) NOT NULL,
+    validade DATE NOT NULL,
+    FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
+);
+
 CREATE TABLE receitas (
 	id_receita INT auto_increment PRIMARY KEY ,
     medico_id INT  NOT NULL,
@@ -109,18 +118,12 @@ CREATE TABLE receitas (
     FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente),
     FOREIGN KEY (medico_id) REFERENCES medicos(id_medico)
 );
-CREATE TABLE produto_estoque (
-	id_produto_estoque INT AUTO_INCREMENT PRIMARY KEY,
-    id_produto INT NOT NULL,
-    quantidade VARCHAR(20) NOT NULL,
-    validade DATE NOT NULL,
-    FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
-);
+
 
 CREATE TABLE pedidos (
 	id_pedido INT AUTO_INCREMENT PRIMARY KEY,
     id_produto_estoque INT NOT NULL,
-    quantidade VARCHAR(20),
+    quantidade INT NOT NULL,
     fornecedor VARCHAR(100) NOT NULL,
     data_pedido DATE NOT NULL,
     FOREIGN KEY (id_produto_estoque) REFERENCES produto_estoque(id_produto_estoque)
@@ -135,14 +138,60 @@ CREATE TABLE Entrada_saida (
     id_paciente INT,
     id_usuario INT,
     id_pedido INT,
-    tipo_transacao VARCHAR(7) NOT NULL,
-    data_transacao DATETIME NOT NULL,
+    tipo_transacao VARCHAR(10) NOT NULL,
+    data_transacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (id_consulta) REFERENCES consultas (id_consulta),
     FOREIGN KEY (id_medico) REFERENCES medicos (id_medico),
     FOREIGN KEY (id_paciente) REFERENCES pacientes (id_paciente),
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
     FOREIGN KEY (id_produto_estoque) REFERENCES produto_estoque (id_produto_estoque)
 );
+
+DELIMITER //
+CREATE TRIGGER trg_produto_estoque_after_insert
+AFTER INSERT ON produto_estoque
+FOR EACH ROW
+BEGIN
+  UPDATE produtos
+  SET quantidade = (
+    SELECT IFNULL(SUM(CAST(quantidade AS UNSIGNED)), 0)
+    FROM produto_estoque
+    WHERE id_produto = NEW.id_produto
+  )
+  WHERE id_produto = NEW.id_produto;
+END;
+//
+DELIMITER ;
+DELIMITER //
+CREATE TRIGGER trg_produto_estoque_after_update
+AFTER UPDATE ON produto_estoque
+FOR EACH ROW
+BEGIN
+  UPDATE produtos
+  SET quantidade = (
+    SELECT IFNULL(SUM(CAST(quantidade AS UNSIGNED)), 0)
+    FROM produto_estoque
+    WHERE id_produto = NEW.id_produto
+  )
+  WHERE id_produto = NEW.id_produto;
+END;
+//
+DELIMITER ;
+DELIMITER //
+CREATE TRIGGER trg_produto_estoque_after_delete
+AFTER DELETE ON produto_estoque
+FOR EACH ROW
+BEGIN
+  UPDATE produtos
+  SET quantidade = (
+    SELECT IFNULL(SUM(CAST(quantidade AS UNSIGNED)), 0)
+    FROM produto_estoque
+    WHERE id_produto = OLD.id_produto
+  )
+  WHERE id_produto = OLD.id_produto;
+END;
+//
+DELIMITER ;
 
 
 INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Admin'),(2, 'Comum'),(3, 'Medico');
@@ -164,11 +213,28 @@ INSERT INTO pacientes (nome, cpf, cartao_sus, data_nascimento, telefone, cep, en
 
 INSERT INTO prontuario (paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas) VALUES (1, "Penicilina, intolerância a lactose ", "O-", "", "Transplante de rim", "Tuberculose");
 
-INSERT INTO produtos (nome, valor, embalagem, unidade_medida, temperatura, quantidade) VALUES 
-("Medicamento A", 50.00, "Caixa com 30 comprimidos", "Comprimido", "Perecível", 2),
-("Medicamento B", 30.00, "Frasco com 100ml", "Líquido", "Resfriado", 30);
+INSERT INTO produtos (nome, valor, quantidade, embalagem, unidade_medida, temperatura)
+VALUES 
+  ('Paracetamol', 10.50, 100, 'Caixa com 20 comprimidos', 'mg', 'PERECIVEL'),
+  ('Ibuprofeno', 15.75, 200, 'Frasco com gotas', 'ml', 'RESFRIADO'),
+  ('Amoxicilina', 5.00, 150, 'Ampola', 'ml', 'TERMOSSENSIVEL');
+INSERT INTO produto_estoque (id_produto, quantidade, validade)
+VALUES 
+(1, '50', '2025-12-31'),
+(1, '30', '2026-01-15'),
+(1, '20', '2026-02-01');
+INSERT INTO produto_estoque (id_produto, quantidade, validade)
+VALUES 
+  (2, '70', '2025-11-30'),
+  (2, '50', '2025-12-15'),
+  (2, '80', '2026-03-01');
+INSERT INTO produto_estoque (id_produto, quantidade, validade)
+VALUES 
+  (3, '40', '2026-05-01'),
+  (3, '60', '2026-06-15'),
+  (3, '30', '2026-07-01');
 
-/*select * from perfis;
+select * from perfis;
 select * from usuarios;
 select * from pacientes;
 select * from medicos;
@@ -176,5 +242,6 @@ select* from escala;
 select * from agendamentos;
 select * from consultas;
 select * from prontuario;
+select * from produto_estoque;
 
 drop database medflow;
