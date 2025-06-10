@@ -246,6 +246,29 @@ export const ProdutoEstoque = () => {
           </Table>
         </TableContainer>
       )}
+
+      {produtos.length <= 0 && (
+        <>
+        <Box
+          component="img"
+          src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+          alt="Nenhum item"
+          sx={{ width: 150, height: 150, mb: 4 }}
+        />
+        <Typography variant="h6" fontWeight="bold">
+          Não há itens no momento
+        </Typography>
+
+        <Button
+          startIcon={<AddIcon />}
+          variant="contained"
+          color="primary"
+          onClick={() => setAdicionar(true)}
+        >
+          Adicionar Item
+        </Button>
+      </>
+      )}
       
       {/* Tabela de formulário para entrada de novos dados */}
       {adicionar && (

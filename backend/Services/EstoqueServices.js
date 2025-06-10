@@ -4,7 +4,7 @@ const { PrismaClient, Temperatura } = pkg;
 const prisma = new PrismaClient();
 
 
-async function registroProduto(nome, valor, embalagem, unidade_medida, temperatura, quantidade) {
+async function registroProduto(nome, valor, embalagem, unidade_medida, temperatura) {
   if (!temperatura) {
     throw new Error('Temperatura não fornecida.');
   }
@@ -17,7 +17,6 @@ async function registroProduto(nome, valor, embalagem, unidade_medida, temperatu
   }
   
   const valorNumerico = parseFloat(valor);
-  const quantidadeNumero = parseInt(quantidade);
   
   const novoProduto = await prisma.produtos.create({
     data: {
@@ -25,8 +24,7 @@ async function registroProduto(nome, valor, embalagem, unidade_medida, temperatu
       valor: valorNumerico, 
       embalagem,
       unidade_medida,
-      temperatura: Temperatura[temperaturaUpper],
-      quantidade: quantidadeNumero
+      temperatura: Temperatura[temperaturaUpper]
     }
   });
   
@@ -74,8 +72,9 @@ try {
 
 async function deletarProduto(id_produto_estoque) {
   try {
-    const produtoDeletado = await prisma.produto_estoque.delete({
+    const produtoDeletado = await prisma.produto_estoque.update({
       where: { id_produto_estoque: parseInt(id_produto_estoque) },
+      data: { deletado: 'Sim' }
     });
     return produtoDeletado;
   } catch (error) {
@@ -107,7 +106,7 @@ async function BuscarProdutoEstoque(id_produto) {
   const id = parseInt(id_produto);
   try {
     const produtosEstoue = await prisma.produto_estoque.findMany({
-      where: { id_produto: id },
+      where: { id_produto: id, deletado: "Nao" },
       include: { produtos: true}
     });
 

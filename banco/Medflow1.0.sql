@@ -92,7 +92,7 @@ CREATE TABLE produtos (
     id_produto INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     valor DECIMAL(10,2) NOT NULL,
-    quantidade INT NOT NULL,
+    quantidade INT DEFAULT 0,
     embalagem VARCHAR(255),
     unidade_medida VARCHAR(100),
     temperatura ENUM('PERECIVEL', 'RESFRIADO', 'TERMOSSENSIVEL') NOT NULL
@@ -101,8 +101,9 @@ CREATE TABLE produtos (
 CREATE TABLE produto_estoque (
 	id_produto_estoque INT AUTO_INCREMENT PRIMARY KEY,
     id_produto INT NOT NULL,
-    quantidade VARCHAR(20) NOT NULL,
+    quantidade INT NOT NULL,
     validade DATE NOT NULL,
+    deletado ENUM('Sim', 'Nao') NOT NULL DEFAULT 'Nao',
     FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
 );
 
@@ -220,21 +221,21 @@ VALUES
   ('Amoxicilina', 5.00, 150, 'Ampola', 'ml', 'TERMOSSENSIVEL');
 INSERT INTO produto_estoque (id_produto, quantidade, validade)
 VALUES 
-(1, '50', '2025-12-31'),
-(1, '30', '2026-01-15'),
-(1, '20', '2026-02-01');
+(1, 50, '2025-12-31'),
+(1, 30, '2026-01-15'),
+(1, 20, '2026-02-01');
 INSERT INTO produto_estoque (id_produto, quantidade, validade)
 VALUES 
-  (2, '70', '2025-11-30'),
-  (2, '50', '2025-12-15'),
-  (2, '80', '2026-03-01');
+  (2, 70, '2025-11-30'),
+  (2, 50, '2025-12-15'),
+  (2, 80, '2026-03-01');
 INSERT INTO produto_estoque (id_produto, quantidade, validade)
 VALUES 
-  (3, '40', '2026-05-01'),
-  (3, '60', '2026-06-15'),
-  (3, '30', '2026-07-01');
+  (3, 40, '2026-05-01'),
+  (3, 60, '2026-06-15'),
+  (3, 30, '2026-07-01');
 
-select * from perfis;
+/*select * from perfis;
 select * from usuarios;
 select * from pacientes;
 select * from medicos;

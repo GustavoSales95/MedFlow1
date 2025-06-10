@@ -15,14 +15,14 @@ route.get("/entrada", async (req, res) => {
 
 
 route.post("/Cadastro", async (req, res) => {
-  const { nome, valor, embalagem, unidade_medida, temperatura, quantidade } = req.body;
+  const { nome, valor, embalagem, unidade_medida, temperatura } = req.body;
 
     if (!nome || !valor || !temperatura) {
       return res.status(400).json({ error: "Campos obrigatórios faltando" });
     }
 
   try {
-    const novoProduto = await service.registroProduto(nome, valor, embalagem, unidade_medida, temperatura, quantidade);
+    const novoProduto = await service.registroProduto(nome, valor, embalagem, unidade_medida, temperatura);
 
     res.status(201).json({
       message: "Produto registrado com sucesso",
