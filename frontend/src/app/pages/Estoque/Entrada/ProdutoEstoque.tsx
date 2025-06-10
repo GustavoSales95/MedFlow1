@@ -32,6 +32,8 @@ interface ProdutoEstoqueData {
   id_produto: number;
   quantidade: string;
   validade: string;
+  deletado: string;
+  vencimento_proximo: string
   produtos: {
     nome: string;
     valor: number;
@@ -57,6 +59,7 @@ interface RetiradaFormData {
 export const ProdutoEstoque = () => {
   const { id_produto } = useParams<{ id_produto: string }>();
   const [produtos, setProdutos] = useState<ProdutoEstoqueData[]>([]);
+  const [produtosVencidos, setProdutosVencidos] = useState<ProdutoEstoqueData[]>([]);
   const [adicionar, setAdicionar] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({ quantidade: "", validade: "" });
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -74,14 +77,35 @@ export const ProdutoEstoque = () => {
   const [selectedProduct, setSelectedProduct] = useState<ProdutoEstoqueData | null>(null);
 
   useEffect(() => {
-    api.get(`/Estoque/ProdutoEstoque/${id_produto}`)
-      .then((resp) => {
-        setProdutos(resp.data);
-      })
-      .catch((err) => {
-        console.error('Erro ao buscar dados do produto:', err);
-      });
-  }, [id_produto]);
+  api.get(`/Estoque/ProdutoEstoque/${id_produto}`)
+    .then((resp) => {
+      const produtosData = resp.data as ProdutoEstoqueData[];
+      setProdutos(produtosData);
+
+      const vencendo = produtosData.filter(
+        produto => produto.vencimento_proximo === "Sim"
+      );
+      setProdutosVencidos(vencendo);
+
+      if (vencendo.length > 0) {
+        const mensagem = vencendo
+          .map(produto => {
+            const { data } = formatarDataHora(produto.validade);
+            return `Produto com id ${produto.id_produto_estoque} está prestes a vencer. Validade: ${data}`;
+          })
+          .join(' | ');
+
+        setTimeout(() => {
+          window.alert(mensagem);
+        }, 1);
+      }
+    })
+    .catch((err) => {
+      console.error('Erro ao buscar dados do produto:', err);
+    });
+}, [id_produto]);
+
+
 
   const produtoInfo = produtos[0]?.produtos;
 
@@ -91,21 +115,38 @@ export const ProdutoEstoque = () => {
   };
 
   const handleSaveForm = async () => {
-    console.log("Dados do formulário:", formData);
-    try {
-      const response = await api.post(`/Estoque/ProdutoEstoque/${id_produto}`, { ...formData });
-      const resp = await api.get(`/Estoque/ProdutoEstoque/${id_produto}`);
-      setProdutos(resp.data);
-      console.log('Produto cadastrado com sucesso:', response.data);
-      setSnackbarMessage("Produto cadastrado com sucesso.");
-      setOpenSnackbar(true);
-    } catch (error) {
-      console.error('Erro ao cadastrar produto:', error);
-      setSnackbarMessage("Erro ao cadastrar produto.");
-      setOpenSnackbar(true);
-    }
-    setAdicionar(false);
-  };
+  // Converte a data informada para um objeto Date
+  const validadeDate = new Date(formData.validade);
+  
+  // Define a data de hoje sem considerar as horas
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  // Checa se a data de validade é menor ou igual à data atual
+  if (validadeDate <= hoje) {
+    setSnackbarMessage("Produtos vencidos não podem ser cadastrados.");
+    setOpenSnackbar(true);
+    return; // Interrompe a execução se a validação falhar
+  }
+
+  console.log("Dados do formulário:", formData);
+  try {
+    const response = await api.post(
+      `/Estoque/ProdutoEstoque/${id_produto}`,
+      { ...formData }
+    );
+    const resp = await api.get(`/Estoque/ProdutoEstoque/${id_produto}`);
+    setProdutos(resp.data);
+    console.log("Produto cadastrado com sucesso:", response.data);
+    setSnackbarMessage("Produto cadastrado com sucesso.");
+    setOpenSnackbar(true);
+  } catch (error) {
+    console.error("Erro ao cadastrar produto:", error);
+    setSnackbarMessage("Erro ao cadastrar produto.");
+    setOpenSnackbar(true);
+  }
+  setAdicionar(false);
+};
 
   const deleteProduto = async (id_produto_estoque: number) => {
     try {
@@ -142,8 +183,8 @@ export const ProdutoEstoque = () => {
 
   try {
     // Use o id do produto selecionado para realizar o post.
-    const response = await api.post(
-      `/Estoque/ProdutoEstoque/${selectedProduct.id_produto_estoque}`,
+    const response = await api.put(
+      `/Estoque/Retirada/${selectedProduct.id_produto_estoque}`,
       { produtoId: selectedProduct.id_produto_estoque, ...retiradaFormData }
     );
     
@@ -228,6 +269,29 @@ export const ProdutoEstoque = () => {
             </TableBody>
           </Table>
         </TableContainer>
+      )}
+
+      {produtos.length <= 0 && (
+        <>
+        <Box
+          component="img"
+          src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+          alt="Nenhum item"
+          sx={{ width: 150, height: 150, mb: 4 }}
+        />
+        <Typography variant="h6" fontWeight="bold">
+          Não há itens no momento
+        </Typography>
+
+        <Button
+          startIcon={<AddIcon />}
+          variant="contained"
+          color="primary"
+          onClick={() => setAdicionar(true)}
+        >
+          Adicionar Item
+        </Button>
+      </>
       )}
       
       {/* Tabela de formulário para entrada de novos dados */}
@@ -338,6 +402,7 @@ export const ProdutoEstoque = () => {
     <TextField
       label="Retirado para (Paciente ID)"
       name="retiradoPara"
+      type="number"
       value={retiradaFormData.retiradoPara}
       onChange={handleRetiradaInputChange}
       fullWidth
@@ -346,6 +411,7 @@ export const ProdutoEstoque = () => {
     <TextField
       label="Retirado por (CRM do Médico)"
       name="retiradoPor"
+      type="number"
       value={retiradaFormData.retiradoPor}
       onChange={handleRetiradaInputChange}
       fullWidth
@@ -354,6 +420,7 @@ export const ProdutoEstoque = () => {
     <TextField
       label="Consulta realizada (ID da Consulta)"
       name="consultaRealizada"
+      type="number"
       value={retiradaFormData.consultaRealizada}
       onChange={handleRetiradaInputChange}
       fullWidth

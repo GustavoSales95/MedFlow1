@@ -3,6 +3,7 @@ const { PrismaClient, Temperatura } = pkg;
 
 const prisma = new PrismaClient();
 
+<<<<<<< HEAD
 async function registroProduto(
   nome,
   valor,
@@ -11,6 +12,10 @@ async function registroProduto(
   temperatura,
   quantidade
 ) {
+=======
+
+async function registroProduto(nome, valor, embalagem, unidade_medida, temperatura) {
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
   if (!temperatura) {
     throw new Error("Temperatura não fornecida.");
   }
@@ -23,17 +28,26 @@ async function registroProduto(
   }
 
   const valorNumerico = parseFloat(valor);
+<<<<<<< HEAD
   const quantidadeNumero = parseInt(quantidade);
 
+=======
+  
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
   const novoProduto = await prisma.produtos.create({
     data: {
       nome,
       valor: valorNumerico,
       embalagem,
       unidade_medida,
+<<<<<<< HEAD
       temperatura: Temperatura[temperaturaUpper],
       quantidade: quantidadeNumero,
     },
+=======
+      temperatura: Temperatura[temperaturaUpper]
+    }
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
   });
 
   return novoProduto;
@@ -49,6 +63,7 @@ async function getTodosProdutos() {
   }
 }
 
+<<<<<<< HEAD
 async function atualizarProduto(
   id_produto,
   nome,
@@ -59,13 +74,17 @@ async function atualizarProduto(
   quantidade
 ) {
   try {
+=======
+
+async function atualizarProduto(id_produto, nome, valor, embalagem, unidade_medida, temperatura) {
+try {
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
     const id = parseInt(id_produto);
     if (isNaN(id)) {
       throw new Error("ID do produto inválido.");
     }
 
     const valorNumerico = parseFloat(valor);
-    const quantidadeNumero = parseInt(quantidade);
 
     const produtoAtualizado = await prisma.produtos.update({
       where: { id_produto },
@@ -75,8 +94,12 @@ async function atualizarProduto(
         embalagem,
         unidade_medida,
         temperatura,
+<<<<<<< HEAD
         quantidade: quantidadeNumero,
       },
+=======
+      }, 
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
     });
     return produtoAtualizado;
   } catch (error) {
@@ -87,8 +110,9 @@ async function atualizarProduto(
 
 async function deletarProduto(id_produto_estoque) {
   try {
-    const produtoDeletado = await prisma.produto_estoque.delete({
+    const produtoDeletado = await prisma.produto_estoque.update({
       where: { id_produto_estoque: parseInt(id_produto_estoque) },
+      data: { deletado: 'Sim' }
     });
     return produtoDeletado;
   } catch (error) {
@@ -120,8 +144,13 @@ async function BuscarProdutoEstoque(id_produto) {
   const id = parseInt(id_produto);
   try {
     const produtosEstoue = await prisma.produto_estoque.findMany({
+<<<<<<< HEAD
       where: { id_produto: id },
       include: { produtos: true },
+=======
+      where: { id_produto: id, deletado: "Nao" },
+      include: { produtos: true}
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
     });
 
     return produtosEstoue;
@@ -137,9 +166,16 @@ async function adicionarProdutoEstoque(id_produto, validade, quantidade) {
     const produtoEstoque = await prisma.produto_estoque.create({
       data: {
         validade: new Date(validade),
+<<<<<<< HEAD
         quantidade,
         produtos: { connect: { id_produto: id } },
       },
+=======
+        quantidade: parseInt(quantidade),
+        produtos: { connect: { id_produto: id} },
+        
+      } 
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
     });
     return produtoEstoque;
   } catch (error) {
@@ -167,6 +203,7 @@ async function listarReceitas() {
   }
 }
 
+<<<<<<< HEAD
 export default {
   listarReceitas,
   registroProduto,
@@ -177,3 +214,49 @@ export default {
   BuscarProdutoEstoque,
   adicionarProdutoEstoque,
 };
+=======
+async function realizarRetirada(id_produto_estoque, quantidadeRetirada, retiradoPara, retiradoPor, consultaRealizada) {
+  const agendamento_id = parseInt(consultaRealizada);
+  const id_paciente = parseInt(retiradoPara);
+  const quantidade = parseInt(quantidadeRetirada)
+
+  const medico = await prisma.medicos.findUnique({
+    where: { crm: retiradoPor },
+  });
+  const consulta = await prisma.consultas.findUnique({
+    where: { agendamento_id}
+  });
+
+  const id = parseInt(id_produto_estoque);
+  const id_consulta = consulta.id_consulta;
+  const id_medico = medico.id_medico;
+
+  const saida = await prisma.entradaSaida.create({
+    data: {
+      ProdutoEstoque: { connect: { id_produto_estoque: id} },
+      Consultas: { connect: {id_consulta} },
+      Medicos: { connect: {id_medico} },
+      Pacientes: { connect: {id_paciente}},
+      quantidade,
+      tipo_transacao: "Retirada"
+    }
+  });
+
+  return saida
+}
+
+async function retiradaProduto(id_produto_estoque, quantidadeRetirada) { 
+  const id = parseInt(id_produto_estoque);
+  const quantidadeRemovida = parseInt(quantidadeRetirada)
+  const produto_estoque = await prisma.produto_estoque.update({
+    where: { id_produto_estoque: id },
+    data: {
+      quantidade: { decrement: quantidadeRemovida }
+    }
+  });
+  return produto_estoque
+}
+
+
+export default { registroProduto, atualizarProduto, deletarProduto, getTodosProdutos, getById, BuscarProdutoEstoque, adicionarProdutoEstoque, realizarRetirada, retiradaProduto}
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c

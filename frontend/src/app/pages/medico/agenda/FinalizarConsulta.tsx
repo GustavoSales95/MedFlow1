@@ -78,6 +78,8 @@ export const FinalizarConsulta = () => {
   const handleSave = async (e: React.FormEvent, user: any) => {
     e.preventDefault();
     try {
+
+      
       const response = await api.put('/Medico/FinalizarConsulta', agendaMedico);
       const agendamentoResponse = await api.get("/Medico/FinalizarConsulta", {
         params: { agendamento_id: idSearch },

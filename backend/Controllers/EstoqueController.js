@@ -16,14 +16,19 @@ route.get("/entrada", async (req, res) => {
 });
 
 route.post("/Cadastro", async (req, res) => {
+<<<<<<< HEAD
   const { nome, valor, embalagem, unidade_medida, temperatura, quantidade } =
     req.body;
+=======
+  const { nome, valor, embalagem, unidade_medida, temperatura } = req.body;
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
 
   if (!nome || !valor || !temperatura) {
     return res.status(400).json({ error: "Campos obrigatórios faltando" });
   }
 
   try {
+<<<<<<< HEAD
     const novoProduto = await service.registroProduto(
       nome,
       valor,
@@ -32,6 +37,9 @@ route.post("/Cadastro", async (req, res) => {
       temperatura,
       quantidade
     );
+=======
+    const novoProduto = await service.registroProduto(nome, valor, embalagem, unidade_medida, temperatura);
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
 
     res.status(201).json({
       message: "Produto registrado com sucesso",
@@ -57,6 +65,7 @@ route.get("/Editar", async (req, res) => {
 });
 
 route.put("/Editar", async (req, res) => {
+<<<<<<< HEAD
   const {
     id_produto,
     nome,
@@ -76,6 +85,11 @@ route.put("/Editar", async (req, res) => {
       temperatura,
       quantidade
     );
+=======
+  const { id_produto, nome, valor, embalagem, unidade_medida, temperatura } = req.body;
+  try {
+    const produtoAtualizado = await service.atualizarProduto(id_produto, nome, valor, embalagem, unidade_medida, temperatura);
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
 
     if (!produtoAtualizado) {
       return res.status(404).json({ error: "Produto não encontrado" });
@@ -147,4 +161,21 @@ route.get("/Receitas", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 export default route;
+=======
+route.put("/Retirada/:id_produto_estoque", async (req, resp) => {
+  const { id_produto_estoque } = req.params;
+  const { quantidadeRetirada, retiradoPara, retiradoPor, consultaRealizada } = req.body;
+  try {
+    const saida = await service.realizarRetirada(id_produto_estoque, quantidadeRetirada, retiradoPara, retiradoPor, consultaRealizada);
+    const produto_estoque = await service.retiradaProduto(id_produto_estoque, quantidadeRetirada)
+    return resp.status(201).json(req.body);
+  } catch (error) {
+    console.error("Erro ao cadastrar produto:", error);
+    return resp.status(400).json({ error: "Erro ao cadastrar produto no banco de dados." });
+  }
+});
+
+export default route;
+>>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c

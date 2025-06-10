@@ -130,7 +130,7 @@ export const ConsultarProntuario = () => {
         variant="h4"
         sx={{ marginBottom: "20px", textAlign: "center" }}
       >
-        Consulta de Porntuário
+        Consulta de Prontuário
       </Typography>
 
       <Grid container spacing={2}>

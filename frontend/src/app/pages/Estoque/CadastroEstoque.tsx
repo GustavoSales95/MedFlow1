@@ -22,7 +22,6 @@ export const CadastroEstoque = () => {
     valor: '',
     embalagem: '',
     temperatura: '', 
-    quantidade: '',
   });
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -106,21 +105,6 @@ export const CadastroEstoque = () => {
               name="unidade_medida"
               value={formData.unidade_medida}
               onChange={handleChange}
-            />
-          </Grid>
-
-
-          <Grid item xs={12}>
-            <TextField
-              label="Quantidade"
-              variant="outlined"
-              fullWidth
-              type="number"
-              name="quantidade"
-              value={formData.quantidade}
-              onChange={handleChange}
-              InputLabelProps={{ shrink: true }}
-              required
             />
           </Grid>
 

@@ -24,7 +24,6 @@ export const Editar = () => {
     valor: '',
     embalagem: '',
     temperatura: '',
-    quantidade: ''
   });
   const [produtoEncontrado, setProdutoEncontrado] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -122,9 +121,6 @@ export const Editar = () => {
             </Grid>
             <Grid item xs={12}>
               <TextField label="Unidade de Medida" name="unidade_medida" value={produto.unidade_medida} onChange={handleChangeProduto} fullWidth />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField label="Quantidade" name="quantidade" value={produto.quantidade} onChange={handleChangeProduto} type="number" fullWidth />
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth>
