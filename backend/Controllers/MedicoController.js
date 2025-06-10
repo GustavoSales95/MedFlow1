@@ -18,14 +18,28 @@ route.get("/ConsultarProntuarios", async (req, resp) => {
     return resp.status(404).json({ error: "Paciente não possui prontuário" });
   }
 
-  return resp.status(200).json({ message: prontuario, paciente});
+  return resp.status(200).json({ message: prontuario, paciente });
 });
 
 route.put("/ConsultarProntuarios", async (req, resp) => {
-  const { paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas } = req.body;
+  const {
+    paciente_id,
+    alergias,
+    tipo_sanguineo,
+    medicamentos,
+    cirurgias,
+    doencas_infecciosas,
+  } = req.body;
 
   try {
-    const novo_prontuario = await service.editarProntuario(paciente_id, alergias, tipo_sanguineo, medicamentos, cirurgias, doencas_infecciosas);
+    const novo_prontuario = await service.editarProntuario(
+      paciente_id,
+      alergias,
+      tipo_sanguineo,
+      medicamentos,
+      cirurgias,
+      doencas_infecciosas
+    );
 
     return resp.status(200).json({ message: novo_prontuario });
   } catch (error) {
@@ -41,9 +55,11 @@ route.get("/Agendamentos", async (req, resp) => {
   try {
     const agendamentos = await service.buscarAgenda(crm);
 
-    return resp.status(200).json({ message: agendamentos});
+    return resp.status(200).json({ message: agendamentos });
   } catch (error) {
-    return resp.status(404).json({ error: "Ocorreu um erro ao buscar agendamentos" });
+    return resp
+      .status(404)
+      .json({ error: "Ocorreu um erro ao buscar agendamentos" });
   }
 });
 
@@ -53,21 +69,64 @@ route.get("/FinalizarConsulta", async (req, resp) => {
   try {
     const consulta = await service.buscarConsulta(agendamento_id);
 
-    return resp.status(200).json({ message: consulta});
+    return resp.status(200).json({ message: consulta });
   } catch (error) {
-    return resp.status(404).json({ error: "Ocorreu um erro ao buscar a consulta" });
+    return resp
+      .status(404)
+      .json({ error: "Ocorreu um erro ao buscar a consulta" });
   }
 });
 
 route.put("/FinalizarConsulta", async (req, resp) => {
   const { descricao, receita, observacoes, id_consulta } = req.body;
   try {
-    const consulta = await service.editarConsulta(descricao, receita, observacoes, id_consulta);
+    const consulta = await service.editarConsulta(
+      descricao,
+      receita,
+      observacoes,
+      id_consulta
+    );
 
-    return resp.status(200).json({ message: consulta});
-
+    return resp.status(200).json({ message: consulta });
   } catch (error) {
-    return resp.status(404).json({ error: "Ocorreu um erro ao buscar a consulta" });
+    return resp
+      .status(404)
+      .json({ error: "Ocorreu um erro ao buscar a consulta" });
+  }
+});
+route.post("/CriarReceita", async (req, res) => {
+  const { cpf, crm, conteudo, orientacoes } = req.body;
+
+  try {
+    const receita = await service.criarReceita(cpf, crm, conteudo, orientacoes);
+    return res.status(201).json(receita);
+  } catch (error) {
+    console.error("Erro ao criar receita:", error.message);
+    if (error.message === "Paciente não encontrado.") {
+      return res.status(404).json({ error: error.message });
+    }
+    if (error.message === "Médico não encontrado.") {
+      return res.status(404).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Erro interno do servidor." });
+  }
+});
+route.get("/BuscarPacientePorCpf", async (req, res) => {
+  const { cpf } = req.query;
+
+  if (!cpf) {
+    return res.status(400).json({ error: "CPF não informado" });
+  }
+
+  try {
+    const paciente = await service.buscarPaciente(cpf);
+    if (!paciente) {
+      return res.status(404).json({ error: "Paciente não encontrado" });
+    }
+
+    return res.status(200).json(paciente);
+  } catch (error) {
+    return res.status(500).json({ error: "Erro ao buscar paciente." });
   }
 });
 

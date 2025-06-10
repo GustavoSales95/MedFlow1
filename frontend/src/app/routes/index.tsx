@@ -23,7 +23,9 @@ import {
   CadastroEstoque,
   DashboardEstoque,
   Entrada,
-  ProdutoEstoque
+  ProdutoEstoque,
+  CriarReceita,
+  ListaReceitas
 } from "../pages";
 import { AppContext } from "../shared/contexts/AppContext";
 
@@ -94,14 +96,9 @@ const router = createBrowserRouter([
               },
               { path: "AgendaDia", element: <AgendaDia /> },
               { path: "Agendamentos", element: <Agendamentos /> },
-              {
-                path: "FinalizarConsulta",
-                element: <FinalizarConsulta />,
-              },
-              {
-                path: "ConsultarEscala",
-                element: <ConsultarEscala />,
-              },
+              { path: "FinalizarConsulta", element: <FinalizarConsulta /> },
+              { path: "ConsultarEscala", element: <ConsultarEscala />},
+              { path: "CriarReceita", element: <CriarReceita /> }
             ],
           },
         ],
@@ -115,6 +112,7 @@ const router = createBrowserRouter([
           { path: "Cadastro", element: <CadastroEstoque /> },
           { path: "Entrada", element: <Entrada /> },
           { path: "Editar", element: <Editar /> },
+          { path: "ListarReceitas", element: <ListaReceitas/>},
           { path: "ProdutoEstoque/:id_produto", element: <ProdutoEstoque /> },
         ],
       },

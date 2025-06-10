@@ -10,14 +10,15 @@ import { Link } from "react-router-dom";
 import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import PersonSearchIcon from "@mui/icons-material/PersonSearch";
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import PendingActionsIcon from '@mui/icons-material/PendingActions';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import ContentPasteIcon from "@mui/icons-material/ContentPaste";
+import CreateIcon from "@mui/icons-material/Create";
 
 export const ListaMedico1 = () => {
   return (
     <List>
-{/*       <ListItem key={1} disablePadding>
+      {/*       <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
           to={"/Medico"}
@@ -34,8 +35,6 @@ export const ListaMedico1 = () => {
         </ListItemButton>
       </ListItem> */}
       <ListItem key={2} disablePadding>
-        
-        
         <ListItemButton
           component={Link}
           to={"/Medico/ConsultarProntuarios"}
@@ -52,8 +51,6 @@ export const ListaMedico1 = () => {
         </ListItemButton>
       </ListItem>
       <ListItem key={2} disablePadding>
-        
-        
         <ListItemButton
           component={Link}
           to={"/Medico/Agendamentos"}
@@ -71,8 +68,6 @@ export const ListaMedico1 = () => {
       </ListItem>
 
       <ListItem key={2} disablePadding>
-        
-        
         <ListItemButton
           component={Link}
           to={"/Medico/FinalizarConsulta"}
@@ -90,8 +85,6 @@ export const ListaMedico1 = () => {
       </ListItem>
 
       <ListItem key={2} disablePadding>
-        
-        
         <ListItemButton
           component={Link}
           to={"/Medico/ConsultarEscala"}
@@ -107,8 +100,24 @@ export const ListaMedico1 = () => {
           <ListItemText primary={"Consultar Escala"} />
         </ListItemButton>
       </ListItem>
-      
- {/*      <ListItem key={1} disablePadding>
+      <ListItem key={2} disablePadding>
+        <ListItemButton
+          component={Link}
+          to={"/Medico/CriarReceita"}
+          sx={{
+            transition: "0.8s",
+            "&:hover": {
+              backgroundColor: "#019C9B",
+              color: "white",
+            },
+          }}
+        >
+          <ListItemIcon>{<CreateIcon />}</ListItemIcon>
+          <ListItemText primary={"Criar Receita"} />
+        </ListItemButton>
+      </ListItem>
+
+      {/*      <ListItem key={1} disablePadding>
         <ListItemButton
           component={Link}
           to={"/"}

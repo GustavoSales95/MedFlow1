@@ -86,12 +86,12 @@ async function buscarUsuarios(cpf) {
   const usuario = await prisma.usuarios.findUnique({
     where: { cpf },
     include: {
-      perfil: {
+      perfis: {
         select: { tipo: true }
       },
-      Medicos: {
+      medicos: {
         include: {
-          Escala: true
+          escala: true
         }
       }
     }

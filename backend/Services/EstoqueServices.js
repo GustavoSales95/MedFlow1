@@ -1,51 +1,64 @@
-import pkg from '@prisma/client';
+import pkg from "@prisma/client";
 const { PrismaClient, Temperatura } = pkg;
 
 const prisma = new PrismaClient();
 
-
-async function registroProduto(nome, valor, embalagem, unidade_medida, temperatura, quantidade) {
+async function registroProduto(
+  nome,
+  valor,
+  embalagem,
+  unidade_medida,
+  temperatura,
+  quantidade
+) {
   if (!temperatura) {
-    throw new Error('Temperatura não fornecida.');
+    throw new Error("Temperatura não fornecida.");
   }
-  
+
   const temperaturaUpper = temperatura.toUpperCase();
-  const temperaturasValidas = ['PERECIVEL', 'RESFRIADO', 'TERMOSSENSIVEL'];
-  
+  const temperaturasValidas = ["PERECIVEL", "RESFRIADO", "TERMOSSENSIVEL"];
+
   if (!temperaturasValidas.includes(temperaturaUpper)) {
-    throw new Error('Temperatura inválida.');
+    throw new Error("Temperatura inválida.");
   }
-  
+
   const valorNumerico = parseFloat(valor);
   const quantidadeNumero = parseInt(quantidade);
-  
+
   const novoProduto = await prisma.produtos.create({
     data: {
       nome,
-      valor: valorNumerico, 
+      valor: valorNumerico,
       embalagem,
       unidade_medida,
       temperatura: Temperatura[temperaturaUpper],
-      quantidade: quantidadeNumero
-    }
+      quantidade: quantidadeNumero,
+    },
   });
-  
+
   return novoProduto;
 }
 
 async function getTodosProdutos() {
-try {
+  try {
     const produtos = await prisma.produtos.findMany();
     return produtos;
-  } catch (error) {  
+  } catch (error) {
     console.error("Erro ao buscar produtos:", error);
     throw new Error("Erro ao buscar produtos");
   }
 }
 
-
-async function atualizarProduto(id_produto, nome, valor, embalagem, unidade_medida, temperatura, quantidade) {
-try {
+async function atualizarProduto(
+  id_produto,
+  nome,
+  valor,
+  embalagem,
+  unidade_medida,
+  temperatura,
+  quantidade
+) {
+  try {
     const id = parseInt(id_produto);
     if (isNaN(id)) {
       throw new Error("ID do produto inválido.");
@@ -53,7 +66,6 @@ try {
 
     const valorNumerico = parseFloat(valor);
     const quantidadeNumero = parseInt(quantidade);
-
 
     const produtoAtualizado = await prisma.produtos.update({
       where: { id_produto },
@@ -63,12 +75,11 @@ try {
         embalagem,
         unidade_medida,
         temperatura,
-        quantidade: quantidadeNumero
-      }, 
+        quantidade: quantidadeNumero,
+      },
     });
     return produtoAtualizado;
-  } 
-  catch (error) {
+  } catch (error) {
     console.error("Erro ao atualizar produto:", error);
     throw new Error("Erro ao atualizar produto");
   }
@@ -95,7 +106,7 @@ async function getById(id_produto) {
     }
 
     const produto = await prisma.produtos.findUnique({
-      where: { id_produto: id }, 
+      where: { id_produto: id },
     });
 
     return produto;
@@ -110,14 +121,14 @@ async function BuscarProdutoEstoque(id_produto) {
   try {
     const produtosEstoue = await prisma.produto_estoque.findMany({
       where: { id_produto: id },
-      include: { produtos: true}
+      include: { produtos: true },
     });
 
-    return produtosEstoue
+    return produtosEstoue;
   } catch (error) {
     console.error("Erro ao buscar produto:", error);
     throw new Error("Erro ao buscar produto");
-  } 
+  }
 }
 
 async function adicionarProdutoEstoque(id_produto, validade, quantidade) {
@@ -127,16 +138,42 @@ async function adicionarProdutoEstoque(id_produto, validade, quantidade) {
       data: {
         validade: new Date(validade),
         quantidade,
-        produtos: { connect: { id_produto: id} },
-        
-      } 
+        produtos: { connect: { id_produto: id } },
+      },
     });
     return produtoEstoque;
   } catch (error) {
     console.error("Erro ao buscar produto:", error);
     throw new Error("Erro ao buscar produto");
-  } 
+  }
+}
+async function listarReceitas() {
+  try {
+    const receitas = await prisma.receitas.findMany({
+      include: {
+        pacientes: true,
+        medicos: true,
+        produtos: true,
+      },
+      orderBy: {
+        data_emissao: "desc",
+      },
+    });
+
+    return receitas;
+  } catch (error) {
+    console.error("Erro ao buscar receitas:", error);
+    throw new Error("Erro ao buscar receitas");
+  }
 }
 
-
-export default { registroProduto, atualizarProduto, deletarProduto, getTodosProdutos, getById, BuscarProdutoEstoque, adicionarProdutoEstoque}
+export default {
+  listarReceitas,
+  registroProduto,
+  atualizarProduto,
+  deletarProduto,
+  getTodosProdutos,
+  getById,
+  BuscarProdutoEstoque,
+  adicionarProdutoEstoque,
+};

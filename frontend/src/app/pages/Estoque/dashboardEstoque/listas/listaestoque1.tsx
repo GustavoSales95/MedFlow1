@@ -4,16 +4,15 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import List from "@mui/material/List";
-import InboxIcon from '@mui/icons-material/Inbox';
+import InboxIcon from "@mui/icons-material/Inbox";
 import { Link } from "react-router-dom";
-
+import ListAltIcon from "@mui/icons-material/ListAlt";
 //Icones
 // import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 // import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import AllInboxIcon from '@mui/icons-material/AllInbox';
+import AllInboxIcon from "@mui/icons-material/AllInbox";
 
-import MouseIcon from '@mui/icons-material/Mouse';
-
+import MouseIcon from "@mui/icons-material/Mouse";
 
 export const Lista1 = () => {
   return (
@@ -38,7 +37,7 @@ export const Lista1 = () => {
       <ListItem key={2} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/Estoque/entrada"}  
+          to={"/Estoque/entrada"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -47,7 +46,7 @@ export const Lista1 = () => {
             },
           }}
         >
-          <ListItemIcon>{<AllInboxIcon/>}</ListItemIcon>
+          <ListItemIcon>{<AllInboxIcon />}</ListItemIcon>
           <ListItemText primary={"Registro"} />
         </ListItemButton>
       </ListItem>
@@ -55,7 +54,7 @@ export const Lista1 = () => {
       <ListItem key={2} disablePadding>
         <ListItemButton
           component={Link}
-          to={"/Estoque/Editar"}  
+          to={"/Estoque/Editar"}
           sx={{
             transition: "0.8s",
             "&:hover": {
@@ -64,8 +63,25 @@ export const Lista1 = () => {
             },
           }}
         >
-          <ListItemIcon>{<MouseIcon/>}</ListItemIcon>
+          <ListItemIcon>{<MouseIcon />}</ListItemIcon>
           <ListItemText primary={"Editar"} />
+        </ListItemButton>
+      </ListItem>
+
+      <ListItem key={2} disablePadding>
+        <ListItemButton
+          component={Link}
+          to={"/Estoque/ListarReceitas"}
+          sx={{
+            transition: "0.8s",
+            "&:hover": {
+              backgroundColor: "#019C9B",
+              color: "white",
+            },
+          }}
+        >
+          <ListItemIcon>{<ListAltIcon />}</ListItemIcon>
+          <ListItemText primary={"Lista de Receitas"} />
         </ListItemButton>
       </ListItem>
     </List>
