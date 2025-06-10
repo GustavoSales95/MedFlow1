@@ -32,6 +32,8 @@ interface ProdutoEstoqueData {
   id_produto: number;
   quantidade: string;
   validade: string;
+  deletado: string;
+  vencimento_proximo: string
   produtos: {
     nome: string;
     valor: number;
@@ -57,6 +59,7 @@ interface RetiradaFormData {
 export const ProdutoEstoque = () => {
   const { id_produto } = useParams<{ id_produto: string }>();
   const [produtos, setProdutos] = useState<ProdutoEstoqueData[]>([]);
+  const [produtosVencidos, setProdutosVencidos] = useState<ProdutoEstoqueData[]>([]);
   const [adicionar, setAdicionar] = useState<boolean>(false);
   const [formData, setFormData] = useState<FormData>({ quantidade: "", validade: "" });
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -74,14 +77,35 @@ export const ProdutoEstoque = () => {
   const [selectedProduct, setSelectedProduct] = useState<ProdutoEstoqueData | null>(null);
 
   useEffect(() => {
-    api.get(`/Estoque/ProdutoEstoque/${id_produto}`)
-      .then((resp) => {
-        setProdutos(resp.data);
-      })
-      .catch((err) => {
-        console.error('Erro ao buscar dados do produto:', err);
-      });
-  }, [id_produto]);
+  api.get(`/Estoque/ProdutoEstoque/${id_produto}`)
+    .then((resp) => {
+      const produtosData = resp.data as ProdutoEstoqueData[];
+      setProdutos(produtosData);
+
+      const vencendo = produtosData.filter(
+        produto => produto.vencimento_proximo === "Sim"
+      );
+      setProdutosVencidos(vencendo);
+
+      if (vencendo.length > 0) {
+        const mensagem = vencendo
+          .map(produto => {
+            const { data } = formatarDataHora(produto.validade);
+            return `Produto com id ${produto.id_produto_estoque} está prestes a vencer. Validade: ${data}`;
+          })
+          .join(' | ');
+
+        setTimeout(() => {
+          window.alert(mensagem);
+        }, 1);
+      }
+    })
+    .catch((err) => {
+      console.error('Erro ao buscar dados do produto:', err);
+    });
+}, [id_produto]);
+
+
 
   const produtoInfo = produtos[0]?.produtos;
 

@@ -104,6 +104,7 @@ CREATE TABLE produto_estoque (
     quantidade INT NOT NULL,
     validade DATE NOT NULL,
     deletado ENUM('Sim', 'Nao') NOT NULL DEFAULT 'Nao',
+    vencimento_proximo ENUM('Sim', 'Nao') NOT NULL DEFAULT 'Nao',
     FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
 );
 
@@ -194,6 +195,16 @@ END;
 //
 DELIMITER ;
 
+DELIMITER //
+CREATE EVENT trg_validade_expirada
+ON SCHEDULE
+	EVERY 24 HOUR
+    COMMENT 'Verificação de validade'
+    DO UPDATE estoque_produto SET deletado = "Sim"
+    WHERE validade < CURDATE();
+//
+DELIMITER ;
+
 
 INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Admin'),(2, 'Comum'),(3, 'Medico');
 
@@ -221,7 +232,7 @@ VALUES
   ('Amoxicilina', 5.00, 150, 'Ampola', 'ml', 'TERMOSSENSIVEL');
 INSERT INTO produto_estoque (id_produto, quantidade, validade)
 VALUES 
-(1, 50, '2025-12-31'),
+(1, 50, '2025-07-10'),
 (1, 30, '2026-01-15'),
 (1, 20, '2026-02-01');
 INSERT INTO produto_estoque (id_produto, quantidade, validade)
@@ -235,7 +246,19 @@ VALUES
   (3, 60, '2026-06-15'),
   (3, 30, '2026-07-01');
 
-/*select * from perfis;
+
+DELIMITER //
+CREATE EVENT trg_validade_proxima
+ON SCHEDULE
+	EVERY 1 second
+    COMMENT 'Verificação de validade'
+    DO UPDATE estoque_produto SET vencimento_proximo = "Sim"
+    WHERE validade <= DATE_ADD(CURDATE(), INTERVAL 60 DAY);
+//
+DELIMITER ;
+
+
+select * from perfis;
 select * from usuarios;
 select * from pacientes;
 select * from medicos;

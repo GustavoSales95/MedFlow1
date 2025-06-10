@@ -154,12 +154,18 @@ enum Deletado {
   Nao
 }
 
+enum Vencimento_proximo {
+  Sim
+  Nao
+}
+
 model produto_estoque {
   id_produto_estoque Int         @id @default(autoincrement())
   id_produto         Int
   quantidade         Int      
   validade           DateTime    @db.Date
   deletado           Deletado @default(Nao)
+  vencimento_proximo Vencimento_proximo @default(Nao)
 
   produtos       Produtos     @relation(fields: [id_produto], references: [id_produto])
   Pedidos        Pedidos[]
