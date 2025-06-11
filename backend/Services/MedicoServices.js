@@ -73,7 +73,13 @@ async function buscarConsulta(agendamento_id) {
   return consulta;
 }
 
-async function editarConsulta(descricao, receita, observacoes, id_consulta, agendamento_id) {
+async function editarConsulta(
+  descricao,
+  receita,
+  observacoes,
+  id_consulta,
+  agendamento_id
+) {
   const consulta_editada = await prisma.consultas.update({
     where: { id_consulta },
     data: {
@@ -83,17 +89,12 @@ async function editarConsulta(descricao, receita, observacoes, id_consulta, agen
     },
   });
 
-  const id_agendamento = parseInt(agendamento_id)
+  const id_agendamento = parseInt(agendamento_id);
   const agendamento_editado = await prisma.agendamentos.update({
     where: { id_agendamento },
     data: {
-<<<<<<< HEAD
-      status: "Concluído",
+      status: "Concluido",
     },
-=======
-      status: "Concluido"
-    }
->>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
   });
   return { consulta_editada, agendamento_editado };
 }

@@ -8,9 +8,8 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { Outlet } from "react-router-dom";
 //Componente
-import {ListaMedico1} from "./listas/ListaMedico1"
-import { ListaMedico2 } from './listas/ListaMedico2';
-
+import { ListaMedico1 } from "./listas/ListaMedico1";
+import { ListaMedico2 } from "./listas/ListaMedico2";
 
 const drawerWidth = 240;
 
@@ -22,7 +21,7 @@ export function DashboardMedico() {
         position="fixed"
         sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
       >
-        <Toolbar>
+        <Toolbar sx={{ backgroundColor: "blue" }}>
           <Typography variant="h6" noWrap component="div">
             Pagina Inicial
           </Typography>

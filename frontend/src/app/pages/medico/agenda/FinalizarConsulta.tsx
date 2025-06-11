@@ -9,10 +9,10 @@ import {
   Alert,
   Paper,
 } from "@mui/material";
-import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
-import ContentPasteGoIcon from '@mui/icons-material/ContentPasteGo';
-import api from '../../../../services/api.js';
-import { formatarDataHora } from '../../../functions/InsertMasks';
+import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
+import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
+import api from "../../../../services/api.js";
+import { formatarDataHora } from "../../../functions/InsertMasks";
 
 interface AgendamentoData {
   id_agendamento: number;
@@ -32,19 +32,21 @@ interface AgendamentoData {
     nome_paciente: string;
     data_hora: string;
     status: string;
-  }
+  };
 }
 
 export const FinalizarConsulta = () => {
   const [idSearch, setIdSearch] = useState<string>("");
-  const [agendaMedico, setAgendaMedico] = useState<AgendamentoData | null>(null);
+  const [agendaMedico, setAgendaMedico] = useState<AgendamentoData | null>(
+    null
+  );
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const handleSearch = async () => {
     try {
-      const response = await api.get('/Medico/FinalizarConsulta', {
-        params: { agendamento_id: idSearch }
+      const response = await api.get("/Medico/FinalizarConsulta", {
+        params: { agendamento_id: idSearch },
       });
 
       if (response.data.message) {
@@ -70,7 +72,7 @@ export const FinalizarConsulta = () => {
     if (agendaMedico) {
       setAgendaMedico({
         ...agendaMedico,
-        [name]: value
+        [name]: value,
       });
     }
   };
@@ -78,9 +80,7 @@ export const FinalizarConsulta = () => {
   const handleSave = async (e: React.FormEvent, user: any) => {
     e.preventDefault();
     try {
-
-      
-      const response = await api.put('/Medico/FinalizarConsulta', agendaMedico);
+      const response = await api.put("/Medico/FinalizarConsulta", agendaMedico);
       const agendamentoResponse = await api.get("/Medico/FinalizarConsulta", {
         params: { agendamento_id: idSearch },
       });
@@ -89,7 +89,7 @@ export const FinalizarConsulta = () => {
         setAgendaMedico(agendamentoResponse.data.message);
         console.log("Consulta finalizada com sucesso:", response.data);
         setAgendaMedico(null);
-        setIdSearch('');
+        setIdSearch("");
         setSnackbarMessage("Consulta finalizada com sucesso.");
         setOpenSnackbar(true);
       }
@@ -102,7 +102,10 @@ export const FinalizarConsulta = () => {
 
   return (
     <Box sx={{ padding: "20px", maxWidth: 800, margin: "0 auto" }}>
-      <Typography variant="h4" sx={{ marginBottom: "20px", textAlign: "center" }}>
+      <Typography
+        variant="h4"
+        sx={{ marginBottom: "20px", textAlign: "center" }}
+      >
         Consulta de Agendamentos
       </Typography>
 
@@ -162,7 +165,9 @@ export const FinalizarConsulta = () => {
               </Typography>
             </Grid>
             <Grid item sm={6} md={6}>
-              <Typography sx={{ fontSize: 18 }}>Descrição da consulta</Typography>
+              <Typography sx={{ fontSize: 18 }}>
+                Descrição da consulta
+              </Typography>
               <TextField
                 name="descricao"
                 variant="standard"
@@ -201,7 +206,12 @@ export const FinalizarConsulta = () => {
                 onChange={handleEdit}
               />
             </Grid>
-            <Grid item sm={6} md={6} sx={{ display: "flex", alignItems: "center" }}>
+            <Grid
+              item
+              sm={6}
+              md={6}
+              sx={{ display: "flex", alignItems: "center" }}
+            >
               <Button
                 variant="contained"
                 color="primary"

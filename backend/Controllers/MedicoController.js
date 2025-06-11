@@ -80,25 +80,12 @@ route.get("/FinalizarConsulta", async (req, resp) => {
 route.put("/FinalizarConsulta", async (req, resp) => {
   const { descricao, receita, observacoes, id_consulta, agendamento_id } = req.body;
   try {
-<<<<<<< HEAD
-    const consulta = await service.editarConsulta(
-      descricao,
-      receita,
-      observacoes,
-      id_consulta
-    );
-=======
     const consulta = await service.editarConsulta(descricao, receita, observacoes, id_consulta, agendamento_id);
 
     return resp.status(200).json({ message: consulta});
->>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
 
-    return resp.status(200).json({ message: consulta });
   } catch (error) {
-<<<<<<< HEAD
-    return resp
-      .status(404)
-      .json({ error: "Ocorreu um erro ao buscar a consulta" });
+    return resp.status(404).json({ error: "Ocorreu um erro ao finalizar a consulta" });
   }
 });
 route.post("/CriarReceita", async (req, res) => {
@@ -134,9 +121,6 @@ route.get("/BuscarPacientePorCpf", async (req, res) => {
     return res.status(200).json(paciente);
   } catch (error) {
     return res.status(500).json({ error: "Erro ao buscar paciente." });
-=======
-    return resp.status(404).json({ error: "Ocorreu um erro ao finalizar a consulta" });
->>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
   }
 });
 

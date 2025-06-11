@@ -13,16 +13,16 @@ function normalizeUsuario(usuario) {
     cpf: usuario.cpf,
     data_nascimento: usuario.data_nascimento,
     data_Cadastro: usuario.data_Cadastro,
-    perfil: usuario.perfil,  
+    perfil: usuario.perfil,
     medico: usuario.Medicos
       ? {
           id_medico: usuario.Medicos.id_medico,
           crm: usuario.Medicos.crm,
           especialidade: usuario.Medicos.especialidade,
           telefone: usuario.Medicos.telefone,
-          escala: usuario.Medicos.Escala || null
+          escala: usuario.Medicos.Escala || null,
         }
-      : null
+      : null,
   };
 }
 
@@ -42,8 +42,8 @@ function normalizeMedico(medico) {
       crm: medico.crm,
       especialidade: medico.especialidade,
       telefone: medico.telefone,
-      escala: medico.Escala || null
-    }
+      escala: medico.Escala || null,
+    },
   };
 }
 
@@ -74,37 +74,36 @@ function normalizeEscala(escala) {
             sabado: escala.sabado,
             sabado_horario: escala.sabado_horario,
             domingo: escala.domingo,
-            domingo_horario: escala.domingo_horario
-          }
+            domingo_horario: escala.domingo_horario,
+          },
         }
-      : null
+      : null,
   };
 }
-
 
 async function buscarUsuarios(cpf) {
   const usuario = await prisma.usuarios.findUnique({
     where: { cpf },
     include: {
-      perfis: {
-        select: { tipo: true }
+      perfil: {
+        select: { tipo: true },
       },
-      medicos: {
+      Medicos: {
         include: {
-          escala: true
-        }
-      }
-    }
+          Escala: true,
+        },
+      },
+    },
   });
 
   return normalizeUsuario(usuario);
 }
 
 async function buscarUsuarioEmail(email) {
-    const usuario = await prisma.usuarios.findUnique({
-        where: { email }
-    });
-    return usuario;
+  const usuario = await prisma.usuarios.findUnique({
+    where: { email },
+  });
+  return usuario;
 }
 
 async function buscarMedico(crm) {
@@ -112,83 +111,123 @@ async function buscarMedico(crm) {
     where: { crm },
     include: {
       Usuarios: true,
-      Escala: true
-    }
+      Escala: true,
+    },
   });
   return normalizeMedico(medico);
 }
 
 async function buscarEscalas(dia) {
-  const diasValidos = ["segunda", "terca", "quarta", "quinta", "sexta", "sabado", "domingo"];
+  const diasValidos = [
+    "segunda",
+    "terca",
+    "quarta",
+    "quinta",
+    "sexta",
+    "sabado",
+    "domingo",
+  ];
   if (!diasValidos.includes(dia)) {
-    throw new Error("Dia inválido. Use valores válidos, por exemplo: 'segunda', 'terca', etc.");
+    throw new Error(
+      "Dia inválido. Use valores válidos, por exemplo: 'segunda', 'terca', etc."
+    );
   }
 
   const escalas = await prisma.escala.findMany({
     where: {
-      [dia]: "Escalado"
+      [dia]: "Escalado",
     },
     include: {
       Medico: {
         include: {
-          Usuarios: true
-        }
-      }
-    }
+          Usuarios: true,
+        },
+      },
+    },
   });
 
   // Normaliza cada registro com base no dia informado
-  return escalas.map(escala => normalizeEscala(escala, dia)); 
+  return escalas.map((escala) => normalizeEscala(escala, dia));
 }
 
-async function criarUsuarios(nome, email, senha, cpf, data_nascimento, id_perfis) {
-    await prisma.usuarios.create({
-        data: {
-            nome,
-            email,
-            senha,
-            cpf,
-            data_nascimento: new Date(data_nascimento).toISOString(),
-            perfil: {
-                connect: { id_perfis } 
-            }
-
-
-        }
-    });
+async function criarUsuarios(
+  nome,
+  email,
+  senha,
+  cpf,
+  data_nascimento,
+  id_perfis
+) {
+  await prisma.usuarios.create({
+    data: {
+      nome,
+      email,
+      senha,
+      cpf,
+      data_nascimento: new Date(data_nascimento).toISOString(),
+      perfil: {
+        connect: { id_perfis },
+      },
+    },
+  });
 }
 
 async function criarMedicos(cpf, crm, especialidade, telefone) {
-    await prisma.medicos.create({
-        data: {
-            Usuarios: {
-                connect: { cpf } 
-            },
-            crm,
-            especialidade, 
-            telefone
-        }
-    });
+  await prisma.medicos.create({
+    data: {
+      Usuarios: {
+        connect: { cpf },
+      },
+      crm,
+      especialidade,
+      telefone,
+    },
+  });
 }
 
-async function criarEscala(crm, segunda, terca, quarta, quinta, sexta, sabado, domingo) {
-    await prisma.escala.create({
-        data: {
-            Medico: {
-                connect: {crm}
-            },
-            segunda,
-            terca,
-            quarta,
-            quinta,
-            sexta,
-            sabado,
-            domingo
-        }
-    });
+async function criarEscala(
+  crm,
+  segunda,
+  terca,
+  quarta,
+  quinta,
+  sexta,
+  sabado,
+  domingo
+) {
+  await prisma.escala.create({
+    data: {
+      Medico: {
+        connect: { crm },
+      },
+      segunda,
+      terca,
+      quarta,
+      quinta,
+      sexta,
+      sabado,
+      domingo,
+    },
+  });
 }
 
-async function editarEscala(segunda, terca, quarta, quinta, sexta, sabado, domingo, segunda_horario, terca_horario, quarta_horario, quinta_horario, sexta_horario, sabado_horario, domingo_horario, id_medico) {
+async function editarEscala(
+  segunda,
+  terca,
+  quarta,
+  quinta,
+  sexta,
+  sabado,
+  domingo,
+  segunda_horario,
+  terca_horario,
+  quarta_horario,
+  quinta_horario,
+  sexta_horario,
+  sabado_horario,
+  domingo_horario,
+  id_medico
+) {
   return await prisma.escala.update({
     where: { id_medico },
     data: {
@@ -205,9 +244,18 @@ async function editarEscala(segunda, terca, quarta, quinta, sexta, sabado, domin
       sabado,
       sabado_horario,
       domingo,
-      domingo_horario
-    }
+      domingo_horario,
+    },
   });
 }
 
-export default { buscarUsuarios, buscarMedico, buscarEscalas, criarUsuarios, criarMedicos, buscarUsuarioEmail, criarEscala,  editarEscala };
+export default {
+  buscarUsuarios,
+  buscarMedico,
+  buscarEscalas,
+  criarUsuarios,
+  criarMedicos,
+  buscarUsuarioEmail,
+  criarEscala,
+  editarEscala,
+};

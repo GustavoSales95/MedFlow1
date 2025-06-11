@@ -47,6 +47,7 @@ export const AppProvider = ({ children }: AppProviderData) => {
           1: "admin",
           2: "comum",
           3: "medico",
+          4: "estoque",
         };
 
         const typeUser = perfilMap[decoded.perfil_id] || "comum";
@@ -64,6 +65,7 @@ export const AppProvider = ({ children }: AppProviderData) => {
         if (typeUser === "admin") navigate("/Admin");
         else if (typeUser === "medico") navigate("/Medico");
         else if (typeUser === "comum") navigate("/Comum");
+        else if (typeUser === "estoque") navigate("/Estoque");
         else navigate("/");
 
         return user;

@@ -7,9 +7,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import { Outlet } from "react-router-dom";
-import {Lista1} from "./listas/listaestoque1";
-import { Lista2 } from './listas/listaestoque2';
-
+import { Lista1 } from "./listas/listaestoque1";
+import { Lista2 } from "./listas/listaestoque2";
 
 const drawerWidth = 240;
 
@@ -21,7 +20,7 @@ export function DashboardEstoque() {
         position="fixed"
         sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
       >
-        <Toolbar>
+        <Toolbar sx={{ backgroundColor: "orange" }}>
           <Typography variant="h6" noWrap component="div">
             Estoque
           </Typography>

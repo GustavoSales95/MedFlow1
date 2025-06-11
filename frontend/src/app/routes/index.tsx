@@ -25,7 +25,7 @@ import {
   Entrada,
   ProdutoEstoque,
   CriarReceita,
-  ListaReceitas
+  ListaReceitas,
 } from "../pages";
 import { AppContext } from "../shared/contexts/AppContext";
 
@@ -47,7 +47,7 @@ const PrivateRoute = ({ allowedRoles }: { allowedRoles: string[] }) => {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // App já envolve o Outlet com AppProvider
+    element: <App />,
     children: [
       {
         index: true,
@@ -56,13 +56,18 @@ const router = createBrowserRouter([
 
       // Rotas para usuários "comum"
       {
-        path: "Comum",
-        element: <Dashboard />,
+        element: <PrivateRoute allowedRoles={["comum"]} />,
         children: [
-          { index: true, element: <Marcacao /> },
-          { path: "Cadastros", element: <Cadastros /> },
-          { path: "ConsultarPessoas", element: <ConsultarPessoas /> },
-          { path: "MedicosDisponiveis", element: <MedicosDisponiveis /> },
+          {
+            path: "Comum",
+            element: <Dashboard />,
+            children: [
+              { index: true, element: <Marcacao /> },
+              { path: "Cadastros", element: <Cadastros /> },
+              { path: "ConsultarPessoas", element: <ConsultarPessoas /> },
+              { path: "MedicosDisponiveis", element: <MedicosDisponiveis /> },
+            ],
+          },
         ],
       },
 
@@ -97,8 +102,8 @@ const router = createBrowserRouter([
               { path: "AgendaDia", element: <AgendaDia /> },
               { path: "Agendamentos", element: <Agendamentos /> },
               { path: "FinalizarConsulta", element: <FinalizarConsulta /> },
-              { path: "ConsultarEscala", element: <ConsultarEscala />},
-              { path: "CriarReceita", element: <CriarReceita /> }
+              { path: "ConsultarEscala", element: <ConsultarEscala /> },
+              { path: "CriarReceita", element: <CriarReceita /> },
             ],
           },
         ],
@@ -106,14 +111,22 @@ const router = createBrowserRouter([
 
       // Rotas para o setor de Estoque
       {
-        path: "Estoque",
-        element: <DashboardEstoque />,
+        element: <PrivateRoute allowedRoles={["estoque"]} />,
         children: [
-          { path: "Cadastro", element: <CadastroEstoque /> },
-          { path: "Entrada", element: <Entrada /> },
-          { path: "Editar", element: <Editar /> },
-          { path: "ListarReceitas", element: <ListaReceitas/>},
-          { path: "ProdutoEstoque/:id_produto", element: <ProdutoEstoque /> },
+          {
+            path: "Estoque",
+            element: <DashboardEstoque />,
+            children: [
+              { path: "Cadastro", element: <CadastroEstoque /> },
+              { path: "Entrada", element: <Entrada /> },
+              { path: "Editar", element: <Editar /> },
+              { path: "ListarReceitas", element: <ListaReceitas /> },
+              {
+                path: "ProdutoEstoque/:id_produto",
+                element: <ProdutoEstoque />,
+              },
+            ],
+          },
         ],
       },
     ],

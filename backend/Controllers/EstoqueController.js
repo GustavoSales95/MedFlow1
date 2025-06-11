@@ -16,19 +16,14 @@ route.get("/entrada", async (req, res) => {
 });
 
 route.post("/Cadastro", async (req, res) => {
-<<<<<<< HEAD
   const { nome, valor, embalagem, unidade_medida, temperatura, quantidade } =
     req.body;
-=======
-  const { nome, valor, embalagem, unidade_medida, temperatura } = req.body;
->>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
 
   if (!nome || !valor || !temperatura) {
     return res.status(400).json({ error: "Campos obrigatórios faltando" });
   }
 
   try {
-<<<<<<< HEAD
     const novoProduto = await service.registroProduto(
       nome,
       valor,
@@ -37,9 +32,6 @@ route.post("/Cadastro", async (req, res) => {
       temperatura,
       quantidade
     );
-=======
-    const novoProduto = await service.registroProduto(nome, valor, embalagem, unidade_medida, temperatura);
->>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
 
     res.status(201).json({
       message: "Produto registrado com sucesso",
@@ -65,7 +57,6 @@ route.get("/Editar", async (req, res) => {
 });
 
 route.put("/Editar", async (req, res) => {
-<<<<<<< HEAD
   const {
     id_produto,
     nome,
@@ -85,11 +76,6 @@ route.put("/Editar", async (req, res) => {
       temperatura,
       quantidade
     );
-=======
-  const { id_produto, nome, valor, embalagem, unidade_medida, temperatura } = req.body;
-  try {
-    const produtoAtualizado = await service.atualizarProduto(id_produto, nome, valor, embalagem, unidade_medida, temperatura);
->>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c
 
     if (!produtoAtualizado) {
       return res.status(404).json({ error: "Produto não encontrado" });
@@ -154,28 +140,35 @@ route.get("/Receitas", async (req, res) => {
     const receitas = await service.listarReceitas();
     return res.status(200).json(receitas);
   } catch (error) {
-    console.error("Erro ao buscar receitas:", error);
-    return res
-      .status(500)
-      .json({ error: "Erro ao buscar receitas no banco de dados." });
+    console.error("Erro ao buscar receitas:", error); // já está aqui, mantenha
+    return res.status(500).json({
+      error: "Erro ao buscar receitas no banco de dados.",
+      detalhe: error.message || error.toString(), // <- adicione isto
+    });
   }
 });
+route.post("/FecharReceita", async (req, res) => {
+  const { id_receita } = req.body;
 
-<<<<<<< HEAD
-export default route;
-=======
-route.put("/Retirada/:id_produto_estoque", async (req, resp) => {
-  const { id_produto_estoque } = req.params;
-  const { quantidadeRetirada, retiradoPara, retiradoPor, consultaRealizada } = req.body;
+  if (!id_receita) {
+    return res.status(400).json({ error: "id_receita é obrigatório" });
+  }
+
   try {
-    const saida = await service.realizarRetirada(id_produto_estoque, quantidadeRetirada, retiradoPara, retiradoPor, consultaRealizada);
-    const produto_estoque = await service.retiradaProduto(id_produto_estoque, quantidadeRetirada)
-    return resp.status(201).json(req.body);
+    const receitaAtualizada = await service.fecharReceita(Number(id_receita));
+
+    if (!receitaAtualizada) {
+      return res.status(404).json({ error: "Receita não encontrada" });
+    }
+
+    return res.status(200).json({ message: "Receita finalizada com sucesso" });
   } catch (error) {
-    console.error("Erro ao cadastrar produto:", error);
-    return resp.status(400).json({ error: "Erro ao cadastrar produto no banco de dados." });
+    console.error("Erro ao finalizar receita:", error);
+    return res.status(500).json({
+      error: "Erro ao finalizar receita",
+      detalhe: error.message,
+    });
   }
 });
 
 export default route;
->>>>>>> dc43cd6a128d52db2a431de84c8051a05154860c

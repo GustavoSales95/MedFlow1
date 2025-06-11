@@ -8,6 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model Perfis {
   id_perfis Int    @id
   tipo      String @db.VarChar(50)
@@ -30,6 +31,46 @@ model Usuarios {
   EntradaSaidas EntradaSaida[]
 }
 
+model Medicos {
+  id_medico     Int       @id @default(autoincrement())
+  usuario_id    Int       @unique
+  crm           String    @db.VarChar(20) @unique
+  especialidade String?   @db.VarChar(50)
+  telefone      String?   @db.VarChar(20)
+
+  Usuarios     Usuarios   @relation(fields: [usuario_id], references: [id_usuario])
+  Escala       Escala?
+  Agendamentos Agendamentos[]
+  EntradaSaidas EntradaSaida[]
+  Receitas     Receitas[]
+}
+
+enum Status {
+  Escalado
+  Folga
+}
+
+model Escala {
+  id_escala       Int      @id @default(autoincrement())
+  id_medico       Int      @unique
+  segunda         Status
+  segunda_horario String?  @default("09:00 - 17:00") @db.VarChar(13)
+  terca           Status
+  terca_horario   String?  @default("09:00 - 17:00") @db.VarChar(13)
+  quarta          Status
+  quarta_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
+  quinta          Status
+  quinta_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
+  sexta           Status
+  sexta_horario   String?  @default("09:00 - 17:00") @db.VarChar(13)
+  sabado          Status
+  sabado_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
+  domingo         Status
+  domingo_horario String?  @default("09:00 - 17:00") @db.VarChar(13)
+
+  Medico          Medicos  @relation(fields: [id_medico], references: [id_medico])
+}
+
 model Pacientes {
   id_paciente     Int       @id @default(autoincrement())
   nome            String    @db.VarChar(100)
@@ -47,46 +88,6 @@ model Pacientes {
   Receitas      Receitas[]
 }
 
-model Medicos {
-  id_medico     Int       @id @default(autoincrement())
-  usuario_id    Int       @unique
-  crm           String    @db.VarChar(20) @unique
-  especialidade String?   @db.VarChar(50)
-  telefone      String?   @db.VarChar(20)
-
-  Usuarios     Usuarios   @relation(fields: [usuario_id], references: [id_usuario])
-  Escala       Escala?
-  Agendamentos Agendamentos[]
-  EntradaSaidas EntradaSaida[]
-  Receitas     Receitas[]
-}
-
-model Escala {
-  id_escala       Int      @id @default(autoincrement())
-  id_medico       Int      @unique
-  segunda         EscalaStatus
-  segunda_horario String?  @default("09:00 - 17:00") @db.VarChar(13)
-  terca           EscalaStatus
-  terca_horario   String?  @default("09:00 - 17:00") @db.VarChar(13)
-  quarta          EscalaStatus
-  quarta_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
-  quinta          EscalaStatus
-  quinta_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
-  sexta           EscalaStatus
-  sexta_horario   String?  @default("09:00 - 17:00") @db.VarChar(13)
-  sabado          EscalaStatus
-  sabado_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
-  domingo         EscalaStatus
-  domingo_horario String?  @default("09:00 - 17:00") @db.VarChar(13)
-
-  Medico          Medicos  @relation(fields: [id_medico], references: [id_medico])
-}
-
-enum EscalaStatus {
-  Escalado
-  Folga
-}
-
 model Prontuario {
   paciente_id         Int     @unique
   alergias            String? @db.VarChar(50)
@@ -96,6 +97,12 @@ model Prontuario {
   doencas_infecciosas String? @db.VarChar(50)
 
   Pacientes         Pacientes @relation(fields: [paciente_id], references: [id_paciente])
+}
+
+enum Situacao {
+  Agendado   @map("Agendado")
+  Cancelado  @map("Cancelado")
+  Concluido  @map("Concluído")
 }
 
 model Agendamentos {
@@ -111,21 +118,18 @@ model Agendamentos {
   Consultas  Consultas?
 }
 
-enum Situacao {
-  Agendado   @map("Agendado")
-  Cancelado  @map("Cancelado")
-  Concluido  @map("Concluído")
-}
 
-model consultas {
-  id_consulta    Int             @id @default(autoincrement())
-  agendamento_id Int             @unique(map: "agendamento_id")
-  descricao      String?         @db.VarChar(255)
-  receita        String?         @db.VarChar(255)
-  observacoes    String?         @db.VarChar(255)
-  data_consulta  DateTime?       @db.DateTime(0)
-  agendamentos   agendamentos    @relation(fields: [agendamento_id], references: [id_agendamento], onDelete: NoAction, onUpdate: NoAction, map: "consultas_ibfk_1")
-  entrada_saida  entrada_saida[]
+
+model Consultas {
+  id_consulta    Int         @id @default(autoincrement())
+  agendamento_id Int         @unique
+  descricao      String?     @db.VarChar(255)
+  receita        String?     @db.VarChar(255)
+  observacoes    String?     @db.VarChar(255)
+  data_consulta  DateTime?
+
+  agendamentos  Agendamentos @relation(fields: [agendamento_id], references: [id_agendamento])
+  EntradaSaidas EntradaSaida[]
 }
 
 enum Temperatura {
@@ -138,7 +142,7 @@ model Produtos {
   id_produto     Int       @id @default(autoincrement())
   nome           String    @db.VarChar(255)
   valor          Decimal   @db.Decimal(10,2)
-  quantidade     Int
+  quantidade     Int?      @default(0)
   embalagem      String?   @db.VarChar(255)
   unidade_medida String?   @db.VarChar(100)
   temperatura    Temperatura
@@ -147,41 +151,42 @@ model Produtos {
   Receitas       Receitas[]
 }
 
-enum Temperatura {
-  PERECIVEL
-  RESFRIADO
-  TERMOSSENSIVEL
+enum Deletado {
+  Sim
+  Nao
+}
+
+enum Vencimento_proximo {
+  Sim
+  Nao
 }
 
 model produto_estoque {
   id_produto_estoque Int         @id @default(autoincrement())
   id_produto         Int
-  quantidade         String      @db.VarChar(20)
+  quantidade         Int      
   validade           DateTime    @db.Date
+  deletado           Deletado @default(Nao)
+  vencimento_proximo Vencimento_proximo @default(Nao)
 
   produtos       Produtos     @relation(fields: [id_produto], references: [id_produto])
   Pedidos        Pedidos[]
   EntradaSaidas  EntradaSaida[]
 }
 
-model usuarios {
-  id_usuario      Int             @id @default(autoincrement())
-  nome            String          @db.VarChar(100)
-  email           String          @unique(map: "email") @db.VarChar(100)
-  senha           String          @db.VarChar(255)
-  cpf             String          @unique(map: "cpf") @db.VarChar(14)
-  data_nascimento DateTime        @db.Date
-  data_cadastro   DateTime?       @default(now()) @db.Timestamp(0)
-  perfil_id       Int
-  entrada_saida   entrada_saida[]
-  medicos         medicos?
-  perfis          perfis          @relation(fields: [perfil_id], references: [id_perfis], onDelete: NoAction, onUpdate: NoAction, map: "usuarios_ibfk_1")
+model Pedidos {
+  id_pedido          Int            @id @default(autoincrement())
+  id_produto_estoque Int
+  quantidade         String?        @db.VarChar(20)
+  fornecedor         String         @db.VarChar(100)
+  data_pedido        DateTime       @db.Date
 
-  @@index([perfil_id], map: "perfil_id")
+  ProdutoEstoque     produto_estoque @relation(fields: [id_produto_estoque], references: [id_produto_estoque])
+  EntradaSaidas      EntradaSaida[]
 }
 
-model entrada_saida {
-  id_entrada_saida   Int             @id @default(autoincrement())
+model EntradaSaida {
+  id_entrada_saida   Int          @id @default(autoincrement())
   id_produto_estoque Int
   quantidade         Int
   id_consulta        Int?
@@ -189,8 +194,8 @@ model entrada_saida {
   id_paciente        Int?
   id_usuario         Int?
   id_pedido          Int?
-  tipo_transacao     String       @db.VarChar(7)
-  data_transacao     DateTime
+  tipo_transacao     String       @db.VarChar(10)
+  data_transacao     DateTime  @default(now())
 
   Consultas      Consultas?      @relation(fields: [id_consulta], references: [id_consulta])
   Medicos        Medicos?        @relation(fields: [id_medico], references: [id_medico])
@@ -200,90 +205,22 @@ model entrada_saida {
   Pedidos        Pedidos?        @relation(fields: [id_pedido], references: [id_pedido])
 }
 
-model produto_estoque {
-  id_produto_estoque Int             @id @default(autoincrement())
-  id_produto         Int
-  quantidade         String          @db.VarChar(20)
-  validade           DateTime        @db.Date
-  entrada_saida      entrada_saida[]
-  pedidos            pedidos[]
-  produtos           produtos        @relation(fields: [id_produto], references: [id_produto], onDelete: NoAction, onUpdate: NoAction, map: "produto_estoque_ibfk_1")
-
-  @@index([id_produto], map: "id_produto")
+enum StatusReceita {
+  Aberta
+  Fechada
 }
 
-model produtos {
-  id_produto      Int                  @id @default(autoincrement())
-  nome            String               @db.VarChar(255)
-  valor           Decimal              @db.Decimal(10, 2)
-  quantidade      Int
-  embalagem       String?              @db.VarChar(255)
-  unidade_medida  String?              @db.VarChar(100)
-  temperatura     produtos_temperatura
-  produto_estoque produto_estoque[]
-  receitas        receitas[]
-}
-
-model receitas {
-  id_receita   Int       @id @default(autoincrement())
-  medico_id    Int
-  paciente_id  Int
-  produto_id   Int
-  data_emissao DateTime  @db.Date
-  medicamentos String    @db.VarChar(255)
-  orientacoes  String?   @db.VarChar(255)
-  produtos     produtos  @relation(fields: [produto_id], references: [id_produto], onDelete: NoAction, onUpdate: NoAction, map: "receitas_ibfk_1")
-  pacientes    pacientes @relation(fields: [paciente_id], references: [id_paciente], onDelete: NoAction, onUpdate: NoAction, map: "receitas_ibfk_2")
-  medicos      medicos   @relation(fields: [medico_id], references: [id_medico], onDelete: NoAction, onUpdate: NoAction, map: "receitas_ibfk_3")
-
-  @@index([medico_id], map: "medico_id")
-  @@index([paciente_id], map: "paciente_id")
-  @@index([produto_id], map: "produto_id")
-}
-
-enum escala_segunda {
-  Escalado
-  Folga
-}
-
-enum escala_terca {
-  Escalado
-  Folga
-}
-
-enum agendamentos_status {
-  Agendado
-  Cancelado
-  Conclu_do @map("Concluído")
-}
-
-enum produtos_temperatura {
-  PERECIVEL
-  RESFRIADO
-  TERMOSSENSIVEL
-}
-
-enum escala_quarta {
-  Escalado
-  Folga
-}
-
-enum escala_quinta {
-  Escalado
-  Folga
-}
-
-enum escala_sexta {
-  Escalado
-  Folga
-}
-
-enum escala_sabado {
-  Escalado
-  Folga
-}
-
-enum escala_domingo {
-  Escalado
-  Folga
+model Receitas {
+  id_receita     Int       @id @default(autoincrement())
+  medico_id      Int
+  paciente_id    Int
+  produto_id     Int
+  data_emissao   DateTime  @db.Date
+  medicamentos   String    @db.VarChar(255)
+  orientacoes    String?   @db.VarChar(255)
+  status         StatusReceita @default(Aberta)
+  
+  medico    Medicos   @relation(fields: [medico_id], references: [id_medico])
+  paciente  Pacientes @relation(fields: [paciente_id], references: [id_paciente])
+  produto   Produtos  @relation(fields: [produto_id], references: [id_produto])
 }

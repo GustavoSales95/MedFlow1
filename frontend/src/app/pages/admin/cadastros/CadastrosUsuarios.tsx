@@ -270,6 +270,7 @@ export const CadastrosUsuarios = () => {
                 <FormControlLabel value='1' control={<Radio />} label="Comum" />
                 <FormControlLabel value='2' control={<Radio />} label="Admin" />
                 <FormControlLabel value='3' control={<Radio />} label="Medico" />
+                <FormControlLabel value='4' control={<Radio />} label="Estoque" />
               </RadioGroup>
             </FormControl>
           </Grid2>

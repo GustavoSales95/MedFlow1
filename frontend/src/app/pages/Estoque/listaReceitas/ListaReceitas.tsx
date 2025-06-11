@@ -12,8 +12,18 @@ import {
   Snackbar,
   Alert,
   Tooltip,
+  Button,
 } from "@mui/material";
+import PrintIcon from "@mui/icons-material/Print";
+import CheckIcon from "@mui/icons-material/Check";
 import api from "../../../../services/api";
+
+import { AxiosError } from "axios";
+
+// Helper para identificar se o erro é do Axios
+function isAxiosError(error: any): error is AxiosError {
+  return error.isAxiosError === true;
+}
 
 export const ListaReceitas = () => {
   const [receitas, setReceitas] = useState<any[]>([]);
@@ -21,27 +31,97 @@ export const ListaReceitas = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  useEffect(() => {
-    const buscarReceitas = async () => {
-      try {
-        const response = await api.get("/Estoque/Receitas");
-        setReceitas(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar receitas:", error);
-        setSnackbarMessage("Erro ao buscar receitas.");
-        setOpenSnackbar(true);
-      } finally {
-        setCarregando(false);
-      }
-    };
+  const buscarReceitas = async () => {
+    try {
+      const response = await api.get("/Estoque/Receitas");
+      setReceitas(response.data.filter((r: any) => r.status !== "Fechada"));
+    } catch (error) {
+      console.error("Erro ao buscar receitas:", error);
+      setSnackbarMessage("Erro ao buscar receitas.");
+      setOpenSnackbar(true);
+    } finally {
+      setCarregando(false);
+    }
+  };
 
+  useEffect(() => {
     buscarReceitas();
   }, []);
+
+  const handleFinalizarReceita = async (id_receita: number) => {
+    try {
+      await api.post("Estoque/FecharReceita", { id_receita });
+
+      setReceitas((prev) => prev.filter((r) => r.id_receita !== id_receita));
+      setSnackbarMessage("Receita finalizada com sucesso!");
+      setOpenSnackbar(true);
+    } catch (error: unknown) {
+      console.error("Erro ao finalizar receita:", error);
+
+      if (isAxiosError(error)) {
+        console.log("Erro detalhado:", error.response?.data);
+      }
+
+      setSnackbarMessage("Erro ao finalizar receita.");
+      setOpenSnackbar(true);
+    }
+  };
+
+  const handleImprimir = (receita: any) => {
+    const printWindow = window.open("", "_blank", "width=800,height=600");
+    if (!printWindow) return;
+
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Receita Médica</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
+            }
+            h2 {
+              text-align: center;
+            }
+            p {
+              margin: 10px 0;
+            }
+            hr {
+              margin: 20px 0;
+            }
+          </style>
+        </head>
+        <body>
+          <h2>Receita Médica</h2>
+          <p><strong>Paciente:</strong> ${receita.paciente?.nome || "N/A"}</p>
+          <p><strong>CRM do Médico:</strong> ${receita.medico?.crm || "N/A"}</p>
+          <p><strong>Data:</strong> ${new Date(
+            receita.data_emissao
+          ).toLocaleDateString()}</p>
+          <hr />
+          <p><strong>Medicamentos:</strong></p>
+          <p>${receita.medicamentos || ""}</p>
+          <p><strong>Orientações:</strong></p>
+          <p>${receita.orientacoes || ""}</p>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 300);
+  };
 
   return (
     <Box sx={{ padding: "20px", maxWidth: 1000, margin: "0 auto" }}>
       <Typography variant="h4" textAlign="center" gutterBottom>
-        Lista de Receitas
+        Lista de Receitas em Aberto
       </Typography>
 
       <Paper elevation={3} sx={{ padding: 3 }}>
@@ -50,16 +130,19 @@ export const ListaReceitas = () => {
             <CircularProgress />
           </Box>
         ) : receitas.length === 0 ? (
-          <Typography variant="body1">Nenhuma receita encontrada.</Typography>
+          <Typography variant="body1">
+            Nenhuma receita em aberto encontrada.
+          </Typography>
         ) : (
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Data</TableCell>
                 <TableCell>Paciente</TableCell>
-                <TableCell>Médico</TableCell>
+                <TableCell>CRM Médico</TableCell>
                 <TableCell>Conteúdo</TableCell>
                 <TableCell>Orientações</TableCell>
+                <TableCell>Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -69,7 +152,7 @@ export const ListaReceitas = () => {
                     {new Date(receita.data_emissao).toLocaleString()}
                   </TableCell>
                   <TableCell>{receita.paciente?.nome || "N/A"}</TableCell>
-                  <TableCell>{receita.medico?.nome || "N/A"}</TableCell>
+                  <TableCell>{receita.medico?.crm || "N/A"}</TableCell>
                   <TableCell>
                     <Tooltip title={receita.medicamentos || ""} arrow>
                       <span>
@@ -88,6 +171,32 @@ export const ListaReceitas = () => {
                       </span>
                     </Tooltip>
                   </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <Button
+                        startIcon={<PrintIcon />}
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        onClick={() => handleImprimir(receita)}
+                        sx={{ flex: 1 }}
+                      >
+                        Imprimir
+                      </Button>
+                      <Button
+                        startIcon={<CheckIcon />}
+                        variant="contained"
+                        color="success"
+                        size="small"
+                        sx={{ flex: 1 }}
+                        onClick={() =>
+                          handleFinalizarReceita(receita.id_receita)
+                        }
+                      >
+                        Finalizar
+                      </Button>
+                    </Box>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -100,7 +209,7 @@ export const ListaReceitas = () => {
         autoHideDuration={6000}
         onClose={() => setOpenSnackbar(false)}
       >
-        <Alert onClose={() => setOpenSnackbar(false)} severity="error">
+        <Alert onClose={() => setOpenSnackbar(false)} severity="info">
           {snackbarMessage}
         </Alert>
       </Snackbar>
