@@ -66,7 +66,7 @@ export const Login = () => {
   return (
     <Background>
       <Container>
-        <img src="logo192.png" />
+       
 
         <LoginPaper>
           <Typography variant="h4" component="h1" color="textSecondary">

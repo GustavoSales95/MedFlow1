@@ -20,7 +20,6 @@ import api from "../../../../services/api";
 
 import { AxiosError } from "axios";
 
-// Helper para identificar se o erro é do Axios
 function isAxiosError(error: any): error is AxiosError {
   return error.isAxiosError === true;
 }

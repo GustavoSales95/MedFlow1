@@ -21,7 +21,7 @@ export function DashboardAdmin() {
         position="fixed"
         sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
       >
-        <Toolbar>
+        <Toolbar sx={{ backgroundColor: "Red" }}>
           <Typography variant="h6" noWrap component="div">
             Pagina Inicial
           </Typography>

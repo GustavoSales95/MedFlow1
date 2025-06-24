@@ -1,8 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
-  TextField,
-  Button,
-  Grid,
   Typography,
   Box,
   Snackbar,
@@ -14,10 +11,16 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Button,
+  Tabs,
+  Tab,
 } from "@mui/material";
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import api from '../../../../services/api.js';
-import { formatarDataHora } from '../../../functions/InsertMasks';
+import CheckIcon from "@mui/icons-material/Check";
+import SearchIcon from "@mui/icons-material/Search";
+import api from "../../../../services/api.js";
+import { formatarDataHora } from "../../../functions/InsertMasks";
+import { AppContext } from "../../../shared/contexts/AppContext";
+import { useNavigate } from "react-router-dom";
 
 interface AgendamentoData {
   id_agendamento: number;
@@ -33,102 +36,127 @@ interface AgendamentoData {
 }
 
 export const Agendamentos = () => {
-  const [crmSearch, setCrmSearch] = useState<string>("");
+  const { usuario } = useContext(AppContext);
+  const crmUsuario = usuario?.crm || "";
+  const navigate = useNavigate();
+
   const [agendaMedico, setAgendaMedico] = useState<AgendamentoData[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [abaSelecionada, setAbaSelecionada] = useState(0);
 
-  const handleSearch = async () => {
+  useEffect(() => {
+    if (crmUsuario) {
+      buscarAgendamentos(crmUsuario);
+    }
+  }, [crmUsuario]);
+
+  const buscarAgendamentos = async (crm: string) => {
     try {
-      const response = await api.get('/Medico/Agendamentos', {
-        params: { crm: crmSearch }
+      const response = await api.get("/Medico/Agendamentos", {
+        params: { crm },
       });
-      
+
       if (response.data.message && response.data.message.length > 0) {
         setAgendaMedico(response.data.message);
-        console.log("Agendamentos armazenados no estado:", response.data.message);
       } else {
         setAgendaMedico([]);
         setSnackbarMessage("Nenhum agendamento encontrado.");
         setOpenSnackbar(true);
       }
     } catch (error) {
-      setSnackbarMessage("Erro ao buscar os agendamentos");
+      setSnackbarMessage("Erro ao buscar os agendamentos.");
       setOpenSnackbar(true);
     }
-  }
+  };
 
-  const handleCrm = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCrmSearch(e.target.value);
-  }
+  const agendamentosAgendados = agendaMedico.filter(
+    (a) => a.status.toLowerCase() === "agendado"
+  );
+
+  const agendamentosConcluidos = agendaMedico.filter(
+    (a) => a.status.toLowerCase() !== "agendado"
+  );
+
+  const handleChangeAba = (event: React.SyntheticEvent, newValue: number) => {
+    setAbaSelecionada(newValue);
+  };
+
+  const renderTabela = (dados: AgendamentoData[]) => (
+    <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>N° Agendamento</TableCell>
+            <TableCell>Paciente</TableCell>
+            <TableCell>Data</TableCell>
+            <TableCell>Hora</TableCell>
+            <TableCell>Status</TableCell>
+            <TableCell>Ações</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {dados.map((agendamento) => {
+            const { data, horario } = formatarDataHora(agendamento.data_hora);
+            return (
+              <TableRow key={agendamento.id_agendamento}>
+                <TableCell>{agendamento.id_agendamento}</TableCell>
+                <TableCell>{agendamento.nome_paciente}</TableCell>
+                <TableCell>{data}</TableCell>
+                <TableCell>{horario}</TableCell>
+                <TableCell>{agendamento.status}</TableCell>
+                <TableCell>
+                  {agendamento.status.toLowerCase() === "agendado" && (
+                    <Button
+                      startIcon={<CheckIcon />}
+                      variant="contained"
+                      color="success"
+                      size="small"
+                      onClick={() =>
+                        navigate("/Medico/FinalizarConsulta", {
+                          state: {
+                            agendamento_id:
+                              agendamento.id_agendamento.toString(),
+                          },
+                        })
+                      }
+                    >
+                      Finalizar
+                    </Button>
+                  )}
+                  {agendamento.status.toLowerCase() === "concluido" && (
+                    <Button
+                      startIcon={<SearchIcon />}
+                      variant="contained"
+                      size="small"
+                      sx={{ backgroundColor: "orange" }}
+                    >
+                      Consultar
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
 
   return (
-    <Box sx={{ padding: "20px", maxWidth: 800, margin: "0 auto" }}>
-      <Typography
-        variant="h4"
-        sx={{ marginBottom: "20px", textAlign: "center" }}
-      >
-        Consulta de Agendamentos
+    <Box sx={{ padding: "20px", maxWidth: 1000, margin: "0 auto" }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Meus Agendamentos
       </Typography>
 
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
-            label="Digite seu CRM"
-            variant="outlined"
-            fullWidth
-            inputProps={{ maxLength: 6 }}
-            value={crmSearch}
-            onChange={handleCrm}
-            sx={{ marginBottom: "20px" }}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSearch} // Chama a função sem passar parâmetro
-            fullWidth
-            sx={{ marginBottom: "20px" }}
-            startIcon={<PersonSearchIcon />}
-          >
-            Pesquisar
-          </Button>
-        </Grid>
-      </Grid>
+      <Tabs value={abaSelecionada} onChange={handleChangeAba} centered>
+        <Tab label="Agendados" />
+        <Tab label="Concluídos" />
+      </Tabs>
 
-      {/* Tabela de Resultados da Busca */}
-      {agendaMedico.length > 0 && (
-        <TableContainer component={Paper} sx={{ marginTop: "20px" }}>
-          <Table sx={{ minWidth: 650 }} aria-label="Agendamentos">
-            <TableHead>
-              <TableRow>
-                <TableCell>Id do agendamento</TableCell>
-                <TableCell>Nome do Paciente</TableCell>
-                <TableCell>Data</TableCell>
-                <TableCell>Horário</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {agendaMedico.map((agendamento) => {
-                const { data, horario } = formatarDataHora(agendamento.data_hora);
-                return (
-                  <TableRow key={agendamento.id_agendamento}>
-                    <TableCell>{agendamento.id_agendamento}</TableCell>
-                    <TableCell>{agendamento.nome_paciente}</TableCell>
-                    <TableCell>{data}</TableCell>
-                    <TableCell>{horario}</TableCell>
-                    <TableCell>{agendamento.status}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+      {abaSelecionada === 0 && renderTabela(agendamentosAgendados)}
+      {abaSelecionada === 1 && renderTabela(agendamentosConcluidos)}
 
-      {/* Snackbar para mensagens de feedback */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={6000}

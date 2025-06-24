@@ -1,25 +1,7 @@
-import React, { useState } from "react";
-import {
-  TextField,
-  Button,
-  Grid,
-  Typography,
-  Box,
-  Snackbar,
-  Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  FormControl,
-  InputLabel
-} from "@mui/material";
-import PersonSearchIcon from '@mui/icons-material/PersonSearch';
-import api from '../../../../services/api.js';
-import { insertMaskHora } from '../../../functions/InsertMasks';
+import React, { useContext, useEffect, useState } from "react";
+import { Typography, Grid, Box, Snackbar, Alert, Paper } from "@mui/material";
+import api from "../../../../services/api.js";
+import { AppContext } from "../../../shared/contexts/AppContext";
 
 interface UserData {
   id_usuario: number;
@@ -31,7 +13,7 @@ interface UserData {
   medico: {
     id_medico: number;
     crm: string;
-    escala: {
+    escala?: {
       medico_id: number;
       segunda: string;
       segunda_horario: string;
@@ -52,138 +34,100 @@ interface UserData {
 }
 
 export const ConsultarEscala = () => {
-  const [searchValue, setSearchValue] = useState("");
-  const [users, setUsers] = useState<UserData[]>([]);
+  const { usuario } = useContext(AppContext);
+  const [user, setUser] = useState<UserData | null>(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  async function getUsers(params: object) {
+  useEffect(() => {
+    if (usuario?.crm) {
+      buscarEscala(usuario.crm);
+    } else {
+      setSnackbarMessage("CRM não encontrado para o usuário logado.");
+      setOpenSnackbar(true);
+    }
+  }, [usuario]);
+
+  const buscarEscala = async (crm: string) => {
     try {
-      const response = await api.get('/admin/EditarEscala', { params });
-      if (response.data.message) {
-        let returnedUsers: UserData[] = [];
-        if (response.data.message.length === undefined) {
-          returnedUsers = [response.data.message];
-        } else if (response.data.message.length > 0) {
-          returnedUsers = response.data.message;
-        } else {
-          setUsers([]);
-          setSnackbarMessage("Nenhum usuário encontrado para os parâmetros informados.");
-          setOpenSnackbar(true);
-          return;
-        }
-        setUsers(returnedUsers);
-      } else {
-        setUsers([]);
-        setSnackbarMessage("Nenhum usuário encontrado para os parâmetros informados.");
+      const response = await api.get("/admin/EditarEscala", {
+        params: { crm },
+      });
+      const dados = response.data.message;
+
+      if (!dados) {
+        setSnackbarMessage("Escala não encontrada.");
         setOpenSnackbar(true);
+        return;
       }
+
+      setUser(Array.isArray(dados) ? dados[0] : dados);
     } catch (error) {
-      console.error("Erro ao buscar usuários:", error);
-      setSnackbarMessage("Erro ao consultar usuários. Tente novamente.");
+      console.error("Erro ao consultar escala:", error);
+      setSnackbarMessage("Erro ao buscar escala.");
       setOpenSnackbar(true);
     }
-  }
-
-  const handleSearchValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
   };
 
-  const handleSearch = async () => {
-    if (searchValue.trim() === "") {
-      setSnackbarMessage("CRM inválido! Por favor, digite um CRM válido.");
-      setOpenSnackbar(true);
-      return;
-    }
-    const params = { crm: searchValue };
-    await getUsers(params);
-  };
+  const corEscala = (escala: string) =>
+    escala === "Escalado" ? "green" : "red";
 
-  function corEscala(escala: string) {
-    return escala === "Escalado" ? "green" : "red";
-  }
+  const escala = user?.medico?.escala;
 
   return (
     <Box sx={{ padding: "20px", maxWidth: 800, margin: "0 auto" }}>
-      <Typography variant="h4" sx={{ marginBottom: "20px", textAlign: "center" }}>
+      <Typography
+        variant="h4"
+        sx={{ marginBottom: "20px", textAlign: "center" }}
+      >
         Consulta de Escala
       </Typography>
 
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
-            label="Digite seu CRM"
-            variant="outlined"
-            fullWidth
-            inputProps={{ maxLength: 6 }}
-            value={searchValue}
-            onChange={handleSearchValueChange}
-          />
-        </Grid>
+      {user && escala ? (
+        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
+          <Typography variant="h4" align="center" marginBottom={1.5}>
+            Escala semanal
+          </Typography>
 
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSearch}
-            fullWidth
-            sx={{ marginBottom: "20px" }}
-            startIcon={<PersonSearchIcon />}
-          >
-            Pesquisar
-          </Button>
-        </Grid>
-      </Grid>
-
-      {users.length > 0 && (   
-        <>
-          {users.map((user) => (
-            <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
-              
-              <Typography variant="h4" align="center" marginBottom={1.5}>{user.nome}</Typography>
-              <Typography variant="h5" marginTop={3} marginBottom={1}>Escala Semanal</Typography>
-              <Grid container spacing={2}>
-                  <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Segunda-Feira</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.segunda) }}>{user.medico.escala?.segunda ?? "Não definido"}</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.segunda_horario ?? "Não definido"}</Typography>
-                  </Grid>
-                  <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Terça-Feira</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.terca) }}>{user.medico.escala?.terca ?? "Não definido"}</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.terca_horario ?? "Não definido"}</Typography>
-                  </Grid>
-                  <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Quarta-Feira</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.quarta) }}>{user.medico.escala?.quarta ?? "Não definido"}</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.quarta_horario ?? "Não definido"}</Typography>
-                  </Grid>
-                  <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Quinta-Feira</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.quinta ) }}>{user.medico.escala?.quinta ?? "Não definido"}</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.quinta_horario ?? "Não definido"}</Typography>
-                  </Grid>
-                  <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Sexta-Feira</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.sexta) }}>{user.medico.escala?.sexta ?? "Não definido"}</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.sexta_horario ?? "Não definido"}</Typography>
-                  </Grid>
-                  <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Sábado</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.sabado) }}>{user.medico.escala?.sabado ?? "Não definido"}</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.sabado_horario ?? "Não definido"}</Typography>
-                  </Grid>
-                  <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Domingo</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.domingo) }}>{user.medico.escala?.domingo ?? "Não definido"}</Typography>
-                      <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.domingo_horario ?? "Não definido"}</Typography>
-                  </Grid>
-                  <Grid item sm={6} md={6} sx={{ alignContent: 'center' }}>
-                  </Grid>
+          <Grid container spacing={2}>
+            {[
+              ["Segunda-Feira", escala?.segunda, escala?.segunda_horario],
+              ["Terça-Feira", escala?.terca, escala?.terca_horario],
+              ["Quarta-Feira", escala?.quarta, escala?.quarta_horario],
+              ["Quinta-Feira", escala?.quinta, escala?.quinta_horario],
+              ["Sexta-Feira", escala?.sexta, escala?.sexta_horario],
+              ["Sábado", escala?.sabado, escala?.sabado_horario],
+              ["Domingo", escala?.domingo, escala?.domingo_horario],
+            ].map(([dia, status, horario]) => (
+              <Grid item sm={6} md={6} key={dia}>
+                <Typography sx={{ fontSize: 18 }}>{dia}</Typography>
+                <Typography
+                  sx={{
+                    fontSize: 16,
+                    padding: 0.7,
+                    border: "1px solid black",
+                    color: corEscala(status || ""),
+                  }}
+                >
+                  {status ?? "Não definido"}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: 16,
+                    padding: 0.7,
+                    border: "1px solid black",
+                  }}
+                >
+                  {horario ?? "Não definido"}
+                </Typography>
               </Grid>
-              </Paper>
-          ))}
-        </>
+            ))}
+          </Grid>
+        </Paper>
+      ) : (
+        <Typography align="center" color="error" mt={3}>
+          Escala não disponível para este usuário.
+        </Typography>
       )}
 
       <Snackbar

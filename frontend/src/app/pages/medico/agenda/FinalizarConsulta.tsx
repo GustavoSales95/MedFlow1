@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
 import ContentPasteGoIcon from "@mui/icons-material/ContentPasteGo";
+import { useLocation } from "react-router-dom";
 import api from "../../../../services/api.js";
 import { formatarDataHora } from "../../../functions/InsertMasks";
 
@@ -36,6 +37,9 @@ interface AgendamentoData {
 }
 
 export const FinalizarConsulta = () => {
+  const location = useLocation();
+  const state = location.state as { agendamento_id?: string };
+
   const [idSearch, setIdSearch] = useState<string>("");
   const [agendaMedico, setAgendaMedico] = useState<AgendamentoData | null>(
     null
@@ -43,27 +47,34 @@ export const FinalizarConsulta = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const handleSearch = async () => {
-    try {
-      const response = await api.get("/Medico/FinalizarConsulta", {
-        params: { agendamento_id: idSearch },
-      });
+  useEffect(() => {
+    if (state?.agendamento_id) {
+      setIdSearch(state.agendamento_id);
+      buscarAgendamento(state.agendamento_id);
+    }
+  }, [state]);
 
+  const buscarAgendamento = async (idParam?: string) => {
+    try {
+      const id = idParam || idSearch;
+      const response = await api.get("/Medico/FinalizarConsulta", {
+        params: { agendamento_id: id },
+      });
       if (response.data.message) {
         setAgendaMedico(response.data.message);
-        console.log("Consulta armazenada no estado:", response.data.message);
       } else {
         setAgendaMedico(null);
         setSnackbarMessage("Nenhum agendamento encontrado.");
         setOpenSnackbar(true);
       }
     } catch (error) {
-      setSnackbarMessage("Erro ao buscar o agendamento");
+      console.error("Erro ao buscar agendamento:", error);
+      setSnackbarMessage("Erro ao buscar o agendamento.");
       setOpenSnackbar(true);
     }
   };
 
-  const handleId = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIdSearch(e.target.value);
   };
 
@@ -77,22 +88,15 @@ export const FinalizarConsulta = () => {
     }
   };
 
-  const handleSave = async (e: React.FormEvent, user: any) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await api.put("/Medico/FinalizarConsulta", agendaMedico);
-      const agendamentoResponse = await api.get("/Medico/FinalizarConsulta", {
-        params: { agendamento_id: idSearch },
-      });
+    if (!agendaMedico) return;
 
-      if (agendamentoResponse.data.message) {
-        setAgendaMedico(agendamentoResponse.data.message);
-        console.log("Consulta finalizada com sucesso:", response.data);
-        setAgendaMedico(null);
-        setIdSearch("");
-        setSnackbarMessage("Consulta finalizada com sucesso.");
-        setOpenSnackbar(true);
-      }
+    try {
+      await api.put("/Medico/FinalizarConsulta", agendaMedico);
+      setSnackbarMessage("Consulta finalizada com sucesso.");
+      setOpenSnackbar(true);
+      buscarAgendamento(idSearch);
     } catch (error) {
       console.error("Erro ao finalizar consulta:", error);
       setSnackbarMessage("Erro ao finalizar consulta.");
@@ -116,7 +120,7 @@ export const FinalizarConsulta = () => {
             variant="outlined"
             fullWidth
             value={idSearch}
-            onChange={handleId}
+            onChange={handleIdChange}
             sx={{ marginBottom: "20px" }}
           />
         </Grid>
@@ -124,7 +128,7 @@ export const FinalizarConsulta = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={handleSearch}
+            onClick={() => buscarAgendamento()}
             fullWidth
             sx={{ marginBottom: "20px" }}
             startIcon={<ContentPasteSearchIcon />}
@@ -176,7 +180,7 @@ export const FinalizarConsulta = () => {
                 rows={4}
                 size="small"
                 sx={{ fontSize: 16, padding: 0.7, border: "1px solid black" }}
-                value={agendaMedico.descricao}
+                value={agendaMedico.descricao || ""}
                 onChange={handleEdit}
               />
             </Grid>
@@ -188,7 +192,7 @@ export const FinalizarConsulta = () => {
                 fullWidth
                 size="small"
                 sx={{ fontSize: 16, padding: 0.7, border: "1px solid black" }}
-                value={agendaMedico.receita}
+                value={agendaMedico.receita || ""}
                 onChange={handleEdit}
               />
             </Grid>
@@ -202,7 +206,7 @@ export const FinalizarConsulta = () => {
                 multiline
                 rows={4}
                 sx={{ fontSize: 16, padding: 0.7, border: "1px solid black" }}
-                value={agendaMedico.observacoes}
+                value={agendaMedico.observacoes || ""}
                 onChange={handleEdit}
               />
             </Grid>
@@ -215,7 +219,7 @@ export const FinalizarConsulta = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={(e) => handleSave(e, agendaMedico)}
+                onClick={handleSave}
                 fullWidth
                 startIcon={<ContentPasteGoIcon />}
               >

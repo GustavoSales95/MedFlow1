@@ -6,8 +6,7 @@ import Router from "./app/routes";
 import { RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import theme from "./app/theme/theme";
-import { AppProvider } from "./app/shared/contexts/AppContext"; // 🔥 não esqueça do import!
-import App from "./App";
+import { AppProvider } from "./app/shared/contexts/AppContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -20,5 +19,6 @@ root.render(
     </ThemeProvider>
   </React.StrictMode>
 );
+
 
 reportWebVitals();

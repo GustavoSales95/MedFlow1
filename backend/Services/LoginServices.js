@@ -5,9 +5,10 @@ const prisma = new PrismaClient();
 
 export const loginService = {
   login: async (email, senha) => {
-    console.log("Tentando logar com email:", email);
-
-    const usuario = await prisma.usuarios.findUnique({ where: { email } });
+    const usuario = await prisma.usuarios.findUnique({
+      where: { email },
+      include: { Medicos: true },
+    });
 
     if (!usuario) {
       console.log("Usuário não encontrado");
@@ -29,6 +30,7 @@ export const loginService = {
         nome: usuario.nome,
         email: usuario.email,
         perfil_id: usuario.perfil_id,
+        crm: usuario.Medicos?.crm || null,
       },
     ];
   },

@@ -11,10 +11,16 @@ router.post("/", async (request, response) => {
     const login = await loginService.login(email, senha);
 
     if (login.length > 0) {
-      const { id_usuario, nome, email, perfil_id } = login[0];
+      const { id_usuario, nome, email, perfil_id, crm } = login[0];
 
       // Gera o token JWT com dados seguros (sem senha!)
-      const token = generateToken({ id: id_usuario, nome, email, perfil_id });
+      const token = generateToken({
+        id: id_usuario,
+        nome,
+        email,
+        perfil_id,
+        crm,
+      });
 
       return response.status(200).send({ token });
     } else {

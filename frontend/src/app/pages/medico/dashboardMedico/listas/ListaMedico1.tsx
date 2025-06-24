@@ -7,9 +7,7 @@ import List from "@mui/material/List";
 import { Link } from "react-router-dom";
 
 //Icones
-import InsertInvitationIcon from "@mui/icons-material/InsertInvitation";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import PersonSearchIcon from "@mui/icons-material/PersonSearch";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
@@ -63,7 +61,7 @@ export const ListaMedico1 = () => {
           }}
         >
           <ListItemIcon>{<PendingActionsIcon />}</ListItemIcon>
-          <ListItemText primary={"Consultar Agendamentos"} />
+          <ListItemText primary={"Meus Agendamentos"} />
         </ListItemButton>
       </ListItem>
 
@@ -97,7 +95,7 @@ export const ListaMedico1 = () => {
           }}
         >
           <ListItemIcon>{<CalendarMonthIcon />}</ListItemIcon>
-          <ListItemText primary={"Consultar Escala"} />
+          <ListItemText primary={"Minha Escala"} />
         </ListItemButton>
       </ListItem>
       <ListItem key={2} disablePadding>
