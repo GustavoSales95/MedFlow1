@@ -64,6 +64,32 @@ const formatarDataHora = (dataHora: string | Date) => {
   };
 }
 
+function nextWeekday(from: Date, targetDow: number): Date {
+  const todayDow = from.getDay();
+  // diferença até o target; se for 0, delta = 0
+  const delta = (targetDow - todayDow + 7) % 7;
+  const result = new Date(from);
+  result.setDate(from.getDate() + delta);
+  return result;
+}
+
+const WEEKDAYS = {
+  segunda: 1,
+  terca:   2,
+  quarta:  3,
+  quinta:  4,
+  sexta:   5,
+  sabado:  6,
+  domingo: 0,
+} as const;
+
+function getNextWeekdays(from = new Date()) {
+  const obj: Record<keyof typeof WEEKDAYS, Date> = {} as any;
+  for (const [name, idx] of Object.entries(WEEKDAYS)) {
+    obj[name as keyof typeof WEEKDAYS] = nextWeekday(from, idx);
+  }
+  return obj;
+}
 
 
-export { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus, insertMaskHora, formatarDataHora }
+export { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus, insertMaskHora, formatarDataHora, getNextWeekdays }

@@ -102,14 +102,16 @@ route.get("/EditarEscala", async (req, resp) => {
 
   if (cpf) {
     const user = await service.buscarUsuarios(cpf);
+    const agenda = await service.buscarAgenda(user.medico.id_medico);
 
-    return resp.status(200).json({ message: user });
+    return resp.status(200).json({ message: user, agenda });
   }
 
   if (crm) {
     const user = await service.buscarMedico(crm);
+    const agenda = await service.buscarAgenda(user.medico.id_medico);
 
-    return resp.status(200).json({ message: user });
+    return resp.status(200).json({ message: user, agenda: agenda });
   }
 
   if (dia) {

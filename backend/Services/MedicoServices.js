@@ -25,6 +25,7 @@ async function buscarProntuario(cpf) {
 
   const prontuario = await prisma.prontuario.findUnique({
     where: { paciente_id: paciente.id_paciente },
+    include: { consultas: true }
   });
 
   return prontuario;
@@ -133,6 +134,22 @@ export async function criarReceita(cpf, crm, conteudo, orientacoes) {
   });
   return receita;
 }
+
+async function buscarConsultaId(id_consulta) {
+  const consulta = await prisma.consultas.findUnique({
+    where: { id_consulta: Number(id_consulta)},
+    include: { agendamentos: true }
+  });
+  return consulta  
+}
+
+async function buscarMedicoId(id_medico) {
+  const medico = await prisma.medicos.findUnique({
+    where: { id_medico: Number(id_medico)}
+  });
+  return medico  
+}
+
 export default {
   criarReceita,
   buscarPaciente,
@@ -142,4 +159,6 @@ export default {
   buscarAgenda,
   buscarConsulta,
   editarConsulta,
+  buscarConsultaId,
+  buscarMedicoId
 };

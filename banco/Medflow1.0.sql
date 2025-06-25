@@ -43,30 +43,35 @@ CREATE TABLE medicos (
 CREATE TABLE escala (
 	id_escala int auto_increment PRIMARY KEY,
 	id_medico INT UNIQUE NOT NULL,
-    segunda ENUM('Escalado', 'Folga'),
+    segunda ENUM('Escalado', 'Folga') DEFAULT 'Folga',
     segunda_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
-    terca ENUM('Escalado', 'Folga'),
+    terca ENUM('Escalado', 'Folga') DEFAULT 'Folga',
     terca_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
-    quarta ENUM('Escalado', 'Folga'),
+    quarta ENUM('Escalado', 'Folga') DEFAULT 'Folga',
     quarta_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
-    quinta ENUM('Escalado', 'Folga'),
+    quinta ENUM('Escalado', 'Folga') DEFAULT 'Folga',
     quinta_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
-    sexta ENUM('Escalado', 'Folga'),
+    sexta ENUM('Escalado', 'Folga') DEFAULT 'Folga',
     sexta_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
-    sabado ENUM('Escalado', 'Folga'),
+    sabado ENUM('Escalado', 'Folga') DEFAULT 'Folga',
     sabado_horario VARCHAR(13) DEFAULT "09:00 - 17:00",
-    domingo ENUM('Escalado', 'Folga'),
+    domingo ENUM('Escalado', 'Folga') DEFAULT 'Folga',
     domingo_horario VARCHAR(13) DEFAULT "09:00 - 17:00"
 );
 
+
+
+
 CREATE TABLE prontuario(
+  id_prontuario int auto_increment PRIMARY KEY,
 	paciente_id int unique not null,
-	alergias varchar(50),
-    tipo_sanguineo varchar(14),
-    medicamentos varchar(255),
-    cirurgias varchar(255),
-    doencas_infecciosas varchar(50),
-    FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente)
+  alergias varchar(50),
+  tipo_sanguineo varchar(14),
+  medicamentos varchar(255),
+  cirurgias varchar(255),
+  doencas_infecciosas varchar(50),
+  observacoes varchar(500),
+  FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente)
 );
 
 CREATE TABLE agendamentos (
@@ -79,15 +84,19 @@ CREATE TABLE agendamentos (
     FOREIGN KEY (paciente_id) REFERENCES pacientes(id_paciente),
     FOREIGN KEY (medico_id) REFERENCES medicos(id_medico)
 );
+
 CREATE TABLE consultas (
     id_consulta int auto_increment PRIMARY KEY,
     agendamento_id INT UNIQUE NOT NULL,
+    prontuario_id INT NOT NULL,
     descricao varchar(255),
     receita varchar(255),
     observacoes varchar(255),
     data_consulta datetime,
-    FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id_agendamento)
+    FOREIGN KEY (agendamento_id) REFERENCES agendamentos(id_agendamento),
+    FOREIGN KEY (prontuario_id) REFERENCES prontuario(id_prontuario)
 );
+
 CREATE TABLE produtos (
     id_produto INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
@@ -195,18 +204,8 @@ END;
 //
 DELIMITER ;
 
-DELIMITER //
-CREATE EVENT trg_validade_expirada
-ON SCHEDULE
-	EVERY 24 HOUR
-    COMMENT 'Verificação de validade'
-    DO UPDATE estoque_produto SET deletado = "Sim"
-    WHERE validade < CURDATE();
-//
-DELIMITER ;
 
-
-INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Admin'),(2, 'Comum'),(3, 'Medico');
+INSERT INTO perfis (id_perfis, tipo) VALUES (1, 'Admin'),(2, 'Comum'),(3, 'Medico'),(4, 'Estoque');
 
 INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("David Ramos", "david@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676835", "2004-12-25", 1);
 
@@ -216,6 +215,8 @@ INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUE
 INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Médico Teste", "medico@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676832", "1990-02-22", 3);
 
 INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Comum Teste", "comum@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676833", "1990-02-22", 2);
+
+INSERT INTO usuarios (nome, email, senha, cpf, data_nascimento, perfil_id) VALUES ("Estoque Teste", "estoque@gmail.com", "$2b$10$wzr/1Ia8QOKWyRKdw78Soels4kqQLkRM7rUdOuzQraiGzytaMlPMu", "41143676834", "1990-02-22", 4);
 
 INSERT INTO medicos (usuario_id, crm, especialidade, telefone) Values (3, "123456", "Cardiologista", "11992382152");
 
@@ -250,15 +251,15 @@ VALUES
 DELIMITER //
 CREATE EVENT trg_validade_proxima
 ON SCHEDULE
-	EVERY 1 second
+	EVERY 24 HOUR
     COMMENT 'Verificação de validade'
-    DO UPDATE estoque_produto SET vencimento_proximo = "Sim"
+    DO UPDATE produto_estoque SET vencimento_proximo = "Sim"
     WHERE validade <= DATE_ADD(CURDATE(), INTERVAL 60 DAY);
 //
 DELIMITER ;
 
 
-select * from perfis;
+/*select * from perfis;
 select * from usuarios;
 select * from pacientes;
 select * from medicos;

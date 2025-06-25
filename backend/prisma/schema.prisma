@@ -53,19 +53,19 @@ enum Status {
 model Escala {
   id_escala       Int      @id @default(autoincrement())
   id_medico       Int      @unique
-  segunda         Status
+  segunda         Status   @default(Folga)
   segunda_horario String?  @default("09:00 - 17:00") @db.VarChar(13)
-  terca           Status
+  terca           Status   @default(Folga)
   terca_horario   String?  @default("09:00 - 17:00") @db.VarChar(13)
-  quarta          Status
+  quarta          Status   @default(Folga)
   quarta_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
-  quinta          Status
+  quinta          Status   @default(Folga)
   quinta_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
-  sexta           Status
+  sexta           Status   @default(Folga)
   sexta_horario   String?  @default("09:00 - 17:00") @db.VarChar(13)
-  sabado          Status
+  sabado          Status   @default(Folga)
   sabado_horario  String?  @default("09:00 - 17:00") @db.VarChar(13)
-  domingo         Status
+  domingo         Status   @default(Folga)
   domingo_horario String?  @default("09:00 - 17:00") @db.VarChar(13)
 
   Medico          Medicos  @relation(fields: [id_medico], references: [id_medico])
@@ -89,20 +89,17 @@ model Pacientes {
 }
 
 model Prontuario {
+  id_prontuario       Int      @id @default(autoincrement())
   paciente_id         Int     @unique
   alergias            String? @db.VarChar(50)
   tipo_sanguineo      String? @db.VarChar(14)
   medicamentos        String? @db.VarChar(255)
   cirurgias           String? @db.VarChar(255)
   doencas_infecciosas String? @db.VarChar(50)
+  observacoes         String? @db.VarChar(500)
 
-  Pacientes         Pacientes @relation(fields: [paciente_id], references: [id_paciente])
-}
-
-enum Situacao {
-  Agendado   @map("Agendado")
-  Cancelado  @map("Cancelado")
-  Concluido  @map("Concluído")
+  Pacientes           Pacientes @relation(fields: [paciente_id], references: [id_paciente])
+  consultas           Consultas[]
 }
 
 model Agendamentos {
@@ -118,19 +115,27 @@ model Agendamentos {
   Consultas  Consultas?
 }
 
-
-
 model Consultas {
   id_consulta    Int         @id @default(autoincrement())
   agendamento_id Int         @unique
+  prontuario_id  Int         
   descricao      String?     @db.VarChar(255)
   receita        String?     @db.VarChar(255)
   observacoes    String?     @db.VarChar(255)
   data_consulta  DateTime?
 
+  prontuario    Prontuario   @relation(fields: [prontuario_id], references: [id_prontuario])
   agendamentos  Agendamentos @relation(fields: [agendamento_id], references: [id_agendamento])
   EntradaSaidas EntradaSaida[]
 }
+
+
+enum Situacao {
+  Agendado   @map("Agendado")
+  Cancelado  @map("Cancelado")
+  Concluido  @map("Concluído")
+}
+
 
 enum Temperatura {
   PERECIVEL

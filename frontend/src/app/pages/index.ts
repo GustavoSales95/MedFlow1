@@ -29,3 +29,4 @@ export { Agendamentos } from "./medico/agenda/Agendamentos";
 export { FinalizarConsulta } from "./medico/agenda/FinalizarConsulta";
 export { ConsultarEscala } from "./medico/agenda/ConsultarEscala";
 export { CriarReceita } from "./medico/receita/CriarReceita";
+export { Consulta } from "./medico/Cadastros/Consulta";

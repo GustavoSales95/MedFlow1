@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../../../services/api";
-import { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus } from '../../../functions/InsertMasks';
+import { insertMaskCpf, insertMaskTel, insertMaskCep, insertMaskSus, formatarDataHora } from '../../../functions/InsertMasks';
 import {
   TextField,
   Button,
@@ -18,10 +18,12 @@ import {
   Paper,
   FormControlLabel,
   Checkbox,
+  Grid2,
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import { useNavigate } from "react-router-dom";
 
 interface Pacientes {
   id_paciente: number;
@@ -34,16 +36,29 @@ interface Pacientes {
   data_nascimento: string;
 }
 
+interface Consulta {
+  id_consulta: number;
+  agendamento_id: number;
+  prontuario_id: number;
+  descricao: string;
+  receita: string;
+  observacoes?: string;
+  data_consulta: string;
+}
+
 interface Prontuario {
+  prontuario_id: number;
   paciente_id?: number;
   alergias?: string;
   tipo_sanguineo?: string;
   medicamentos?: string;
   cirurgias?: string;
   doencas_infecciosas?: string;
+  consultas: Consulta[];
 }
 
 export const ConsultarProntuario = () => {
+  const navigate = useNavigate();
   const [cpf, setCpf] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -92,6 +107,8 @@ export const ConsultarProntuario = () => {
 
   const handleEdit = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    if (!formData) { return }
 
     setFormData({ ...formData, [name]: value });
   }
@@ -160,7 +177,7 @@ export const ConsultarProntuario = () => {
       </Grid>
 
       {prontuario && !startEdit && (
-        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
+        <><Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
           <Typography variant="h4" align="center" marginBottom={1.5}>
             Prontuário Médico
           </Typography>
@@ -185,11 +202,11 @@ export const ConsultarProntuario = () => {
                 </Grid>
                 <Grid item sm={6} md={6}>
 
-                  <Typography sx={{fontSize: 18,}}>Cartão do SUS</Typography>
+                  <Typography sx={{ fontSize: 18, }}>Cartão do SUS</Typography>
                   <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskSus(paciente.cartao_sus) || "Não informado"}</Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Data de Nascimento</Typography>
+                  <Typography sx={{ fontSize: 18, }}>Data de Nascimento</Typography>
                   <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{formatarData(paciente.data_nascimento)}</Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
@@ -199,11 +216,11 @@ export const ConsultarProntuario = () => {
                   </Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>CEP</Typography>
+                  <Typography sx={{ fontSize: 18, }}>CEP</Typography>
                   <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskCep(paciente.cep) || "Não informado"}</Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Endereço</Typography>
+                  <Typography sx={{ fontSize: 18, }}>Endereço</Typography>
                   <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.endereco || "Não informado"}</Typography>
                 </Grid>
               </>
@@ -211,7 +228,7 @@ export const ConsultarProntuario = () => {
           </Grid>
 
           <Typography variant="h5" marginTop={3} marginBottom={1}>
-            Histórico
+            Informações Médicas
           </Typography>
           <Grid container spacing={2}>
             <>
@@ -255,7 +272,7 @@ export const ConsultarProntuario = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={()=>setStartEdit(true)}
+                  onClick={() => setStartEdit(true)}
                   fullWidth
                   startIcon={<EditIcon />}
                 >
@@ -266,10 +283,60 @@ export const ConsultarProntuario = () => {
             </>
           </Grid>
         </Paper>
+        < Grid>
+          <Typography variant="h4" marginTop={7} marginBottom={1} textAlign={'center'}>
+            Histórico
+          </Typography>
+
+          <Box sx={{ display: "flex", flexWrap: "nowrap", overflow: "scroll", width: "100%" }}>
+            {prontuario.consultas.length > 0 ? (
+              prontuario.consultas.map((consulta) => {
+                const dataHora = formatarDataHora(consulta.data_consulta);
+                return (
+                  <Paper
+                    key={consulta.id_consulta}
+                    elevation={3}
+                    sx={{
+                      flex: "0 0 30%",  // Garante 40% da largura do pai sem encolher
+                      padding: 3,
+                      margin: 3,
+                      boxSizing: "border-box",
+                      display: "flex",
+                      flexWrap: "wrap"
+                    }}
+                  >
+                    <Grid2>
+                      {dataHora.data}
+                    </Grid2>
+                    <Grid2 sx={{ marginTop: 1.3 }}>
+                      <Typography sx={{ fontSize: 16, padding: 0.7 }}>
+                        {consulta.descricao || "Consulta esperando para ser finalizada"}
+                      </Typography>
+                    </Grid2>
+                    <Grid2 sx={{ marginTop: 2, marginLeft: 0.8, }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => navigate(`/Medico/Consulta/${consulta.id_consulta}`)}
+                      >
+                        Ver detalhes
+                      </Button>
+                    </Grid2>
+                  </Paper>
+                );
+              })
+            ) : (
+              <Paper elevation={4}>
+                <Typography>Paciente não possui histórico no momento</Typography>
+              </Paper>
+            )}
+          </Box>
+        </Grid>
+        </>
       )}
 
       {prontuario && startEdit && (
-        <Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
+        <><Paper elevation={3} sx={{ padding: 3, marginTop: 3 }}>
           <Typography variant="h4" align="center" marginBottom={1.5}>
             Prontuário Médico
           </Typography>
@@ -294,11 +361,11 @@ export const ConsultarProntuario = () => {
                 </Grid>
                 <Grid item sm={6} md={6}>
 
-                  <Typography sx={{fontSize: 18,}}>Cartão do SUS</Typography>
+                  <Typography sx={{ fontSize: 18, }}>Cartão do SUS</Typography>
                   <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskSus(paciente.cartao_sus) || "Não informado"}</Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Data de Nascimento</Typography>
+                  <Typography sx={{ fontSize: 18, }}>Data de Nascimento</Typography>
                   <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{formatarData(paciente.data_nascimento)}</Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
@@ -308,11 +375,11 @@ export const ConsultarProntuario = () => {
                   </Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>CEP</Typography>
+                  <Typography sx={{ fontSize: 18, }}>CEP</Typography>
                   <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{insertMaskCep(paciente.cep) || "Não informado"}</Typography>
                 </Grid>
                 <Grid item sm={6} md={6}>
-                  <Typography sx={{fontSize: 18,}}>Endereço</Typography>
+                  <Typography sx={{ fontSize: 18, }}>Endereço</Typography>
                   <Typography sx={{ fontSize: 16, padding: 0.7, border: 1 }}>{paciente.endereco || "Não informado"}</Typography>
                 </Grid>
               </>
@@ -320,85 +387,70 @@ export const ConsultarProntuario = () => {
           </Grid>
 
           <Typography variant="h5" marginTop={3} marginBottom={1}>
-            Histórico
+            Informações médicas
           </Typography>
           <Grid container spacing={2}>
             <>
               <Grid item sm={6} md={6}>
-                  <Typography sx={{ fontSize: 18 }}>Alergias</Typography>
-                  <TextField
-                    name="alergias"
-                    variant="standard"
-                    fullWidth
-                    size="small"
-                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
-                    value={
-                      formData?.alergias
-                    }
-                    onChange={handleEdit}
-                  />
+                <Typography sx={{ fontSize: 18 }}>Alergias</Typography>
+                <TextField
+                  name="alergias"
+                  variant="standard"
+                  fullWidth
+                  size="small"
+                  sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                  value={formData?.alergias}
+                  onChange={handleEdit} />
               </Grid>
               <Grid item sm={6} md={6}>
                 <Typography sx={{ fontSize: 18 }}>
                   Doenças Infecciosas
                 </Typography>
                 <TextField
-                    name="doencas_infecciosas"
-                    variant="standard"
-                    fullWidth
-                    size="small"
-                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
-                    value={
-                      formData?.doencas_infecciosas
-                    }
-                    onChange={handleEdit}
-                  />
+                  name="doencas_infecciosas"
+                  variant="standard"
+                  fullWidth
+                  size="small"
+                  sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                  value={formData?.doencas_infecciosas}
+                  onChange={handleEdit} />
               </Grid>
               <Grid item sm={6} md={6}>
                 <Typography sx={{ fontSize: 18 }}>
                   Medicamentos de Uso Contínuo
                 </Typography>
                 <TextField
-                    name="medicamentos"
-                    variant="standard"
-                    fullWidth
-                    size="small"
-                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
-                    value={
-                      formData?.medicamentos
-                    }
-                    onChange={handleEdit}
-                  />
+                  name="medicamentos"
+                  variant="standard"
+                  fullWidth
+                  size="small"
+                  sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                  value={formData?.medicamentos}
+                  onChange={handleEdit} />
               </Grid>
               <Grid item sm={6} md={6}>
                 <Typography sx={{ fontSize: 18 }}>
                   Cirurgias Anteriores
                 </Typography>
                 <TextField
-                    name="cirurgias"
-                    variant="standard"
-                    fullWidth
-                    size="small"
-                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
-                    value={
-                      formData?.cirurgias
-                    }
-                    onChange={handleEdit}
-                  />
+                  name="cirurgias"
+                  variant="standard"
+                  fullWidth
+                  size="small"
+                  sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                  value={formData?.cirurgias}
+                  onChange={handleEdit} />
               </Grid>
               <Grid item sm={6} md={6}>
                 <Typography sx={{ fontSize: 18 }}>Tipo Sanguíneo</Typography>
                 <TextField
-                    name="tipo_sanguineo"
-                    variant="standard"
-                    fullWidth
-                    size="small"
-                    sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
-                    value={
-                      formData?.tipo_sanguineo
-                    }
-                    onChange={handleEdit}
-                  />
+                  name="tipo_sanguineo"
+                  variant="standard"
+                  fullWidth
+                  size="small"
+                  sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}
+                  value={formData?.tipo_sanguineo}
+                  onChange={handleEdit} />
               </Grid>
               <Grid item sm={6} md={6} sx={{ alignContent: 'center' }}>
                 <Button
@@ -413,7 +465,51 @@ export const ConsultarProntuario = () => {
               </Grid>
             </>
           </Grid>
-        </Paper>
+        </Paper><Grid>
+            <Typography variant="h4" marginTop={7} marginBottom={1} textAlign={'center'}>
+              Histórico
+            </Typography>
+
+            <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+              {prontuario.consultas.length > 0 ? (
+                prontuario.consultas.map((consulta) => {
+                  const dataHora = formatarDataHora(consulta.data_consulta);
+
+                  return (
+                    <Paper
+                      key={consulta.id_consulta}
+                      elevation={3}
+                      sx={{ padding: 3, margin: 3, width: "27%", display: "flex", flexWrap: "wrap" }}
+                    >
+                      <Grid2>
+                        {dataHora.data}
+                      </Grid2>
+                      <Grid2 sx={{ marginTop: 1.3 }}>
+                        <Typography sx={{ fontSize: 16, padding: 0.7 }}>
+                          {consulta.descricao || "Consulta esperando para ser finalizada"}
+                        </Typography>
+                      </Grid2>
+                      <Grid2 sx={{ marginTop: 2, marginLeft: 0.8 }}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() =>
+                          navigate(`/Medico/Consulta/${consulta.id_consulta}`)
+                        }>
+                          Ver detalhes
+                        </Button>
+                      </Grid2>
+                    </Paper>
+                  );
+                })
+              ) : (
+                <Paper elevation={4}>
+                  <Typography>Paciente não possui histórico no momento</Typography>
+                </Paper>
+              )}
+            </Box>
+          </Grid></>
+        
       )}
 
       <Snackbar

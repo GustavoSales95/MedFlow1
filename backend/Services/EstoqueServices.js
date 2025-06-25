@@ -9,7 +9,6 @@ async function registroProduto(
   embalagem,
   unidade_medida,
   temperatura,
-  quantidade
 ) {
   if (!temperatura) {
     throw new Error("Temperatura não fornecida.");
@@ -23,7 +22,7 @@ async function registroProduto(
   }
 
   const valorNumerico = parseFloat(valor);
-  const quantidadeNumero = parseInt(quantidade);
+
 
   const novoProduto = await prisma.produtos.create({
     data: {
@@ -168,6 +167,7 @@ async function listarReceitas() {
     throw new Error("Erro ao buscar receitas");
   }
 }
+
 async function fecharReceita(id_receita) {
   try {
     const receitaAtualizada = await prisma.receitas.update({
@@ -188,19 +188,15 @@ async function realizarRetirada(
   retiradoPor,
   consultaRealizada
 ) {
-  const agendamento_id = parseInt(consultaRealizada);
+  const id_consulta = parseInt(consultaRealizada);
   const id_paciente = parseInt(retiradoPara);
   const quantidade = parseInt(quantidadeRetirada);
 
   const medico = await prisma.medicos.findUnique({
     where: { crm: retiradoPor },
   });
-  const consulta = await prisma.consultas.findUnique({
-    where: { agendamento_id },
-  });
 
   const id = parseInt(id_produto_estoque);
-  const id_consulta = consulta.id_consulta;
   const id_medico = medico.id_medico;
 
   const saida = await prisma.entradaSaida.create({

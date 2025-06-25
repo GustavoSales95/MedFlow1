@@ -11,7 +11,8 @@ import {
   FormLabel,
   FormControl,
   Snackbar,
-  Alert
+  Alert,
+  Paper
 } from '@mui/material';
 import api from "../../../services/api";
 
@@ -51,7 +52,7 @@ export const CadastroEstoque = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
+    <Paper elevation={4} sx={{ maxWidth: 600, margin: 'auto', padding: 3 }}>
       <Typography variant="h4" gutterBottom>
         Registrar Produto
       </Typography>
@@ -142,6 +143,6 @@ export const CadastroEstoque = () => {
           {snackbarMessage}
         </Alert>
     </Snackbar>
-    </Box>
+    </Paper>
   );
 };

@@ -124,4 +124,17 @@ route.get("/BuscarPacientePorCpf", async (req, res) => {
   }
 });
 
+route.get("/Consulta/:id_consulta", async (req, res) => {
+  const { id_consulta } = req.params;
+
+  try {
+    const consulta = await service.buscarConsultaId(id_consulta)
+    const medico = await service.buscarMedicoId(consulta.agendamentos.medico_id)
+
+    return res.status(200).json({consulta: consulta, medico: medico})
+  }  catch (error) {
+    return res.status(500).json({ error: "Erro ao buscar consulta." });
+  }
+})
+
 export default route;

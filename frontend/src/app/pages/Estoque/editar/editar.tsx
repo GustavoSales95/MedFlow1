@@ -11,7 +11,8 @@ import {
   FormLabel,
   FormControl,
   Alert,
-  Snackbar
+  Snackbar,
+  Paper
 } from '@mui/material';
 import api from '../../../../services/api'; 
 
@@ -85,7 +86,7 @@ export const Editar = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: 700, margin: 'auto', padding: 3 }}>
+    <Paper elevation={4} sx={{ maxWidth: 700, margin: 'auto', padding: 3 }}>
       <Typography variant="h4" align="center" gutterBottom>
         Editar Produto
       </Typography>
@@ -150,6 +151,6 @@ export const Editar = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </Box>
+    </Paper>
   );
 };

@@ -24,7 +24,7 @@ import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import api from '../../../../services/api.js';
-import { insertMaskCpf, insertMaskHora } from '../../../functions/InsertMasks';
+import { insertMaskCpf, insertMaskHora, getNextWeekdays } from '../../../functions/InsertMasks';
 
 interface UserData {
   id_usuario: number;
@@ -56,6 +56,15 @@ interface UserData {
   }
 }
 
+interface Ageda {
+  id_agendamento: number;      
+  paciente_id:    string;
+  medico_i:       string;
+  nome_paciente:  String; 
+  data_hora:      string;
+  status:         string;
+}
+
 export const EditarEscala = () => {
   // Estados para a pesquisa
   const [searchType, setSearchType] = useState<"cpf" | "crm" | "dia">("cpf");
@@ -63,6 +72,7 @@ export const EditarEscala = () => {
   const [searchDay, setSearchDay] = useState(""); // para pesquisa por dia escalado
   const [startEdit, setStartEdit] = useState(false);
   const [users, setUsers] = useState<UserData[]>([]);
+  const [agenda, setAgenda] = useState<Ageda[]>([]);
   const [formData, setFormData] = useState<UserData[]>([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -82,6 +92,8 @@ async function getUsers(params: object) {
         setOpenSnackbar(true);
         return;
       }
+      setAgenda(response.data.agenda);
+      console.log(response.data.agenda)
       setUsers(returnedUsers);
       setFormData(returnedUsers.map(user => ({ ...user })));
     } else {
@@ -162,6 +174,30 @@ const handleEdit = (userId: number) => (e: React.ChangeEvent<HTMLInputElement>) 
 };
 
 const handleEditEscala = (userId: number, dia: string) => (e: SelectChangeEvent) => {
+  const diaSemana = getNextWeekdays();
+  const data = diaSemana[dia as keyof typeof diaSemana];
+
+  function mesmoDia(a: Date, b: Date) {
+    return (
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth()    === b.getMonth() &&
+      a.getDate()     === b.getDate()
+    );
+  }
+
+  const conflito = agenda.some((agendamento) => {
+    const dataAgendamento = new Date(agendamento.data_hora);
+
+    return mesmoDia(dataAgendamento, data);
+  });
+
+  if (conflito) {
+    setSnackbarMessage("Não é possível alterar essa escala. Médico tem um agendamento para este dia");
+    setOpenSnackbar(true);
+    return;
+  }
+
+
   const selectedValue = e.target.value;
   
   setFormData((prevFormData) =>
@@ -335,37 +371,37 @@ const handleSave = async (e: React.FormEvent, user: any) => {
               <Typography variant="h5" marginTop={3} marginBottom={1}>Escala Semanal</Typography>
               <Grid container spacing={2}>
                   <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Segunda-Feira</Typography>
+                      <Typography sx={{ fontSize: 18 }}>Segunda-Feira - {getNextWeekdays().segunda.toLocaleDateString()}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.segunda) }}>{user.medico.escala?.segunda ?? "Não definido"}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.segunda_horario ?? "Não definido"}</Typography>
                   </Grid>
                   <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Terça-Feira</Typography>
+                      <Typography sx={{ fontSize: 18 }}>Terça-Feira - {getNextWeekdays().terca.toLocaleDateString()}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.terca) }}>{user.medico.escala?.terca ?? "Não definido"}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.terca_horario ?? "Não definido"}</Typography>
                   </Grid>
                   <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Quarta-Feira</Typography>
+                      <Typography sx={{ fontSize: 18 }}>Quarta-Feira - {getNextWeekdays().quarta.toLocaleDateString()}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.quarta) }}>{user.medico.escala?.quarta ?? "Não definido"}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.quarta_horario ?? "Não definido"}</Typography>
                   </Grid>
                   <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Quinta-Feira</Typography>
+                      <Typography sx={{ fontSize: 18 }}>Quinta-Feira - {getNextWeekdays().quinta.toLocaleDateString()}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.quinta ) }}>{user.medico.escala?.quinta ?? "Não definido"}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.quinta_horario ?? "Não definido"}</Typography>
                   </Grid>
                   <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Sexta-Feira</Typography>
+                      <Typography sx={{ fontSize: 18 }}>Sexta-Feira - {getNextWeekdays().sexta.toLocaleDateString()}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.sexta) }}>{user.medico.escala?.sexta ?? "Não definido"}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.sexta_horario ?? "Não definido"}</Typography>
                   </Grid>
                   <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Sábado</Typography>
+                      <Typography sx={{ fontSize: 18 }}>Sábado - {getNextWeekdays().sabado.toLocaleDateString()}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.sabado) }}>{user.medico.escala?.sabado ?? "Não definido"}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.sabado_horario ?? "Não definido"}</Typography>
                   </Grid>
                   <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Domingo</Typography>
+                      <Typography sx={{ fontSize: 18 }}>Domingo - {getNextWeekdays().domingo.toLocaleDateString()}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black', color: corEscala(user.medico.escala?.domingo) }}>{user.medico.escala?.domingo ?? "Não definido"}</Typography>
                       <Typography sx={{ fontSize: 16, padding: 0.7, border: '1px solid black' }}>{user.medico.escala?.domingo_horario ?? "Não definido"}</Typography>
                   </Grid>
@@ -408,7 +444,7 @@ const handleSave = async (e: React.FormEvent, user: any) => {
               <Typography variant="h5" marginTop={3} marginBottom={1}>Escala Semanal</Typography>
               <Grid container spacing={2}>
                   <Grid item sm={6} md={6}>
-                      <Typography sx={{ fontSize: 18 }}>Segunda-Feira</Typography>
+                      <Typography sx={{ fontSize: 18 }}>Segunda-Feira - {getNextWeekdays().segunda.toLocaleDateString()}</Typography>
                       <FormControl fullWidth variant="standard">
                         <Select
                           name="segunda"
@@ -434,7 +470,7 @@ const handleSave = async (e: React.FormEvent, user: any) => {
                       />
                   </Grid>
                   <Grid item sm={6} md={6}>
-                    <Typography sx={{ fontSize: 18 }}>Terça-Feira</Typography>
+                    <Typography sx={{ fontSize: 18 }}>Terça-Feira - {getNextWeekdays().terca.toLocaleDateString()}</Typography>
                     <FormControl fullWidth variant="standard">
                       <Select
                         name="terca"
@@ -460,7 +496,7 @@ const handleSave = async (e: React.FormEvent, user: any) => {
                     />
                   </Grid>
                   <Grid item sm={6} md={6}>
-                    <Typography sx={{ fontSize: 18 }}>Quarta-Feira</Typography>
+                    <Typography sx={{ fontSize: 18 }}>Quarta-Feira - {getNextWeekdays().quarta.toLocaleDateString()}</Typography>
                     <FormControl fullWidth variant="standard">
                       <Select
                         name="quarta"
@@ -486,7 +522,7 @@ const handleSave = async (e: React.FormEvent, user: any) => {
                     />
                   </Grid>
                   <Grid item sm={6} md={6}>
-                    <Typography sx={{ fontSize: 18 }}>Quinta-Feira</Typography>
+                    <Typography sx={{ fontSize: 18 }}>Quinta-Feira - {getNextWeekdays().quinta.toLocaleDateString()}</Typography>
                     <FormControl fullWidth variant="standard">
                       <Select
                         name="quinta"
@@ -512,7 +548,7 @@ const handleSave = async (e: React.FormEvent, user: any) => {
                     />
                   </Grid>
                   <Grid item sm={6} md={6}>
-                    <Typography sx={{ fontSize: 18 }}>Sexta-Feira</Typography>
+                    <Typography sx={{ fontSize: 18 }}>Sexta-Feira - {getNextWeekdays().sexta.toLocaleDateString()}</Typography>
                     <FormControl fullWidth variant="standard">
                       <Select
                         name="sexta"
@@ -538,7 +574,7 @@ const handleSave = async (e: React.FormEvent, user: any) => {
                     />
                   </Grid>
                   <Grid item sm={6} md={6}>
-                    <Typography sx={{ fontSize: 18 }}>Sábado</Typography>
+                    <Typography sx={{ fontSize: 18 }}>Sábado - {getNextWeekdays().sabado.toLocaleDateString()}</Typography>
                     <FormControl fullWidth variant="standard">
                       <Select
                         name="sabado"
@@ -564,7 +600,7 @@ const handleSave = async (e: React.FormEvent, user: any) => {
                     />
                   </Grid>
                   <Grid item sm={6} md={6}>
-                    <Typography sx={{ fontSize: 18 }}>Domingo</Typography>
+                    <Typography sx={{ fontSize: 18 }}>Domingo - {getNextWeekdays().domingo.toLocaleDateString()}</Typography>
                     <FormControl fullWidth variant="standard">
                       <Select
                         name="domingo"

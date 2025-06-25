@@ -70,6 +70,19 @@ export const Marcacao = () => {
     return;
   }
 
+  const marcacaoDate = new Date(formData.data_hora);
+  
+  // Define a data de hoje sem considerar as horas
+  const hoje = new Date();
+
+  // Checa se a data de validade é menor ou igual à data atual
+  if (marcacaoDate <= hoje) {
+    setSnackbarMessage("Por favor insira uma data valida.");
+    setOpenSnackbar(true);
+    return; // Interrompe a execução se a validação falhar
+  }
+
+
   if (
   medico.Agendamentos &&
   medico.Agendamentos.find((agenda: { data_hora: string | Date }) => {

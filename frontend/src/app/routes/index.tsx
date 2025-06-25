@@ -26,6 +26,7 @@ import {
   ProdutoEstoque,
   CriarReceita,
   ListaReceitas,
+  Consulta
 } from "../pages";
 import { AppContext } from "../shared/contexts/AppContext";
 
@@ -104,6 +105,7 @@ const router = createBrowserRouter([
               { path: "FinalizarConsulta", element: <FinalizarConsulta /> },
               { path: "ConsultarEscala", element: <ConsultarEscala /> },
               { path: "CriarReceita", element: <CriarReceita /> },
+              { path: "Consulta/:id_consulta", element: <Consulta /> },
             ],
           },
         ],

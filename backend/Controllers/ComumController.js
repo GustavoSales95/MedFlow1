@@ -63,7 +63,7 @@ route.post("/", async (req, resp) => {
         const agendamento = await service.criarAgendamento(nome_paciente, data_hora, id_paciente, id_medico);
         const id_agendamento = agendamento.id_agendamento;
 
-        await service.criarConsulta(id_agendamento, data_hora);
+        await service.criarConsulta(id_agendamento, id_paciente, data_hora);
 
         return resp.status(201).json({ message: "Agendamento cadastrado com sucesso." });
     } catch (error) {

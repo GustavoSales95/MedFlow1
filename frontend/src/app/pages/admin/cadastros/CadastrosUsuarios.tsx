@@ -67,7 +67,7 @@ export const CadastrosUsuarios = () => {
       }
       else {
         setIsMedic(false);
-        setFormData({ ...formData, crm: '', especialidade: '', telefone: '', segunda: '', terca: '', quarta: '', quinta: '', sexta: '', sabado: '', domingo: '', id_perfis});
+        setFormData({ ...formData, crm: '', especialidade: '', telefone: '', segunda: 'Folga', terca: 'Folga', quarta: 'Folga', quinta: 'Folga', sexta: 'Folga', sabado: 'Folga', domingo: 'Folga', id_perfis});
       }
   }
 

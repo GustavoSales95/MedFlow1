@@ -249,6 +249,13 @@ async function editarEscala(
   });
 }
 
+async function buscarAgenda(id_medico) {
+  const agenda = await prisma.agendamentos.findMany({
+    where: { medico_id: Number(id_medico) }
+  })
+  return agenda
+}
+
 export default {
   buscarUsuarios,
   buscarMedico,
@@ -258,4 +265,5 @@ export default {
   buscarUsuarioEmail,
   criarEscala,
   editarEscala,
+  buscarAgenda
 };

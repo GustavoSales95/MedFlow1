@@ -135,6 +135,21 @@ route.post("/ProdutoEstoque/:id_produto", async (req, resp) => {
       .json({ error: "Erro ao cadastrar produto no banco de dados." });
   }
 });
+
+route.put("/Retirada/:id_produto_estoque", async (req, resp) => {
+  const { id_produto_estoque } = req.params;
+  const { quantidadeRetirada, retiradoPara, retiradoPor, consultaRealizada } = req.body;
+  try {
+    const saida = await service.realizarRetirada(id_produto_estoque, quantidadeRetirada, retiradoPara, retiradoPor, consultaRealizada);
+    const produto_estoque = await service.retiradaProduto(id_produto_estoque, quantidadeRetirada)
+    return resp.status(201).json(req.body);
+  } catch (error) {
+    console.error("Erro ao cadastrar produto:", error);
+    return resp.status(400).json({ error: "Erro ao cadastrar produto no banco de dados." });
+  }
+});
+
+
 route.get("/Receitas", async (req, res) => {
   try {
     const receitas = await service.listarReceitas();

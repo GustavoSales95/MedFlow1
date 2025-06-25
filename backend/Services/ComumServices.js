@@ -86,11 +86,14 @@ async function criarAgendamento(nome_paciente, data_hora, id_paciente, id_medico
     return agendamento;
 }
 
-async function criarConsulta(id_agendamento, data_hora) {
+async function criarConsulta(id_agendamento, id_paciente, data_hora) {
     await prisma.consultas.create({
         data: {
             agendamentos: {
                 connect: { id_agendamento }
+            },
+            prontuario: { 
+                connect: { paciente_id: id_paciente} 
             },
             descricao: '',
             receita: '',
