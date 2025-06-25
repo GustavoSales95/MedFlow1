@@ -45,7 +45,7 @@ export const ListaMedico1 = () => {
           }}
         >
           <ListItemIcon>{<PersonAddIcon />}</ListItemIcon>
-          <ListItemText primary={"Consultar Prontuario"} />
+          <ListItemText primary={"Consultar Prontuário"} />
         </ListItemButton>
       </ListItem>
       <ListItem key={2} disablePadding>

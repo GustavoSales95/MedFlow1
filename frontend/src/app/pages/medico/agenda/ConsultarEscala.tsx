@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Typography, Grid, Box, Snackbar, Alert, Paper } from "@mui/material";
 import api from "../../../../services/api.js";
 import { AppContext } from "../../../shared/contexts/AppContext";
-import { getNextWeekdays } from "../../../functions/InsertMasks.js";
+import { getNextWeekdays } from "../../../functions/InsertMasks";
 
 interface UserData {
   id_usuario: number;
@@ -92,13 +92,13 @@ export const ConsultarEscala = () => {
 
           <Grid container spacing={2}>
             {[
-              ["Segunda-Feira", escala?.segunda, escala?.segunda_horario],
-              ["Terça-Feira", escala?.terca, escala?.terca_horario],
-              ["Quarta-Feira", escala?.quarta, escala?.quarta_horario],
-              ["Quinta-Feira", escala?.quinta, escala?.quinta_horario],
-              ["Sexta-Feira", escala?.sexta, escala?.sexta_horario],
-              ["Sábado", escala?.sabado, escala?.sabado_horario],
-              ["Domingo", escala?.domingo, escala?.domingo_horario],
+              [`Segunda-Feira - ${getNextWeekdays().segunda.toLocaleDateString()}`, escala?.segunda, escala?.segunda_horario],
+              [`Terça-Feira - ${getNextWeekdays().terca.toLocaleDateString()}`, escala?.terca, escala?.terca_horario],
+              [`Quarta-Feira - ${getNextWeekdays().quarta.toLocaleDateString()}`, escala?.quarta, escala?.quarta_horario],
+              [`Quinta-Feira - ${getNextWeekdays().quinta.toLocaleDateString()}`, escala?.quinta, escala?.quinta_horario],
+              [`Sexta-Feira - ${getNextWeekdays().sexta.toLocaleDateString()}`, escala?.sexta, escala?.sexta_horario],
+              [`Sábado - ${getNextWeekdays().sabado.toLocaleDateString()}`, escala?.sabado, escala?.sabado_horario],
+              [`Domingo - ${getNextWeekdays().domingo.toLocaleDateString()}`, escala?.domingo, escala?.domingo_horario],
             ].map(([dia, status, horario]) => (
               <Grid item sm={6} md={6} key={dia}>
                 <Typography sx={{ fontSize: 18 }}>{dia}</Typography>

@@ -23,7 +23,7 @@ export function DashboardMedico() {
       >
         <Toolbar sx={{ backgroundColor: "blue" }}>
           <Typography variant="h6" noWrap component="div">
-            Pagina Inicial
+            Médico
           </Typography>
         </Toolbar>
       </AppBar>

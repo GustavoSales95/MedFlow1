@@ -130,6 +130,10 @@ export const Agendamentos = () => {
                       variant="contained"
                       size="small"
                       sx={{ backgroundColor: "orange" }}
+                      onClick={() =>
+                        navigate(`/Medico/Consulta/${agendamento.id_agendamento}`, {
+                        })
+                      }
                     >
                       Consultar
                     </Button>

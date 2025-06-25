@@ -23,7 +23,7 @@ export function DashboardAdmin() {
       >
         <Toolbar sx={{ backgroundColor: "Red" }}>
           <Typography variant="h6" noWrap component="div">
-            Pagina Inicial
+            Administrador
           </Typography>
         </Toolbar>
       </AppBar>

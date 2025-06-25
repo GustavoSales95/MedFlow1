@@ -24,7 +24,7 @@ export function Dashboard() {
       >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Pagina Inicial
+            Página Inicial
           </Typography>
         </Toolbar>
       </AppBar>
